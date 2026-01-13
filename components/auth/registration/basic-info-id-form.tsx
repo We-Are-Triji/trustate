@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PasswordMeter } from "./password-meter";
+import { PasswordMeter } from "@/components/auth/shared/password-meter";
 import { validators } from "@/lib/validation";
 import { PH_VALID_IDS, type BasicInfoData, type PhilippineID } from "@/lib/types/registration";
 

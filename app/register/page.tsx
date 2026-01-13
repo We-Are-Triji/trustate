@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { RegistrationContainer } from "@/components/auth/registration-container";
-import { RegistrationStepper } from "@/components/auth/registration-stepper";
-import { BasicInfoIdForm } from "@/components/auth/basic-info-id-form";
-import { FaceVerificationContent } from "@/components/auth/face-verification-content";
-import { AccountTypeContent } from "@/components/auth/account-type-content";
-import { AgentVerificationForm } from "@/components/auth/agent-verification-form";
-import { BrokerCredentialsForm } from "@/components/auth/broker-credentials-form";
-import { BrokerTypeContent } from "@/components/auth/broker-type-content";
-import { FirmLegitimacyContent } from "@/components/auth/firm-legitimacy-content";
-import { PendingApprovalScreen } from "@/components/auth/pending-approval-screen";
-import { VerificationChoiceModal } from "@/components/auth/verification-choice-modal";
-import { OtpVerificationModal } from "@/components/auth/otp-verification-modal";
+import { RegistrationContainer } from "@/components/auth/registration/registration-container";
+import { RegistrationStepper } from "@/components/auth/registration/registration-stepper";
+import { BasicInfoIdForm } from "@/components/auth/registration/basic-info-id-form";
+import { FaceVerificationContent } from "@/components/auth/registration/face-verification-content";
+import { AccountTypeContent } from "@/components/auth/registration/account-type-content";
+import { AgentVerificationForm } from "@/components/auth/registration/agent-verification-form";
+import { BrokerCredentialsForm } from "@/components/auth/registration/broker-credentials-form";
+import { BrokerTypeContent } from "@/components/auth/registration/broker-type-content";
+import { FirmLegitimacyContent } from "@/components/auth/registration/firm-legitimacy-content";
+import { PendingApprovalScreen } from "@/components/auth/registration/pending-approval-screen";
+import { VerificationChoiceModal } from "@/components/auth/registration/verification-choice-modal";
+import { OtpVerificationModal } from "@/components/auth/registration/otp-verification-modal";
 import type {
   AccountType,
   BasicInfoData,
