@@ -8,12 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { BrokerLicenseData } from "@/lib/types/registration";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface BrokerLicenseFormProps {
   onComplete: (data: BrokerLicenseData) => void;
   onBack: () => void;
+  onDevBypass?: () => void;
 }
 
-export function BrokerLicenseForm({ onComplete, onBack }: BrokerLicenseFormProps) {
+export function BrokerLicenseForm({ onComplete, onBack, onDevBypass }: BrokerLicenseFormProps) {
   const [data, setData] = useState<BrokerLicenseData>({
     prcBrokerNumber: "",
     corNumber: "",
@@ -116,6 +119,17 @@ export function BrokerLicenseForm({ onComplete, onBack }: BrokerLicenseFormProps
         >
           Continue
         </Button>
+
+        {isDev && onDevBypass && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onDevBypass}
+            className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
+          >
+            [DEV] Skip License Verification
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
