@@ -11,12 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { SuretyBondData } from "@/lib/types/registration";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface SuretyBondFormProps {
   onComplete: (data: SuretyBondData) => void;
   onBack: () => void;
+  onDevBypass?: () => void;
 }
 
-export function SuretyBondForm({ onComplete, onBack }: SuretyBondFormProps) {
+export function SuretyBondForm({ onComplete, onBack, onDevBypass }: SuretyBondFormProps) {
   const [data, setData] = useState<SuretyBondData>({
     bondPolicyNumber: "",
     bondExpiryDate: "",
@@ -147,6 +150,17 @@ export function SuretyBondForm({ onComplete, onBack }: SuretyBondFormProps) {
         >
           Continue
         </Button>
+
+        {isDev && onDevBypass && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onDevBypass}
+            className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
+          >
+            [DEV] Skip Surety Bond
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
