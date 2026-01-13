@@ -112,6 +112,10 @@ export default function RegisterPage() {
     }));
   };
 
+  const handleIdDevBypass = () => {
+    setState((prev) => ({ ...prev, step: "face-verification" }));
+  };
+
   const handleBackToAccountType = () => {
     setState((prev) => ({ ...prev, step: "account-type" }));
   };
@@ -159,6 +163,7 @@ export default function RegisterPage() {
         <IdVerificationForm
           onComplete={handleIdComplete}
           onBack={handleBackToBasicInfo}
+          onDevBypass={handleIdDevBypass}
           stepInfo={state.accountType === "agent" ? { current: 2, total: 5 } : { current: 2, total: 3 }}
         />
       )}
