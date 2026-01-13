@@ -67,9 +67,19 @@ export default function RegisterPage() {
     console.log("Identity verification complete:", data);
   };
 
+  const handleDevBypass = () => {
+    setState((prev) => ({
+      ...prev,
+      isVerified: true,
+      step: "identity",
+    }));
+  };
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4">
-      {state.step === "basic-info" && <BasicInfoForm onSubmit={handleBasicInfoSubmit} />}
+      {state.step === "basic-info" && (
+        <BasicInfoForm onSubmit={handleBasicInfoSubmit} onDevBypass={handleDevBypass} />
+      )}
 
       {state.step === "identity" && (
         <IdentityVerificationForm onComplete={handleIdentityComplete} />
