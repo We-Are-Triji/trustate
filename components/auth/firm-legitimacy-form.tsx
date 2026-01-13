@@ -24,9 +24,9 @@ interface FirmLegitimacyFormProps {
 }
 
 const FIRM_TYPES: { value: FirmType; label: string; regLabel: string }[] = [
-  { value: "corporation", label: "Corporation", regLabel: "SEC Certificate Number" },
-  { value: "partnership", label: "Partnership", regLabel: "SEC Certificate Number" },
-  { value: "sole-proprietorship", label: "Sole Proprietorship", regLabel: "DTI Certificate Number" },
+  { value: "corporation", label: "Corporation", regLabel: "SEC Number" },
+  { value: "partnership", label: "Partnership", regLabel: "SEC Number" },
+  { value: "sole-proprietorship", label: "Sole Proprietorship", regLabel: "DTI Number" },
 ];
 
 export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegitimacyFormProps) {
@@ -57,32 +57,27 @@ export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegi
     if (canSubmit) onComplete(data);
   };
 
-  const renderUpload = (
-    label: string,
-    file: File | null,
-    field: keyof FirmLegitimacyData
-  ) => (
-    <div className="space-y-1.5">
-      <Label className="text-sm text-gray-600">{label}</Label>
-      <label className="flex h-20 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1]">
+  const renderUpload = (label: string, file: File | null, field: keyof FirmLegitimacyData) => (
+    <div className="space-y-1">
+      <Label className="text-xs text-gray-600">{label}</Label>
+      <label className="flex h-16 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1]">
         <input
           type="file"
           accept="image/*,.pdf"
           onChange={(e) =>
-            e.target.files?.[0] &&
-            setData((prev) => ({ ...prev, [field]: e.target.files![0] }))
+            e.target.files?.[0] && setData((prev) => ({ ...prev, [field]: e.target.files![0] }))
           }
           className="hidden"
         />
         {file ? (
-          <div className="flex items-center gap-2 text-green-600">
-            <CheckCircle size={16} />
-            <span className="text-xs truncate max-w-[150px]">{file.name}</span>
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle size={14} />
+            <span className="text-xs truncate max-w-[80px]">{file.name}</span>
           </div>
         ) : (
           <>
             <Upload className="h-4 w-4 text-gray-400" />
-            <span className="mt-1 text-xs text-gray-500">Upload</span>
+            <span className="text-xs text-gray-500">Upload</span>
           </>
         )}
       </label>
@@ -90,8 +85,8 @@ export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegi
   );
 
   return (
-    <Card className="w-full max-w-lg border-[#E2E8F0] bg-white shadow-sm">
-      <CardHeader className="pb-4">
+    <Card className="w-full max-w-3xl border-[#E2E8F0] bg-white shadow-sm">
+      <CardHeader className="pb-3">
         <div className="flex items-center">
           <Button
             type="button"
@@ -103,90 +98,89 @@ export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegi
             <ArrowLeft size={18} />
           </Button>
           <div className="flex-1 text-center pr-10">
-            <CardTitle className="text-xl font-semibold text-gray-800">
-              Firm Legitimacy
-            </CardTitle>
-            <p className="text-sm text-gray-500">Corporate Registration & Permits</p>
+            <CardTitle className="text-lg font-semibold text-gray-800">Firm Legitimacy</CardTitle>
+            <p className="text-sm text-gray-500">Corporate Registration and Permits</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label className="text-sm text-gray-600">Business Type</Label>
-          <Select
-            value={data.firmType || ""}
-            onValueChange={(v) => setData((prev) => ({ ...prev, firmType: v as FirmType }))}
-          >
-            <SelectTrigger className="border-[#E2E8F0] bg-[#F8FAFC]">
-              <SelectValue placeholder="Select business type" />
-            </SelectTrigger>
-            <SelectContent>
-              {FIRM_TYPES.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-sm text-gray-600">Business Type</Label>
+            <Select
+              value={data.firmType || ""}
+              onValueChange={(v) => setData((prev) => ({ ...prev, firmType: v as FirmType }))}
+            >
+              <SelectTrigger className="border-[#E2E8F0] bg-[#F8FAFC]">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                {FIRM_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm text-gray-600">{selectedFirmType?.regLabel || "Registration No."}</Label>
+            <Input
+              value={data.registrationNumber}
+              onChange={(e) => setData((prev) => ({ ...prev, registrationNumber: e.target.value }))}
+              placeholder="Enter number"
+              disabled={!data.firmType}
+              className="border-[#E2E8F0] bg-[#F8FAFC]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm text-gray-600">DHSUD Firm Number</Label>
+            <Input
+              value={data.dhsudNumber}
+              onChange={(e) => setData((prev) => ({ ...prev, dhsudNumber: e.target.value }))}
+              placeholder="e.g., DHSUD-B-1234"
+              disabled={!data.firmType}
+              className="border-[#E2E8F0] bg-[#F8FAFC]"
+            />
+          </div>
         </div>
 
         {data.firmType && (
           <>
-            <div className="space-y-2">
-              <Label className="text-sm text-gray-600">{selectedFirmType?.regLabel}</Label>
-              <Input
-                value={data.registrationNumber}
-                onChange={(e) => setData((prev) => ({ ...prev, registrationNumber: e.target.value }))}
-                placeholder="Enter registration number"
-                className="border-[#E2E8F0] bg-[#F8FAFC]"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-5 gap-3">
               {renderUpload(
-                data.firmType === "sole-proprietorship" ? "DTI Certificate" : "SEC Certificate",
+                data.firmType === "sole-proprietorship" ? "DTI Cert" : "SEC Cert",
                 data.registrationDocument,
                 "registrationDocument"
               )}
-              {renderUpload("Mayor's/Business Permit", data.businessPermit, "businessPermit")}
+              {renderUpload("Business Permit", data.businessPermit, "businessPermit")}
+              {renderUpload("BIR 2303", data.birForm2303, "birForm2303")}
+              {renderUpload("DHSUD Reg", data.dhsudRegistration, "dhsudRegistration")}
+              {renderUpload("Corp Bond", data.corporateBondImage, "corporateBondImage")}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {renderUpload("BIR Form 2303 (COR)", data.birForm2303, "birForm2303")}
-              {renderUpload("DHSUD Registration", data.dhsudRegistration, "dhsudRegistration")}
+            <div className="flex justify-end gap-2">
+              {isDev && onDevBypass && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onDevBypass}
+                  className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
+                >
+                  [DEV] Skip
+                </Button>
+              )}
+              <Button
+                onClick={handleSubmit}
+                disabled={!canSubmit}
+                className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
+              >
+                Complete Registration
+              </Button>
             </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm text-gray-600">DHSUD Firm Registration Number</Label>
-              <Input
-                value={data.dhsudNumber}
-                onChange={(e) => setData((prev) => ({ ...prev, dhsudNumber: e.target.value }))}
-                placeholder="e.g., DHSUD-B-1234"
-                className="border-[#E2E8F0] bg-[#F8FAFC]"
-              />
-            </div>
-
-            {renderUpload("Corporate Surety Bond", data.corporateBondImage, "corporateBondImage")}
           </>
-        )}
-
-        <Button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className="w-full bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
-        >
-          Complete Registration
-        </Button>
-
-        {isDev && onDevBypass && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onDevBypass}
-            className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
-          >
-            [DEV] Skip Firm Legitimacy
-          </Button>
         )}
       </CardContent>
     </Card>
