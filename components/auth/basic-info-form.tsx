@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff, CalendarIcon, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Eye, EyeOff, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,16 +18,16 @@ const isDev = process.env.NODE_ENV === "development";
 interface BasicInfoFormProps {
   onSubmit: (data: BasicInfoData) => void;
   onDevBypass?: () => void;
-  onBack?: () => void;
   initialData?: BasicInfoData;
 }
 
-export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: BasicInfoFormProps) {
+export function BasicInfoForm({ onSubmit, onDevBypass, initialData }: BasicInfoFormProps) {
   const [form, setForm] = useState<BasicInfoData>(
     initialData || {
       firstName: "",
       middleName: "",
       lastName: "",
+      nationality: "",
       dateOfBirth: "",
       mobile: "",
       email: "",
@@ -53,6 +54,9 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
         break;
       case "middleName":
         error = value ? validators.name(value) : null;
+        break;
+      case "nationality":
+        error = value ? null : "Nationality is required";
         break;
       case "email":
         error = validators.email(value);
@@ -81,6 +85,7 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
     const fields: (keyof BasicInfoData)[] = [
       "firstName",
       "lastName",
+      "nationality",
       "email",
       "mobile",
       "dateOfBirth",
@@ -96,26 +101,11 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
 
   return (
     <Card className="w-full max-w-2xl border-[#E2E8F0] bg-white shadow-sm">
-      <CardHeader className="pb-4">
-        <div className="flex items-center">
-          {onBack && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onBack}
-              className="mr-2 h-8 w-8 p-0 text-gray-500 hover:text-gray-700"
-            >
-              <ArrowLeft size={18} />
-            </Button>
-          )}
-          <div className={`flex-1 text-center ${onBack ? "pr-10" : ""}`}>
-            <CardTitle className="text-xl font-semibold text-gray-800">
-              Create Account
-            </CardTitle>
-            <p className="text-sm text-gray-500">Step 1 of 3: Basic Information</p>
-          </div>
-        </div>
+      <CardHeader className="pb-4 text-center">
+        <CardTitle className="text-xl font-semibold text-gray-800">
+          Create Account
+        </CardTitle>
+        <p className="text-sm text-gray-500">Step 1 of 3: Basic Information</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -148,7 +138,16 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
+            <FormField
+              id="nationality"
+              label="Nationality"
+              value={form.nationality}
+              onChange={(v) => updateField("nationality", v)}
+              error={errors.nationality}
+              placeholder="Filipino"
+              required
+            />
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-gray-700">
                 Date of Birth <span className="text-red-500">*</span>
@@ -236,7 +235,7 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
             </p>
           </div>
 
-          <Button type="submit" className="w-full bg-gray-800 hover:bg-gray-900">
+          <Button type="submit" className="w-full bg-gray-800 hover:bg-gray-900 active:bg-gray-950">
             Continue
           </Button>
 
@@ -245,11 +244,18 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
               type="button"
               variant="outline"
               onClick={onDevBypass}
-              className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50"
+              className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
             >
               [DEV] Skip OTP Verification
             </Button>
           )}
+
+          <p className="text-center text-sm text-gray-500">
+            Already have an account?{" "}
+            <Link href="/login" className="text-gray-800 hover:underline">
+              Sign in
+            </Link>
+          </p>
         </form>
       </CardContent>
     </Card>

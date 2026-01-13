@@ -21,12 +21,13 @@ import type {
 
 export default function RegisterPage() {
   const [state, setState] = useState<RegistrationState>({
-    step: "account-type",
+    step: "basic-info",
     accountType: null,
     basicInfo: {
       firstName: "",
       middleName: "",
       lastName: "",
+      nationality: "",
       dateOfBirth: "",
       mobile: "",
       email: "",
@@ -37,14 +38,11 @@ export default function RegisterPage() {
   });
 
   const [idData, setIdData] = useState<{ idType: PhilippineID; idImage: File } | null>(null);
+  const [faceData, setFaceData] = useState<File | null>(null);
   const [prcData, setPrcData] = useState<PrcData | null>(null);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isPending, setIsPending] = useState(false);
-
-  const handleAccountTypeSelect = (type: AccountType) => {
-    setState((prev) => ({ ...prev, accountType: type, step: "basic-info" }));
-  };
 
   const handleBasicInfoSubmit = (data: BasicInfoData) => {
     setState((prev) => ({ ...prev, basicInfo: data }));
@@ -79,11 +77,22 @@ export default function RegisterPage() {
     setState((prev) => ({ ...prev, step: "face-verification" }));
   };
 
-  const handleFaceComplete = async (faceImage: File) => {
-    if (state.accountType === "agent") {
+  const handleFaceComplete = (faceImage: File) => {
+    setFaceData(faceImage);
+    setState((prev) => ({ ...prev, step: "account-type" }));
+  };
+
+  const handleAccountTypeSelect = (type: AccountType) => {
+    setState((prev) => ({ ...prev, accountType: type }));
+
+    if (type === "client") {
+      console.log("Client registration complete:", { basicInfo: state.basicInfo, idData, faceData });
+      // TODO: Navigate to main screen
+    } else if (type === "agent") {
       setState((prev) => ({ ...prev, step: "prc-verification" }));
-    } else {
-      console.log("Registration complete:", { accountType: state.accountType, ...idData, faceImage });
+    } else if (type === "broker") {
+      // TODO: Broker professional verification
+      console.log("Broker flow - to be implemented");
     }
   };
 
@@ -94,9 +103,9 @@ export default function RegisterPage() {
 
   const handleBrokerLinkSubmit = async (nexusLink: string) => {
     console.log("Agent registration submitted:", {
-      accountType: state.accountType,
       basicInfo: state.basicInfo,
       idData,
+      faceData,
       prcData,
       nexusLink,
     });
@@ -104,14 +113,14 @@ export default function RegisterPage() {
   };
 
   const handleDevBypass = () => {
-    setState((prev) => ({
-      ...prev,
-      isVerified: true,
-      step: "id-verification",
-    }));
+    setState((prev) => ({ ...prev, isVerified: true, step: "id-verification" }));
   };
 
-  const handleBackToAccountType = () => {
+  const handleIdDevBypass = () => {
+    setState((prev) => ({ ...prev, step: "face-verification" }));
+  };
+
+  const handleFaceDevBypass = () => {
     setState((prev) => ({ ...prev, step: "account-type" }));
   };
 
@@ -125,6 +134,10 @@ export default function RegisterPage() {
 
   const handleBackToFaceVerification = () => {
     setState((prev) => ({ ...prev, step: "face-verification" }));
+  };
+
+  const handleBackToAccountType = () => {
+    setState((prev) => ({ ...prev, step: "account-type", accountType: null }));
   };
 
   const handleBackToPrcVerification = () => {
@@ -141,15 +154,10 @@ export default function RegisterPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4">
-      {state.step === "account-type" && (
-        <AccountTypeSelection onSelect={handleAccountTypeSelect} />
-      )}
-
       {state.step === "basic-info" && (
         <BasicInfoForm
           onSubmit={handleBasicInfoSubmit}
           onDevBypass={handleDevBypass}
-          onBack={handleBackToAccountType}
           initialData={state.basicInfo}
         />
       )}
@@ -158,7 +166,7 @@ export default function RegisterPage() {
         <IdVerificationForm
           onComplete={handleIdComplete}
           onBack={handleBackToBasicInfo}
-          stepInfo={state.accountType === "agent" ? { current: 2, total: 5 } : { current: 2, total: 3 }}
+          onDevBypass={handleIdDevBypass}
         />
       )}
 
@@ -166,16 +174,29 @@ export default function RegisterPage() {
         <FaceVerificationForm
           onComplete={handleFaceComplete}
           onBack={handleBackToIdVerification}
-          stepInfo={state.accountType === "agent" ? { current: 3, total: 5 } : { current: 3, total: 3 }}
+          onDevBypass={handleFaceDevBypass}
+        />
+      )}
+
+      {state.step === "account-type" && (
+        <AccountTypeSelection
+          onSelect={handleAccountTypeSelect}
+          onBack={handleBackToFaceVerification}
         />
       )}
 
       {state.step === "prc-verification" && (
-        <PrcVerificationForm onComplete={handlePrcComplete} onBack={handleBackToFaceVerification} />
+        <PrcVerificationForm
+          onComplete={handlePrcComplete}
+          onBack={handleBackToAccountType}
+        />
       )}
 
       {state.step === "broker-link" && (
-        <BrokerLinkForm onSubmit={handleBrokerLinkSubmit} onBack={handleBackToPrcVerification} />
+        <BrokerLinkForm
+          onSubmit={handleBrokerLinkSubmit}
+          onBack={handleBackToPrcVerification}
+        />
       )}
 
       <VerificationChoiceModal

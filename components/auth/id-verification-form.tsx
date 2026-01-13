@@ -14,13 +14,15 @@ import {
 import { Label } from "@/components/ui/label";
 import { PH_VALID_IDS, type PhilippineID } from "@/lib/types/registration";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface IdVerificationFormProps {
   onComplete: (data: { idType: PhilippineID; idImage: File }) => void;
   onBack: () => void;
-  stepInfo?: { current: number; total: number };
+  onDevBypass?: () => void;
 }
 
-export function IdVerificationForm({ onComplete, onBack, stepInfo }: IdVerificationFormProps) {
+export function IdVerificationForm({ onComplete, onBack, onDevBypass }: IdVerificationFormProps) {
   const [idType, setIdType] = useState<PhilippineID | "">("");
   const [idImage, setIdImage] = useState<File | null>(null);
 
@@ -57,9 +59,7 @@ export function IdVerificationForm({ onComplete, onBack, stepInfo }: IdVerificat
             <CardTitle className="text-xl font-semibold text-gray-800">
               ID Verification
             </CardTitle>
-            <p className="text-sm text-gray-500">
-              Step {stepInfo?.current ?? 2} of {stepInfo?.total ?? 3}: Upload your government ID
-            </p>
+            <p className="text-sm text-gray-500">Step 2 of 3: Upload your government ID</p>
           </div>
         </div>
       </CardHeader>
@@ -101,10 +101,21 @@ export function IdVerificationForm({ onComplete, onBack, stepInfo }: IdVerificat
         <Button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="w-full bg-gray-800 hover:bg-gray-900"
+          className="w-full bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
         >
           Continue
         </Button>
+
+        {isDev && onDevBypass && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onDevBypass}
+            className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
+          >
+            [DEV] Skip ID Verification
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
