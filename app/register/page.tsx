@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { AccountTypeSelection } from "@/components/auth/account-type-selection";
 import { BasicInfoForm } from "@/components/auth/basic-info-form";
 import { VerificationChoiceModal } from "@/components/auth/verification-choice-modal";
 import { OtpVerificationModal } from "@/components/auth/otp-verification-modal";
 import { IdVerificationForm } from "@/components/auth/id-verification-form";
 import { FaceVerificationForm } from "@/components/auth/face-verification-form";
 import type {
+  AccountType,
   BasicInfoData,
   RegistrationState,
   VerificationMethod,
@@ -15,7 +17,8 @@ import type {
 
 export default function RegisterPage() {
   const [state, setState] = useState<RegistrationState>({
-    step: "basic-info",
+    step: "account-type",
+    accountType: null,
     basicInfo: {
       firstName: "",
       middleName: "",
@@ -32,6 +35,10 @@ export default function RegisterPage() {
   const [idData, setIdData] = useState<{ idType: PhilippineID; idImage: File } | null>(null);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
+
+  const handleAccountTypeSelect = (type: AccountType) => {
+    setState((prev) => ({ ...prev, accountType: type, step: "basic-info" }));
+  };
 
   const handleBasicInfoSubmit = (data: BasicInfoData) => {
     setState((prev) => ({ ...prev, basicInfo: data }));
@@ -67,7 +74,7 @@ export default function RegisterPage() {
   };
 
   const handleFaceComplete = async (faceImage: File) => {
-    console.log("Registration complete:", { ...idData, faceImage });
+    console.log("Registration complete:", { accountType: state.accountType, ...idData, faceImage });
   };
 
   const handleDevBypass = () => {
@@ -76,6 +83,10 @@ export default function RegisterPage() {
       isVerified: true,
       step: "id-verification",
     }));
+  };
+
+  const handleBackToAccountType = () => {
+    setState((prev) => ({ ...prev, step: "account-type" }));
   };
 
   const handleBackToBasicInfo = () => {
@@ -88,10 +99,15 @@ export default function RegisterPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4">
+      {state.step === "account-type" && (
+        <AccountTypeSelection onSelect={handleAccountTypeSelect} />
+      )}
+
       {state.step === "basic-info" && (
         <BasicInfoForm
           onSubmit={handleBasicInfoSubmit}
           onDevBypass={handleDevBypass}
+          onBack={handleBackToAccountType}
           initialData={state.basicInfo}
         />
       )}

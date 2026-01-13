@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff, CalendarIcon } from "lucide-react";
+import { Eye, EyeOff, CalendarIcon, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,10 +17,11 @@ const isDev = process.env.NODE_ENV === "development";
 interface BasicInfoFormProps {
   onSubmit: (data: BasicInfoData) => void;
   onDevBypass?: () => void;
+  onBack?: () => void;
   initialData?: BasicInfoData;
 }
 
-export function BasicInfoForm({ onSubmit, onDevBypass, initialData }: BasicInfoFormProps) {
+export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: BasicInfoFormProps) {
   const [form, setForm] = useState<BasicInfoData>(
     initialData || {
       firstName: "",
@@ -96,10 +97,25 @@ export function BasicInfoForm({ onSubmit, onDevBypass, initialData }: BasicInfoF
   return (
     <Card className="w-full max-w-2xl border-[#E2E8F0] bg-white shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-center text-xl font-semibold text-gray-800">
-          Create Account
-        </CardTitle>
-        <p className="text-center text-sm text-gray-500">Step 1 of 3: Basic Information</p>
+        <div className="flex items-center">
+          {onBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onBack}
+              className="mr-2 h-8 w-8 p-0 text-gray-500 hover:text-gray-700"
+            >
+              <ArrowLeft size={18} />
+            </Button>
+          )}
+          <div className={`flex-1 text-center ${onBack ? "pr-10" : ""}`}>
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Create Account
+            </CardTitle>
+            <p className="text-sm text-gray-500">Step 1 of 3: Basic Information</p>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
