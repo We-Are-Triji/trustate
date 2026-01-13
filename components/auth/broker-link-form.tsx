@@ -7,12 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface BrokerLinkFormProps {
   onSubmit: (nexusLink: string) => void;
   onBack: () => void;
+  onDevBypass?: () => void;
 }
 
-export function BrokerLinkForm({ onSubmit, onBack }: BrokerLinkFormProps) {
+export function BrokerLinkForm({ onSubmit, onBack, onDevBypass }: BrokerLinkFormProps) {
   const [nexusLink, setNexusLink] = useState("");
 
   const canSubmit = nexusLink.trim().length > 0;
@@ -72,6 +75,17 @@ export function BrokerLinkForm({ onSubmit, onBack }: BrokerLinkFormProps) {
         >
           Submit Registration
         </Button>
+
+        {isDev && onDevBypass && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onDevBypass}
+            className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
+          >
+            [DEV] Skip Broker Link
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
