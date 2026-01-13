@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, Camera, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -169,21 +169,28 @@ interface FaceCaptureProps {
 
 function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const videoRef = useState<HTMLVideoElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const startCamera = async (video: HTMLVideoElement | null) => {
-    if (!video) return;
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = mediaStream;
-      setStream(mediaStream);
-    } catch {
-      console.error("Camera access denied");
-    }
-  };
+  useEffect(() => {
+    const startCamera = async () => {
+      const video = videoRef.current;
+      if (!video) return;
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = mediaStream;
+        setStream(mediaStream);
+      } catch {
+        console.error("Camera access denied");
+      }
+    };
+    startCamera();
+    return () => {
+      stream?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
 
   const capture = () => {
-    const video = document.getElementById("face-video") as HTMLVideoElement;
+    const video = videoRef.current;
     if (!video) return;
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -207,7 +214,7 @@ function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps
       <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
         <video
           id="face-video"
-          ref={startCamera}
+          ref={videoRef}
           autoPlay
           playsInline
           muted
