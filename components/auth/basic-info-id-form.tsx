@@ -225,7 +225,7 @@ export function BasicInfoIdForm({ onSubmit, onDevBypass, initialBasicInfo }: Bas
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label className="text-sm text-gray-600">Government ID Type *</Label>
-                <Select value={idType} onValueChange={(v) => setIdType(v as PhilippineID)}>
+                <Select value={idType} onValueChange={(v) => { setIdType(v as PhilippineID); setIdImage(null); }}>
                   <SelectTrigger className="border-[#E2E8F0] bg-[#F8FAFC]">
                     <SelectValue placeholder="Select ID type" />
                   </SelectTrigger>
@@ -237,28 +237,30 @@ export function BasicInfoIdForm({ onSubmit, onDevBypass, initialBasicInfo }: Bas
                 </Select>
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-sm text-gray-600">Upload ID Photo *</Label>
-                <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1]">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => e.target.files?.[0] && setIdImage(e.target.files[0])}
-                    className="hidden"
-                  />
-                  {idImage ? (
-                    <div className="flex items-center gap-2 text-green-600">
-                      <CheckCircle size={20} />
-                      <span className="text-sm truncate max-w-[200px]">{idImage.name}</span>
-                    </div>
-                  ) : (
-                    <>
-                      <Upload className="h-8 w-8 text-gray-400" />
-                      <span className="mt-2 text-sm text-gray-500">Click to upload</span>
-                    </>
-                  )}
-                </label>
-              </div>
+              {idType && (
+                <div className="space-y-1.5">
+                  <Label className="text-sm text-gray-600">Upload {idType} *</Label>
+                  <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1]">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => e.target.files?.[0] && setIdImage(e.target.files[0])}
+                      className="hidden"
+                    />
+                    {idImage ? (
+                      <div className="flex items-center gap-2 text-green-600">
+                        <CheckCircle size={20} />
+                        <span className="text-sm truncate max-w-[200px]">{idImage.name}</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="mt-2 text-sm text-gray-500">Upload your {idType}</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+              )}
 
               <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
                 <p className="font-medium mb-1">Accepted IDs</p>
