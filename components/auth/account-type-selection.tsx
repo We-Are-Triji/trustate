@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { User, Briefcase, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AccountType } from "@/lib/types/registration";
@@ -43,7 +44,7 @@ export function AccountTypeSelection({ onSelect }: AccountTypeSelectionProps) {
           <button
             key={type}
             onClick={() => onSelect(type)}
-            className="flex w-full items-center gap-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-left transition-colors hover:border-gray-400 hover:bg-gray-50"
+            className="flex w-full items-center gap-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-left transition-colors hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-800 text-white">
               <Icon size={24} />
@@ -54,6 +55,12 @@ export function AccountTypeSelection({ onSelect }: AccountTypeSelectionProps) {
             </div>
           </button>
         ))}
+        <p className="text-center text-sm text-gray-500 pt-2">
+          Already have an account?{" "}
+          <Link href="/login" className="text-gray-800 hover:underline">
+            Sign in
+          </Link>
+        </p>
       </CardContent>
     </Card>
   );
