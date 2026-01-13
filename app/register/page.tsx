@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { AccountTypeSelection } from "@/components/auth/account-type-selection";
-import { BasicInfoForm } from "@/components/auth/basic-info-form";
+import { RegistrationContainer } from "@/components/auth/registration-container";
+import { RegistrationStepper } from "@/components/auth/registration-stepper";
+import { BasicInfoIdForm } from "@/components/auth/basic-info-id-form";
+import { FaceVerificationContent } from "@/components/auth/face-verification-content";
+import { AccountTypeContent } from "@/components/auth/account-type-content";
+import { AgentVerificationForm } from "@/components/auth/agent-verification-form";
+import { BrokerCredentialsForm } from "@/components/auth/broker-credentials-form";
+import { BrokerTypeContent } from "@/components/auth/broker-type-content";
+import { FirmLegitimacyContent } from "@/components/auth/firm-legitimacy-content";
+import { PendingApprovalScreen } from "@/components/auth/pending-approval-screen";
 import { VerificationChoiceModal } from "@/components/auth/verification-choice-modal";
 import { OtpVerificationModal } from "@/components/auth/otp-verification-modal";
-import { IdVerificationForm } from "@/components/auth/id-verification-form";
-import { FaceVerificationForm } from "@/components/auth/face-verification-form";
-import { PrcVerificationForm } from "@/components/auth/prc-verification-form";
-import { BrokerLinkForm } from "@/components/auth/broker-link-form";
-import { BrokerLicenseForm } from "@/components/auth/broker-license-form";
-import { SuretyBondForm } from "@/components/auth/surety-bond-form";
-import { BrokerTypeSelection } from "@/components/auth/broker-type-selection";
-import { FirmLegitimacyForm } from "@/components/auth/firm-legitimacy-form";
-import { PendingApprovalScreen } from "@/components/auth/pending-approval-screen";
 import type {
   AccountType,
   BasicInfoData,
@@ -21,282 +20,209 @@ import type {
   BrokerType,
   FirmLegitimacyData,
   PrcData,
-  RegistrationState,
   SuretyBondData,
   VerificationMethod,
   PhilippineID,
 } from "@/lib/types/registration";
 
-export default function RegisterPage() {
-  const [state, setState] = useState<RegistrationState>({
-    step: "basic-info",
-    accountType: null,
-    basicInfo: {
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      nationality: "",
-      dateOfBirth: "",
-      mobile: "",
-      email: "",
-      password: "",
-    },
-    verificationMethod: null,
-    isVerified: false,
-  });
+type Step = 
+  | "basic-info-id"
+  | "face-verification"
+  | "account-type"
+  | "agent-verification"
+  | "broker-credentials"
+  | "broker-type"
+  | "firm-legitimacy";
 
+export default function RegisterPage() {
+  const [step, setStep] = useState<Step>("basic-info-id");
+  const [accountType, setAccountType] = useState<AccountType | null>(null);
+  const [basicInfo, setBasicInfo] = useState<BasicInfoData | null>(null);
   const [idData, setIdData] = useState<{ idType: PhilippineID; idImage: File } | null>(null);
   const [faceData, setFaceData] = useState<File | null>(null);
-  const [prcData, setPrcData] = useState<PrcData | null>(null);
-  const [brokerLicenseData, setBrokerLicenseData] = useState<BrokerLicenseData | null>(null);
-  const [suretyBondData, setSuretyBondData] = useState<SuretyBondData | null>(null);
-  const [brokerType, setBrokerType] = useState<BrokerType | null>(null);
+  const [verificationMethod, setVerificationMethod] = useState<VerificationMethod | null>(null);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
-  const handleBasicInfoSubmit = (data: BasicInfoData) => {
-    setState((prev) => ({ ...prev, basicInfo: data }));
+  const getSteps = () => {
+    const baseSteps = [
+      { label: "Info & ID", completed: !!basicInfo && !!idData, current: step === "basic-info-id" },
+      { label: "Face", completed: !!faceData, current: step === "face-verification" },
+      { label: "Account", completed: !!accountType, current: step === "account-type" },
+    ];
+
+    if (accountType === "agent") {
+      return [...baseSteps, { label: "Verification", completed: false, current: step === "agent-verification" }];
+    }
+
+    if (accountType === "broker") {
+      const brokerSteps = [
+        { label: "Credentials", completed: step === "broker-type" || step === "firm-legitimacy", current: step === "broker-credentials" },
+        { label: "Structure", completed: step === "firm-legitimacy", current: step === "broker-type" },
+      ];
+      return [...baseSteps, ...brokerSteps];
+    }
+
+    return baseSteps;
+  };
+
+  const handleBasicInfoIdSubmit = (info: BasicInfoData, id: { idType: PhilippineID; idImage: File }) => {
+    setBasicInfo(info);
+    setIdData(id);
     setShowChoiceModal(true);
   };
 
   const handleVerificationMethodSelect = (method: VerificationMethod) => {
-    setState((prev) => ({ ...prev, verificationMethod: method }));
+    setVerificationMethod(method);
     setShowChoiceModal(false);
-    sendVerificationCode(method);
     setShowOtpModal(true);
-  };
-
-  const sendVerificationCode = async (method: VerificationMethod) => {
-    const destination = method === "email" ? state.basicInfo.email : state.basicInfo.mobile;
-    console.log(`Sending code to ${method}: ${destination}`);
   };
 
   const handleOtpVerify = async (code: string): Promise<boolean> => {
     await new Promise((r) => setTimeout(r, 1000));
     const success = code === "123456";
     if (success) {
-      setState((prev) => ({ ...prev, isVerified: true, step: "id-verification" }));
       setShowOtpModal(false);
+      setStep("face-verification");
     }
     return success;
   };
 
-  const handleIdComplete = (data: { idType: PhilippineID; idImage: File }) => {
-    setIdData(data);
-    setState((prev) => ({ ...prev, step: "face-verification" }));
-  };
-
   const handleFaceComplete = (faceImage: File) => {
     setFaceData(faceImage);
-    setState((prev) => ({ ...prev, step: "account-type" }));
+    setStep("account-type");
   };
 
   const handleAccountTypeSelect = (type: AccountType) => {
-    setState((prev) => ({ ...prev, accountType: type }));
-
+    setAccountType(type);
     if (type === "client") {
-      console.log("Client registration complete:", { basicInfo: state.basicInfo, idData, faceData });
+      console.log("Client registration complete:", { basicInfo, idData, faceData });
     } else if (type === "agent") {
-      setState((prev) => ({ ...prev, step: "prc-verification" }));
+      setStep("agent-verification");
     } else if (type === "broker") {
-      setState((prev) => ({ ...prev, step: "broker-license" }));
+      setStep("broker-credentials");
     }
   };
 
-  // Agent flow
-  const handlePrcComplete = (data: PrcData) => {
-    setPrcData(data);
-    setState((prev) => ({ ...prev, step: "broker-link" }));
-  };
-
-  const handleBrokerLinkSubmit = async (nexusLink: string) => {
-    console.log("Agent registration submitted:", { basicInfo: state.basicInfo, idData, faceData, prcData, nexusLink });
+  const handleAgentSubmit = (prcData: PrcData, nexusLink: string) => {
+    console.log("Agent registration submitted:", { basicInfo, idData, faceData, prcData, nexusLink });
     setIsPending(true);
   };
 
-  // Broker flow
-  const handleBrokerLicenseComplete = (data: BrokerLicenseData) => {
-    setBrokerLicenseData(data);
-    setState((prev) => ({ ...prev, step: "surety-bond" }));
-  };
-
-  const handleSuretyBondComplete = (data: SuretyBondData) => {
-    setSuretyBondData(data);
-    setState((prev) => ({ ...prev, step: "broker-type" }));
+  const handleBrokerCredentialsSubmit = (licenseData: BrokerLicenseData, bondData: SuretyBondData) => {
+    console.log("Broker credentials:", { licenseData, bondData });
+    setStep("broker-type");
   };
 
   const handleBrokerTypeSelect = (type: BrokerType) => {
-    setBrokerType(type);
     if (type === "individual") {
-      console.log("Individual broker registration complete:", {
-        basicInfo: state.basicInfo,
-        idData,
-        faceData,
-        brokerLicenseData,
-        suretyBondData,
-      });
+      console.log("Individual broker registration complete");
     } else {
-      setState((prev) => ({ ...prev, step: "firm-legitimacy" }));
+      setStep("firm-legitimacy");
     }
   };
 
   const handleFirmLegitimacyComplete = (data: FirmLegitimacyData) => {
-    console.log("Brokerage firm registration complete:", {
-      basicInfo: state.basicInfo,
-      idData,
-      faceData,
-      brokerLicenseData,
-      suretyBondData,
-      firmData: data,
-    });
+    console.log("Firm registration complete:", data);
   };
 
   // Dev bypasses
-  const handleDevBypass = () => {
-    setState((prev) => ({ ...prev, isVerified: true, step: "id-verification" }));
-  };
-
-  const handleIdDevBypass = () => {
-    setState((prev) => ({ ...prev, step: "face-verification" }));
-  };
-
-  const handleFaceDevBypass = () => {
-    setState((prev) => ({ ...prev, step: "account-type" }));
-  };
-
-  const handlePrcDevBypass = () => {
-    setState((prev) => ({ ...prev, step: "broker-link" }));
-  };
-
-  const handleBrokerLinkDevBypass = () => {
-    setIsPending(true);
-  };
-
-  const handleBrokerLicenseDevBypass = () => {
-    setState((prev) => ({ ...prev, step: "surety-bond" }));
-  };
-
-  const handleSuretyBondDevBypass = () => {
-    setState((prev) => ({ ...prev, step: "broker-type" }));
-  };
-
-  const handleFirmLegitimacyDevBypass = () => {
-    console.log("Firm registration complete (dev bypass)");
-  };
+  const handleBasicInfoDevBypass = () => setStep("face-verification");
+  const handleFaceDevBypass = () => setStep("account-type");
+  const handleAgentDevBypass = () => setIsPending(true);
+  const handleBrokerCredentialsDevBypass = () => setStep("broker-type");
+  const handleFirmDevBypass = () => console.log("Firm registration complete (dev)");
 
   // Back handlers
-  const handleBackToBasicInfo = () => setState((prev) => ({ ...prev, step: "basic-info" }));
-  const handleBackToIdVerification = () => setState((prev) => ({ ...prev, step: "id-verification" }));
-  const handleBackToFaceVerification = () => setState((prev) => ({ ...prev, step: "face-verification" }));
-  const handleBackToAccountType = () => setState((prev) => ({ ...prev, step: "account-type", accountType: null }));
-  const handleBackToPrcVerification = () => setState((prev) => ({ ...prev, step: "prc-verification" }));
-  const handleBackToBrokerLicense = () => setState((prev) => ({ ...prev, step: "broker-license" }));
-  const handleBackToSuretyBond = () => setState((prev) => ({ ...prev, step: "surety-bond" }));
-  const handleBackToBrokerType = () => setState((prev) => ({ ...prev, step: "broker-type" }));
+  const handleBackToBasicInfo = () => setStep("basic-info-id");
+  const handleBackToFace = () => setStep("face-verification");
+  const handleBackToAccountType = () => { setStep("account-type"); setAccountType(null); };
+  const handleBackToBrokerCredentials = () => setStep("broker-credentials");
+  const handleBackToBrokerType = () => setStep("broker-type");
 
   if (isPending) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4">
+      <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-6">
         <PendingApprovalScreen />
       </main>
     );
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4">
-      {state.step === "basic-info" && (
-        <BasicInfoForm
-          onSubmit={handleBasicInfoSubmit}
-          onDevBypass={handleDevBypass}
-          initialData={state.basicInfo}
-        />
-      )}
+    <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-6">
+      <div className="w-full max-w-5xl">
+        <RegistrationStepper steps={getSteps()} />
+        <RegistrationContainer>
+          {step === "basic-info-id" && (
+            <BasicInfoIdForm
+              onSubmit={handleBasicInfoIdSubmit}
+              onDevBypass={handleBasicInfoDevBypass}
+              initialBasicInfo={basicInfo || undefined}
+            />
+          )}
 
-      {state.step === "id-verification" && (
-        <IdVerificationForm
-          onComplete={handleIdComplete}
-          onBack={handleBackToBasicInfo}
-          onDevBypass={handleIdDevBypass}
-        />
-      )}
+          {step === "face-verification" && (
+            <FaceVerificationContent
+              onComplete={handleFaceComplete}
+              onBack={handleBackToBasicInfo}
+              onDevBypass={handleFaceDevBypass}
+            />
+          )}
 
-      {state.step === "face-verification" && (
-        <FaceVerificationForm
-          onComplete={handleFaceComplete}
-          onBack={handleBackToIdVerification}
-          onDevBypass={handleFaceDevBypass}
-        />
-      )}
+          {step === "account-type" && (
+            <AccountTypeContent
+              onSelect={handleAccountTypeSelect}
+              onBack={handleBackToFace}
+            />
+          )}
 
-      {state.step === "account-type" && (
-        <AccountTypeSelection
-          onSelect={handleAccountTypeSelect}
-          onBack={handleBackToFaceVerification}
-        />
-      )}
+          {step === "agent-verification" && (
+            <AgentVerificationForm
+              onSubmit={handleAgentSubmit}
+              onBack={handleBackToAccountType}
+              onDevBypass={handleAgentDevBypass}
+            />
+          )}
 
-      {/* Agent flow */}
-      {state.step === "prc-verification" && (
-        <PrcVerificationForm
-          onComplete={handlePrcComplete}
-          onBack={handleBackToAccountType}
-          onDevBypass={handlePrcDevBypass}
-        />
-      )}
+          {step === "broker-credentials" && (
+            <BrokerCredentialsForm
+              onSubmit={handleBrokerCredentialsSubmit}
+              onBack={handleBackToAccountType}
+              onDevBypass={handleBrokerCredentialsDevBypass}
+            />
+          )}
 
-      {state.step === "broker-link" && (
-        <BrokerLinkForm
-          onSubmit={handleBrokerLinkSubmit}
-          onBack={handleBackToPrcVerification}
-          onDevBypass={handleBrokerLinkDevBypass}
-        />
-      )}
+          {step === "broker-type" && (
+            <BrokerTypeContent
+              onSelect={handleBrokerTypeSelect}
+              onBack={handleBackToBrokerCredentials}
+            />
+          )}
 
-      {/* Broker flow */}
-      {state.step === "broker-license" && (
-        <BrokerLicenseForm
-          onComplete={handleBrokerLicenseComplete}
-          onBack={handleBackToAccountType}
-          onDevBypass={handleBrokerLicenseDevBypass}
-        />
-      )}
-
-      {state.step === "surety-bond" && (
-        <SuretyBondForm
-          onComplete={handleSuretyBondComplete}
-          onBack={handleBackToBrokerLicense}
-          onDevBypass={handleSuretyBondDevBypass}
-        />
-      )}
-
-      {state.step === "broker-type" && (
-        <BrokerTypeSelection onSelect={handleBrokerTypeSelect} onBack={handleBackToSuretyBond} />
-      )}
-
-      {state.step === "firm-legitimacy" && (
-        <FirmLegitimacyForm
-          onComplete={handleFirmLegitimacyComplete}
-          onBack={handleBackToBrokerType}
-          onDevBypass={handleFirmLegitimacyDevBypass}
-        />
-      )}
+          {step === "firm-legitimacy" && (
+            <FirmLegitimacyContent
+              onComplete={handleFirmLegitimacyComplete}
+              onBack={handleBackToBrokerType}
+              onDevBypass={handleFirmDevBypass}
+            />
+          )}
+        </RegistrationContainer>
+      </div>
 
       <VerificationChoiceModal
         open={showChoiceModal}
-        email={state.basicInfo.email}
-        mobile={state.basicInfo.mobile}
+        email={basicInfo?.email || ""}
+        mobile={basicInfo?.mobile || ""}
         onSelect={handleVerificationMethodSelect}
       />
 
       <OtpVerificationModal
         open={showOtpModal}
-        method={state.verificationMethod || "email"}
-        destination={
-          state.verificationMethod === "mobile" ? state.basicInfo.mobile : state.basicInfo.email
-        }
+        method={verificationMethod || "email"}
+        destination={verificationMethod === "mobile" ? basicInfo?.mobile || "" : basicInfo?.email || ""}
         onVerify={handleOtpVerify}
-        onResend={() => sendVerificationCode(state.verificationMethod!)}
+        onResend={() => {}}
         onClose={() => setShowOtpModal(false)}
       />
     </main>
