@@ -8,8 +8,11 @@ export interface BasicInfoData {
   password: string;
 }
 
+export type AccountType = "client" | "agent" | "broker";
+
 export interface RegistrationState {
-  step: "basic-info" | "verification" | "id-verification" | "face-verification";
+  step: "account-type" | "basic-info" | "verification" | "id-verification" | "face-verification";
+  accountType: AccountType | null;
   basicInfo: BasicInfoData;
   verificationMethod: "email" | "mobile" | null;
   isVerified: boolean;
