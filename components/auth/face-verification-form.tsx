@@ -92,7 +92,7 @@ export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerif
                 setFaceStep(0);
                 setShowCamera(true);
               }}
-              className="w-full border-[#E2E8F0]"
+              className="w-full border-[#E2E8F0] hover:bg-gray-50 active:bg-gray-100"
             >
               <Camera className="mr-2 h-4 w-4" />
               {allFacesCaptured ? "Retake Photos" : "Start Camera"}
@@ -110,7 +110,7 @@ export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerif
         <Button
           onClick={handleSubmit}
           disabled={!allFacesCaptured}
-          className="w-full bg-gray-800 hover:bg-gray-900"
+          className="w-full bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
         >
           {stepInfo && stepInfo.current < stepInfo.total ? "Continue" : "Complete Registration"}
         </Button>
@@ -185,10 +185,10 @@ function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps
         </div>
       </div>
       <div className="flex gap-2">
-        <Button variant="outline" onClick={stopCamera} className="flex-1">
+        <Button variant="outline" onClick={stopCamera} className="flex-1 hover:bg-gray-50 active:bg-gray-100">
           Cancel
         </Button>
-        <Button onClick={capture} className="flex-1 bg-gray-800 hover:bg-gray-900">
+        <Button onClick={capture} className="flex-1 bg-gray-800 hover:bg-gray-900 active:bg-gray-950">
           Capture
         </Button>
       </div>

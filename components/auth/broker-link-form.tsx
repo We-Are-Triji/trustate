@@ -68,7 +68,7 @@ export function BrokerLinkForm({ onSubmit, onBack }: BrokerLinkFormProps) {
         <Button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="w-full bg-gray-800 hover:bg-gray-900"
+          className="w-full bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
         >
           Submit Registration
         </Button>

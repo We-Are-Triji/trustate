@@ -250,7 +250,7 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
             </p>
           </div>
 
-          <Button type="submit" className="w-full bg-gray-800 hover:bg-gray-900">
+          <Button type="submit" className="w-full bg-gray-800 hover:bg-gray-900 active:bg-gray-950">
             Continue
           </Button>
 
@@ -259,7 +259,7 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
               type="button"
               variant="outline"
               onClick={onDevBypass}
-              className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50"
+              className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
             >
               [DEV] Skip OTP Verification
             </Button>
