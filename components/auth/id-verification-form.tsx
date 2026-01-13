@@ -17,9 +17,10 @@ import { PH_VALID_IDS, type PhilippineID } from "@/lib/types/registration";
 interface IdVerificationFormProps {
   onComplete: (data: { idType: PhilippineID; idImage: File }) => void;
   onBack: () => void;
+  stepInfo?: { current: number; total: number };
 }
 
-export function IdVerificationForm({ onComplete, onBack }: IdVerificationFormProps) {
+export function IdVerificationForm({ onComplete, onBack, stepInfo }: IdVerificationFormProps) {
   const [idType, setIdType] = useState<PhilippineID | "">("");
   const [idImage, setIdImage] = useState<File | null>(null);
 
@@ -56,7 +57,9 @@ export function IdVerificationForm({ onComplete, onBack }: IdVerificationFormPro
             <CardTitle className="text-xl font-semibold text-gray-800">
               ID Verification
             </CardTitle>
-            <p className="text-sm text-gray-500">Step 2 of 3: Upload your government ID</p>
+            <p className="text-sm text-gray-500">
+              Step {stepInfo?.current ?? 2} of {stepInfo?.total ?? 3}: Upload your government ID
+            </p>
           </div>
         </div>
       </CardHeader>

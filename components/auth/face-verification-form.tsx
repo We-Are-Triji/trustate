@@ -16,9 +16,10 @@ const FACE_STEPS: { direction: FaceDirection; label: string }[] = [
 interface FaceVerificationFormProps {
   onComplete: (faceImage: File) => void;
   onBack: () => void;
+  stepInfo?: { current: number; total: number };
 }
 
-export function FaceVerificationForm({ onComplete, onBack }: FaceVerificationFormProps) {
+export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerificationFormProps) {
   const [faceStep, setFaceStep] = useState(0);
   const [faceImages, setFaceImages] = useState<Record<FaceDirection, File | null>>({
     front: null,
@@ -62,7 +63,9 @@ export function FaceVerificationForm({ onComplete, onBack }: FaceVerificationFor
             <CardTitle className="text-xl font-semibold text-gray-800">
               Face Verification
             </CardTitle>
-            <p className="text-sm text-gray-500">Step 3 of 3: Capture your face</p>
+            <p className="text-sm text-gray-500">
+              Step {stepInfo?.current ?? 3} of {stepInfo?.total ?? 3}: Capture your face
+            </p>
           </div>
         </div>
       </CardHeader>
@@ -109,7 +112,7 @@ export function FaceVerificationForm({ onComplete, onBack }: FaceVerificationFor
           disabled={!allFacesCaptured}
           className="w-full bg-gray-800 hover:bg-gray-900"
         >
-          Complete Registration
+          {stepInfo && stepInfo.current < stepInfo.total ? "Continue" : "Complete Registration"}
         </Button>
       </CardContent>
     </Card>
