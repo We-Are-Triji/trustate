@@ -151,13 +151,30 @@ interface FaceCaptureProps {
 function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const stopStream = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => {
+        track.stop();
+      });
+      streamRef.current = null;
+    }
+  }, [streamRef]);
+
   useEffect(() => {
+    let mounted = true;
     const startCamera = async () => {
-      const video = videoRef.current;
-      if (!video) return;
       try {
         const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = mediaStream;
+        if (!mounted) {
+          mediaStream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
         streamRef.current = mediaStream;
       } catch {
         console.error("Camera access denied");
@@ -165,12 +182,10 @@ function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
     };
     startCamera();
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
-      }
+      mounted = false;
+      stopStream();
     };
-  }, [streamRef]);
+  }, [streamRef, stopStream]);
 
   const capture = () => {
     const video = videoRef.current;
@@ -179,16 +194,14 @@ function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext("2d")?.drawImage(video, 0, 0);
+    stopStream();
     canvas.toBlob((blob) => {
       if (blob) onCapture(new File([blob], "face.jpg", { type: "image/jpeg" }));
     }, "image/jpeg");
   };
 
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    }
+  const handleCancelClick = () => {
+    stopStream();
     onCancel();
   };
 
@@ -201,7 +214,7 @@ function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
         </div>
       </div>
       <div className="flex gap-3 mt-4">
-        <Button variant="outline" onClick={stopCamera} className="hover:bg-gray-50 active:bg-gray-100 px-6">
+        <Button variant="outline" onClick={handleCancelClick} className="hover:bg-gray-50 active:bg-gray-100 px-6">
           Cancel
         </Button>
         <Button onClick={capture} className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950 px-6">
