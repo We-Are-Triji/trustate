@@ -129,6 +129,7 @@ interface FaceCaptureProps {
 function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     const startCamera = async () => {
@@ -137,6 +138,7 @@ function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps
       try {
         const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = mediaStream;
+        streamRef.current = mediaStream;
         setStream(mediaStream);
       } catch {
         console.error("Camera access denied");
@@ -144,7 +146,7 @@ function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps
     };
     startCamera();
     return () => {
-      stream?.getTracks().forEach((t) => t.stop());
+      streamRef.current?.getTracks().forEach((t) => t.stop());
     };
   }, []);
 
