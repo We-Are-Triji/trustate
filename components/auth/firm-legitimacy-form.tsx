@@ -1,18 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, CheckCircle, ArrowLeft } from "lucide-react";
+import { Upload, CheckCircle, ArrowLeft, Building2, Users, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { FirmLegitimacyData, FirmType } from "@/lib/types/registration";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -23,10 +16,10 @@ interface FirmLegitimacyFormProps {
   onDevBypass?: () => void;
 }
 
-const FIRM_TYPES: { value: FirmType; label: string; regLabel: string }[] = [
-  { value: "corporation", label: "Corporation", regLabel: "SEC Number" },
-  { value: "partnership", label: "Partnership", regLabel: "SEC Number" },
-  { value: "sole-proprietorship", label: "Sole Proprietorship", regLabel: "DTI Number" },
+const FIRM_TYPES: { value: FirmType; label: string; regLabel: string; icon: typeof Building2 }[] = [
+  { value: "corporation", label: "Corporation", regLabel: "SEC Number", icon: Building2 },
+  { value: "partnership", label: "Partnership", regLabel: "SEC Number", icon: Users },
+  { value: "sole-proprietorship", label: "Sole Proprietorship", regLabel: "DTI Number", icon: User },
 ];
 
 export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegitimacyFormProps) {
@@ -60,7 +53,7 @@ export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegi
   const renderUpload = (label: string, file: File | null, field: keyof FirmLegitimacyData) => (
     <div className="space-y-1.5">
       <Label className="text-sm text-gray-600">{label}</Label>
-      <label className="flex h-20 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1]">
+      <label className="flex h-10 cursor-pointer items-center justify-center rounded-md border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1] px-3">
         <input
           type="file"
           accept="image/*,.pdf"
@@ -70,15 +63,15 @@ export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegi
           className="hidden"
         />
         {file ? (
-          <div className="flex items-center gap-1.5 text-green-600 px-2">
+          <div className="flex items-center gap-1.5 text-green-600">
             <CheckCircle size={14} />
-            <span className="text-xs truncate max-w-[100px]">{file.name}</span>
+            <span className="text-sm truncate max-w-[150px]">{file.name}</span>
           </div>
         ) : (
-          <>
-            <Upload className="h-4 w-4 text-gray-400" />
-            <span className="text-xs text-gray-500">Upload</span>
-          </>
+          <div className="flex items-center gap-2 text-gray-500">
+            <Upload className="h-4 w-4" />
+            <span className="text-sm">Upload</span>
+          </div>
         )}
       </label>
     </div>
@@ -104,57 +97,55 @@ export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegi
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-          <div className="space-y-1.5">
-            <Label className="text-sm text-gray-600">Business Type</Label>
-            <Select
-              value={data.firmType || ""}
-              onValueChange={(v) => setData((prev) => ({ ...prev, firmType: v as FirmType }))}
-            >
-              <SelectTrigger className="border-[#E2E8F0] bg-[#F8FAFC]">
-                <SelectValue placeholder="Select business type" />
-              </SelectTrigger>
-              <SelectContent>
-                {FIRM_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {!data.firmType ? (
+          <div className="grid grid-cols-3 gap-4">
+            {FIRM_TYPES.map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                onClick={() => setData((prev) => ({ ...prev, firmType: value }))}
+                className="flex flex-col items-center gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-6 text-center transition-colors hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-800 text-white">
+                  <Icon size={24} />
+                </div>
+                <p className="font-medium text-gray-800">{label}</p>
+              </button>
+            ))}
           </div>
-
-          <div className="space-y-1.5">
-            <Label className="text-sm text-gray-600">{selectedFirmType?.regLabel || "Registration Number"}</Label>
-            <Input
-              value={data.registrationNumber}
-              onChange={(e) => setData((prev) => ({ ...prev, registrationNumber: e.target.value }))}
-              placeholder="Enter registration number"
-              disabled={!data.firmType}
-              className="border-[#E2E8F0] bg-[#F8FAFC]"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label className="text-sm text-gray-600">DHSUD Firm Registration Number</Label>
-            <Input
-              value={data.dhsudNumber}
-              onChange={(e) => setData((prev) => ({ ...prev, dhsudNumber: e.target.value }))}
-              placeholder="e.g., DHSUD-B-1234"
-              disabled={!data.firmType}
-              className="border-[#E2E8F0] bg-[#F8FAFC]"
-            />
-          </div>
-
-          <div className="space-y-1.5 opacity-0 pointer-events-none">
-            <Label className="text-sm text-gray-600">Placeholder</Label>
-            <Input disabled className="border-[#E2E8F0] bg-[#F8FAFC]" />
-          </div>
-        </div>
-
-        {data.firmType && (
+        ) : (
           <>
-            <div className="grid grid-cols-5 gap-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>Business Type:</span>
+              <span className="font-medium text-gray-800">{selectedFirmType?.label}</span>
+              <button
+                onClick={() => setData((prev) => ({ ...prev, firmType: null }))}
+                className="text-blue-600 hover:underline ml-2"
+              >
+                Change
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-600">{selectedFirmType?.regLabel}</Label>
+                <Input
+                  value={data.registrationNumber}
+                  onChange={(e) => setData((prev) => ({ ...prev, registrationNumber: e.target.value }))}
+                  placeholder="Enter registration number"
+                  className="border-[#E2E8F0] bg-[#F8FAFC]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-600">DHSUD Firm Registration Number</Label>
+                <Input
+                  value={data.dhsudNumber}
+                  onChange={(e) => setData((prev) => ({ ...prev, dhsudNumber: e.target.value }))}
+                  placeholder="e.g., DHSUD-B-1234"
+                  className="border-[#E2E8F0] bg-[#F8FAFC]"
+                />
+              </div>
+
               {renderUpload(
                 data.firmType === "sole-proprietorship" ? "DTI Certificate" : "SEC Certificate",
                 data.registrationDocument,
