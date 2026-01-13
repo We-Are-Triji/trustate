@@ -7,12 +7,16 @@ import { VerificationChoiceModal } from "@/components/auth/verification-choice-m
 import { OtpVerificationModal } from "@/components/auth/otp-verification-modal";
 import { IdVerificationForm } from "@/components/auth/id-verification-form";
 import { FaceVerificationForm } from "@/components/auth/face-verification-form";
+import { PrcVerificationForm } from "@/components/auth/prc-verification-form";
+import { BrokerLinkForm } from "@/components/auth/broker-link-form";
+import { PendingApprovalScreen } from "@/components/auth/pending-approval-screen";
 import type {
   AccountType,
   BasicInfoData,
   RegistrationState,
   VerificationMethod,
   PhilippineID,
+  PrcData,
 } from "@/lib/types/registration";
 
 export default function RegisterPage() {
@@ -33,8 +37,10 @@ export default function RegisterPage() {
   });
 
   const [idData, setIdData] = useState<{ idType: PhilippineID; idImage: File } | null>(null);
+  const [prcData, setPrcData] = useState<PrcData | null>(null);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   const handleAccountTypeSelect = (type: AccountType) => {
     setState((prev) => ({ ...prev, accountType: type, step: "basic-info" }));
@@ -74,7 +80,27 @@ export default function RegisterPage() {
   };
 
   const handleFaceComplete = async (faceImage: File) => {
-    console.log("Registration complete:", { accountType: state.accountType, ...idData, faceImage });
+    if (state.accountType === "agent") {
+      setState((prev) => ({ ...prev, step: "prc-verification" }));
+    } else {
+      console.log("Registration complete:", { accountType: state.accountType, ...idData, faceImage });
+    }
+  };
+
+  const handlePrcComplete = (data: PrcData) => {
+    setPrcData(data);
+    setState((prev) => ({ ...prev, step: "broker-link" }));
+  };
+
+  const handleBrokerLinkSubmit = async (nexusLink: string) => {
+    console.log("Agent registration submitted:", {
+      accountType: state.accountType,
+      basicInfo: state.basicInfo,
+      idData,
+      prcData,
+      nexusLink,
+    });
+    setIsPending(true);
   };
 
   const handleDevBypass = () => {
@@ -97,6 +123,22 @@ export default function RegisterPage() {
     setState((prev) => ({ ...prev, step: "id-verification" }));
   };
 
+  const handleBackToFaceVerification = () => {
+    setState((prev) => ({ ...prev, step: "face-verification" }));
+  };
+
+  const handleBackToPrcVerification = () => {
+    setState((prev) => ({ ...prev, step: "prc-verification" }));
+  };
+
+  if (isPending) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4">
+        <PendingApprovalScreen />
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4">
       {state.step === "account-type" && (
@@ -118,6 +160,14 @@ export default function RegisterPage() {
 
       {state.step === "face-verification" && (
         <FaceVerificationForm onComplete={handleFaceComplete} onBack={handleBackToIdVerification} />
+      )}
+
+      {state.step === "prc-verification" && (
+        <PrcVerificationForm onComplete={handlePrcComplete} onBack={handleBackToFaceVerification} />
+      )}
+
+      {state.step === "broker-link" && (
+        <BrokerLinkForm onSubmit={handleBrokerLinkSubmit} onBack={handleBackToPrcVerification} />
       )}
 
       <VerificationChoiceModal
