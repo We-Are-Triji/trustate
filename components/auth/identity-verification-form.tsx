@@ -83,7 +83,7 @@ export function IdentityVerificationForm({ onComplete, onBack }: IdentityVerific
             <CardTitle className="text-xl font-semibold text-gray-800">
               Identity Verification
             </CardTitle>
-            <p className="text-sm text-gray-500">Step 3 of 3: Verify your identity</p>
+            <p className="text-sm text-gray-500">Step 2 of 2: Verify your identity</p>
           </div>
         </div>
       </CardHeader>
