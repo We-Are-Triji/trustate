@@ -34,7 +34,7 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-sm border-gray-200 bg-[#F8FAFC] shadow-sm">
+    <Card className="w-full max-w-sm border-[#E2E8F0] bg-white shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-center text-xl font-semibold text-gray-800">
           Sign In
@@ -53,7 +53,7 @@ export function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="border-gray-300 bg-white focus:border-gray-400"
+              className="border-[#E2E8F0] bg-[#F8FAFC] focus:border-[#CBD5E1] focus:ring-[#CBD5E1]"
             />
           </div>
 
@@ -69,12 +69,12 @@ export function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="border-gray-300 bg-white pr-10 focus:border-gray-400"
+                className="border-[#E2E8F0] bg-[#F8FAFC] pr-10 focus:border-[#CBD5E1] focus:ring-[#CBD5E1]"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B]"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -85,7 +85,7 @@ export function LoginForm() {
           <div className="text-right">
             <Link
               href="/forgot-password"
-              className="text-sm text-gray-500 hover:text-gray-700"
+              className="text-sm text-[#64748B] hover:text-[#475569]"
             >
               Forgot password?
             </Link>
