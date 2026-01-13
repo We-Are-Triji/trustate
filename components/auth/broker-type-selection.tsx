@@ -27,7 +27,7 @@ const BROKER_TYPES: { type: BrokerType; label: string; description: string; icon
 
 export function BrokerTypeSelection({ onSelect, onBack }: BrokerTypeSelectionProps) {
   return (
-    <Card className="w-full max-w-md border-[#E2E8F0] bg-white shadow-sm">
+    <Card className="w-full max-w-4xl border-[#E2E8F0] bg-white shadow-sm">
       <CardHeader className="pb-4">
         <div className="flex items-center">
           <Button
@@ -40,29 +40,29 @@ export function BrokerTypeSelection({ onSelect, onBack }: BrokerTypeSelectionPro
             <ArrowLeft size={18} />
           </Button>
           <div className="flex-1 text-center pr-10">
-            <CardTitle className="text-xl font-semibold text-gray-800">
-              Business Structure
-            </CardTitle>
-            <p className="text-sm text-gray-500">Step 3 of 3: How do you operate?</p>
+            <CardTitle className="text-xl font-semibold text-gray-800">Business Structure</CardTitle>
+            <p className="text-sm text-gray-500">Step 3 of 3 - How do you operate?</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {BROKER_TYPES.map(({ type, label, description, icon: Icon }) => (
-          <button
-            key={type}
-            onClick={() => onSelect(type)}
-            className="flex w-full items-center gap-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-left transition-colors hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-800 text-white">
-              <Icon size={24} />
-            </div>
-            <div>
-              <p className="font-medium text-gray-800">{label}</p>
-              <p className="text-sm text-gray-500">{description}</p>
-            </div>
-          </button>
-        ))}
+      <CardContent>
+        <div className="grid grid-cols-2 gap-6">
+          {BROKER_TYPES.map(({ type, label, description, icon: Icon }) => (
+            <button
+              key={type}
+              onClick={() => onSelect(type)}
+              className="flex items-center gap-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-6 text-left transition-colors hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-800 text-white">
+                <Icon size={28} />
+              </div>
+              <div>
+                <p className="font-medium text-gray-800">{label}</p>
+                <p className="text-sm text-gray-500">{description}</p>
+              </div>
+            </button>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

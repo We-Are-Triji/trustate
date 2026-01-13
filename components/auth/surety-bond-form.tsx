@@ -37,8 +37,8 @@ export function SuretyBondForm({ onComplete, onBack, onDevBypass }: SuretyBondFo
   };
 
   return (
-    <Card className="w-full max-w-2xl border-[#E2E8F0] bg-white shadow-sm">
-      <CardHeader className="pb-3">
+    <Card className="w-full max-w-4xl border-[#E2E8F0] bg-white shadow-sm">
+      <CardHeader className="pb-4">
         <div className="flex items-center">
           <Button
             type="button"
@@ -50,15 +50,15 @@ export function SuretyBondForm({ onComplete, onBack, onDevBypass }: SuretyBondFo
             <ArrowLeft size={18} />
           </Button>
           <div className="flex-1 text-center pr-10">
-            <CardTitle className="text-lg font-semibold text-gray-800">Surety Bond</CardTitle>
+            <CardTitle className="text-xl font-semibold text-gray-800">Surety Bond</CardTitle>
             <p className="text-sm text-gray-500">Step 2 of 3 - Required under RA 9646</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-3 gap-4">
+      <CardContent className="space-y-5">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
           <div className="space-y-1.5">
-            <Label className="text-sm text-gray-600">Policy Number</Label>
+            <Label className="text-sm text-gray-600">Bond Policy Number</Label>
             <Input
               value={data.bondPolicyNumber}
               onChange={(e) => setData((prev) => ({ ...prev, bondPolicyNumber: e.target.value }))}
@@ -68,7 +68,7 @@ export function SuretyBondForm({ onComplete, onBack, onDevBypass }: SuretyBondFo
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-sm text-gray-600">Expiry Date</Label>
+            <Label className="text-sm text-gray-600">Bond Expiry Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -78,7 +78,7 @@ export function SuretyBondForm({ onComplete, onBack, onDevBypass }: SuretyBondFo
                   } ${data.bondExpiryDate && !isExpiryValid ? "border-red-500" : ""}`}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {data.bondExpiryDate ? format(new Date(data.bondExpiryDate), "PP") : "Select"}
+                  {data.bondExpiryDate ? format(new Date(data.bondExpiryDate), "PPP") : "Select expiry date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -94,25 +94,23 @@ export function SuretyBondForm({ onComplete, onBack, onDevBypass }: SuretyBondFo
               </PopoverContent>
             </Popover>
             {data.bondExpiryDate && !isExpiryValid && (
-              <p className="text-xs text-red-500">Must be future date</p>
+              <p className="text-xs text-red-500">Expiry date must be in the future</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-sm text-gray-600">Provider</Label>
+            <Label className="text-sm text-gray-600">Provider Name</Label>
             <Input
               value={data.providerName}
               onChange={(e) => setData((prev) => ({ ...prev, providerName: e.target.value }))}
-              placeholder="e.g., GSIS, Pioneer"
+              placeholder="e.g., GSIS, Pioneer, etc."
               className="border-[#E2E8F0] bg-[#F8FAFC]"
             />
           </div>
-        </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-1 space-y-1.5">
-            <Label className="text-sm text-gray-600">Bond Document</Label>
-            <label className="flex h-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1]">
+          <div className="space-y-1.5">
+            <Label className="text-sm text-gray-600">Surety Bond Document</Label>
+            <label className="flex h-10 cursor-pointer items-center justify-center rounded-md border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1] px-3">
               <input
                 type="file"
                 accept="image/*"
@@ -124,35 +122,36 @@ export function SuretyBondForm({ onComplete, onBack, onDevBypass }: SuretyBondFo
               {data.bondImage ? (
                 <div className="flex items-center gap-2 text-green-600">
                   <CheckCircle size={16} />
-                  <span className="text-xs truncate max-w-[100px]">{data.bondImage.name}</span>
+                  <span className="text-sm truncate max-w-[200px]">{data.bondImage.name}</span>
                 </div>
               ) : (
-                <>
-                  <Upload className="h-5 w-5 text-gray-400" />
-                  <span className="mt-1 text-xs text-gray-500">Upload</span>
-                </>
+                <div className="flex items-center gap-2 text-gray-500">
+                  <Upload className="h-4 w-4" />
+                  <span className="text-sm">Upload document</span>
+                </div>
               )}
             </label>
           </div>
-          <div className="col-span-2 flex items-end justify-end gap-2">
-            {isDev && onDevBypass && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onDevBypass}
-                className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
-              >
-                [DEV] Skip
-              </Button>
-            )}
+        </div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          {isDev && onDevBypass && (
             <Button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
+              type="button"
+              variant="outline"
+              onClick={onDevBypass}
+              className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
             >
-              Continue
+              [DEV] Skip
             </Button>
-          </div>
+          )}
+          <Button
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950 px-8"
+          >
+            Continue
+          </Button>
         </div>
       </CardContent>
     </Card>

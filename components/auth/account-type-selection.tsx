@@ -34,7 +34,7 @@ const ACCOUNT_TYPES: { type: AccountType; label: string; description: string; ic
 
 export function AccountTypeSelection({ onSelect, onBack }: AccountTypeSelectionProps) {
   return (
-    <Card className="w-full max-w-md border-[#E2E8F0] bg-white shadow-sm">
+    <Card className="w-full max-w-4xl border-[#E2E8F0] bg-white shadow-sm">
       <CardHeader className="pb-4">
         <div className="flex items-center">
           {onBack && (
@@ -56,24 +56,26 @@ export function AccountTypeSelection({ onSelect, onBack }: AccountTypeSelectionP
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {ACCOUNT_TYPES.map(({ type, label, description, icon: Icon }) => (
-          <button
-            key={type}
-            onClick={() => onSelect(type)}
-            className="flex w-full items-center gap-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-left transition-colors hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-800 text-white">
-              <Icon size={24} />
-            </div>
-            <div>
-              <p className="font-medium text-gray-800">{label}</p>
-              <p className="text-sm text-gray-500">{description}</p>
-            </div>
-          </button>
-        ))}
+      <CardContent>
+        <div className="grid grid-cols-3 gap-4">
+          {ACCOUNT_TYPES.map(({ type, label, description, icon: Icon }) => (
+            <button
+              key={type}
+              onClick={() => onSelect(type)}
+              className="flex flex-col items-center gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-6 text-center transition-colors hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100"
+            >
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-800 text-white">
+                <Icon size={28} />
+              </div>
+              <div>
+                <p className="font-medium text-gray-800">{label}</p>
+                <p className="text-sm text-gray-500 mt-1">{description}</p>
+              </div>
+            </button>
+          ))}
+        </div>
         {!onBack && (
-          <p className="text-center text-sm text-gray-500 pt-2">
+          <p className="text-center text-sm text-gray-500 pt-4">
             Already have an account?{" "}
             <Link href="/login" className="text-gray-800 hover:underline">
               Sign in

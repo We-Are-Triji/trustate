@@ -32,7 +32,7 @@ export function PrcVerificationForm({ onComplete, onBack, onDevBypass }: PrcVeri
   const renderUpload = (label: string, file: File | null, onChange: (file: File) => void) => (
     <div className="space-y-1.5">
       <Label className="text-sm text-gray-600">{label}</Label>
-      <label className="flex h-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1]">
+      <label className="flex h-10 cursor-pointer items-center justify-center rounded-md border border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#CBD5E1] px-3">
         <input
           type="file"
           accept="image/*"
@@ -42,21 +42,21 @@ export function PrcVerificationForm({ onComplete, onBack, onDevBypass }: PrcVeri
         {file ? (
           <div className="flex items-center gap-2 text-green-600">
             <CheckCircle size={16} />
-            <span className="text-xs truncate max-w-[120px]">{file.name}</span>
+            <span className="text-sm truncate max-w-[200px]">{file.name}</span>
           </div>
         ) : (
-          <>
-            <Upload className="h-5 w-5 text-gray-400" />
-            <span className="mt-1 text-xs text-gray-500">Upload</span>
-          </>
+          <div className="flex items-center gap-2 text-gray-500">
+            <Upload className="h-4 w-4" />
+            <span className="text-sm">Upload image</span>
+          </div>
         )}
       </label>
     </div>
   );
 
   return (
-    <Card className="w-full max-w-xl border-[#E2E8F0] bg-white shadow-sm">
-      <CardHeader className="pb-3">
+    <Card className="w-full max-w-4xl border-[#E2E8F0] bg-white shadow-sm">
+      <CardHeader className="pb-4">
         <div className="flex items-center">
           <Button
             type="button"
@@ -68,27 +68,33 @@ export function PrcVerificationForm({ onComplete, onBack, onDevBypass }: PrcVeri
             <ArrowLeft size={18} />
           </Button>
           <div className="flex-1 text-center pr-10">
-            <CardTitle className="text-lg font-semibold text-gray-800">PRC Accreditation</CardTitle>
+            <CardTitle className="text-xl font-semibold text-gray-800">PRC Accreditation</CardTitle>
             <p className="text-sm text-gray-500">Step 1 of 2</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-3 gap-4">
+      <CardContent className="space-y-5">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
           <div className="space-y-1.5">
-            <Label className="text-sm text-gray-600">PRC Number</Label>
+            <Label className="text-sm text-gray-600">PRC Accreditation Number</Label>
             <Input
               value={prcNumber}
               onChange={(e) => setPrcNumber(e.target.value)}
-              placeholder="Enter PRC number"
+              placeholder="Enter your PRC number"
               className="border-[#E2E8F0] bg-[#F8FAFC]"
             />
           </div>
+
+          <div className="opacity-0 pointer-events-none">
+            <Label className="text-sm text-gray-600">Placeholder</Label>
+            <Input disabled className="border-[#E2E8F0] bg-[#F8FAFC]" />
+          </div>
+
           {renderUpload("PRC Card (Front)", prcFrontImage, setPrcFrontImage)}
           {renderUpload("PRC Card (Back)", prcBackImage, setPrcBackImage)}
         </div>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-3 pt-2">
           {isDev && onDevBypass && (
             <Button
               type="button"
@@ -102,7 +108,7 @@ export function PrcVerificationForm({ onComplete, onBack, onDevBypass }: PrcVeri
           <Button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
+            className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950 px-8"
           >
             Continue
           </Button>
