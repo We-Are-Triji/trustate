@@ -8,12 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { PrcData } from "@/lib/types/registration";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface PrcVerificationFormProps {
   onComplete: (data: PrcData) => void;
   onBack: () => void;
+  onDevBypass?: () => void;
 }
 
-export function PrcVerificationForm({ onComplete, onBack }: PrcVerificationFormProps) {
+export function PrcVerificationForm({ onComplete, onBack, onDevBypass }: PrcVerificationFormProps) {
   const [prcNumber, setPrcNumber] = useState("");
   const [prcFrontImage, setPrcFrontImage] = useState<File | null>(null);
   const [prcBackImage, setPrcBackImage] = useState<File | null>(null);
@@ -97,6 +100,17 @@ export function PrcVerificationForm({ onComplete, onBack }: PrcVerificationFormP
         >
           Continue
         </Button>
+
+        {isDev && onDevBypass && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onDevBypass}
+            className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
+          >
+            [DEV] Skip PRC Verification
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
