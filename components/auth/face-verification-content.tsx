@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Camera, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,13 +16,39 @@ interface FaceVerificationContentProps {
 export function FaceVerificationContent({ onComplete, onBack, onDevBypass }: FaceVerificationContentProps) {
   const [faceImage, setFaceImage] = useState<File | null>(null);
   const [showCamera, setShowCamera] = useState(false);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const stopAllStreams = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopAllStreams();
+    };
+  }, [stopAllStreams]);
 
   const handleCapture = (file: File) => {
+    stopAllStreams();
     setFaceImage(file);
     setShowCamera(false);
   };
 
+  const handleCancel = () => {
+    stopAllStreams();
+    setShowCamera(false);
+  };
+
+  const handleBack = () => {
+    stopAllStreams();
+    onBack();
+  };
+
   const handleSubmit = () => {
+    stopAllStreams();
     if (faceImage) onComplete(faceImage);
   };
 
@@ -34,7 +60,7 @@ export function FaceVerificationContent({ onComplete, onBack, onDevBypass }: Fac
             type="button"
             variant="ghost"
             size="sm"
-            onClick={onBack}
+            onClick={handleBack}
             className="mr-2 h-8 w-8 p-0 text-gray-500 hover:text-gray-700"
           >
             <ArrowLeft size={18} />
@@ -85,7 +111,11 @@ export function FaceVerificationContent({ onComplete, onBack, onDevBypass }: Fac
             </div>
           </div>
         ) : (
-          <FaceCapture onCapture={handleCapture} onCancel={() => setShowCamera(false)} />
+          <FaceCapture 
+            onCapture={handleCapture} 
+            onCancel={handleCancel}
+            streamRef={streamRef}
+          />
         )}
 
         <div className="flex justify-end gap-3 pt-6 mt-4 border-t border-gray-100">
@@ -115,12 +145,11 @@ export function FaceVerificationContent({ onComplete, onBack, onDevBypass }: Fac
 interface FaceCaptureProps {
   onCapture: (file: File) => void;
   onCancel: () => void;
+  streamRef: React.MutableRefObject<MediaStream | null>;
 }
 
-function FaceCapture({ onCapture, onCancel }: FaceCaptureProps) {
-  const [stream, setStream] = useState<MediaStream | null>(null);
+function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     const startCamera = async () => {
@@ -130,16 +159,18 @@ function FaceCapture({ onCapture, onCancel }: FaceCaptureProps) {
         const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = mediaStream;
         streamRef.current = mediaStream;
-        setStream(mediaStream);
       } catch {
         console.error("Camera access denied");
       }
     };
     startCamera();
     return () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
     };
-  }, []);
+  }, [streamRef]);
 
   const capture = () => {
     const video = videoRef.current;
@@ -154,7 +185,10 @@ function FaceCapture({ onCapture, onCancel }: FaceCaptureProps) {
   };
 
   const stopCamera = () => {
-    stream?.getTracks().forEach((t) => t.stop());
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
     onCancel();
   };
 
