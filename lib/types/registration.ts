@@ -17,8 +17,47 @@ export interface PrcData {
   prcBackImage: File | null;
 }
 
+export interface BrokerLicenseData {
+  prcBrokerNumber: string;
+  corNumber: string;
+  prcFrontImage: File | null;
+  prcBackImage: File | null;
+}
+
+export interface SuretyBondData {
+  bondPolicyNumber: string;
+  bondExpiryDate: string;
+  providerName: string;
+  bondImage: File | null;
+}
+
+export type BrokerType = "individual" | "firm";
+
+export type FirmType = "corporation" | "partnership" | "sole-proprietorship";
+
+export interface FirmLegitimacyData {
+  firmType: FirmType | null;
+  registrationNumber: string;
+  registrationDocument: File | null;
+  businessPermit: File | null;
+  birForm2303: File | null;
+  dhsudNumber: string;
+  dhsudRegistration: File | null;
+  corporateBondImage: File | null;
+}
+
 export interface RegistrationState {
-  step: "account-type" | "basic-info" | "verification" | "id-verification" | "face-verification" | "prc-verification" | "broker-link";
+  step: 
+    | "basic-info" 
+    | "id-verification" 
+    | "face-verification" 
+    | "account-type" 
+    | "prc-verification" 
+    | "broker-link"
+    | "broker-license"
+    | "surety-bond"
+    | "broker-type"
+    | "firm-legitimacy";
   accountType: AccountType | null;
   basicInfo: BasicInfoData;
   verificationMethod: "email" | "mobile" | null;
