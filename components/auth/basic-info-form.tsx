@@ -27,6 +27,7 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
       firstName: "",
       middleName: "",
       lastName: "",
+      nationality: "",
       dateOfBirth: "",
       mobile: "",
       email: "",
@@ -53,6 +54,9 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
         break;
       case "middleName":
         error = value ? validators.name(value) : null;
+        break;
+      case "nationality":
+        error = value ? null : "Nationality is required";
         break;
       case "email":
         error = validators.email(value);
@@ -81,6 +85,7 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
     const fields: (keyof BasicInfoData)[] = [
       "firstName",
       "lastName",
+      "nationality",
       "email",
       "mobile",
       "dateOfBirth",
@@ -148,7 +153,16 @@ export function BasicInfoForm({ onSubmit, onDevBypass, onBack, initialData }: Ba
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
+            <FormField
+              id="nationality"
+              label="Nationality"
+              value={form.nationality}
+              onChange={(v) => updateField("nationality", v)}
+              error={errors.nationality}
+              placeholder="Filipino"
+              required
+            />
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-gray-700">
                 Date of Birth <span className="text-red-500">*</span>

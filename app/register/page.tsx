@@ -27,6 +27,7 @@ export default function RegisterPage() {
       firstName: "",
       middleName: "",
       lastName: "",
+      nationality: "",
       dateOfBirth: "",
       mobile: "",
       email: "",
