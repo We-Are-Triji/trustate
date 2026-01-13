@@ -40,7 +40,7 @@ export function BrokerLinkForm({ onSubmit, onBack }: BrokerLinkFormProps) {
             <CardTitle className="text-xl font-semibold text-gray-800">
               Broker Connection
             </CardTitle>
-            <p className="text-sm text-gray-500">Step 5 of 5: Link to your supervising broker</p>
+            <p className="text-sm text-gray-500">Step 2 of 2: Link to your supervising broker</p>
           </div>
         </div>
       </CardHeader>

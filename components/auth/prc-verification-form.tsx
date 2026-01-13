@@ -72,7 +72,7 @@ export function PrcVerificationForm({ onComplete, onBack }: PrcVerificationFormP
             <CardTitle className="text-xl font-semibold text-gray-800">
               PRC Accreditation
             </CardTitle>
-            <p className="text-sm text-gray-500">Step 4 of 5: Enter your PRC details</p>
+            <p className="text-sm text-gray-500">Step 1 of 2: Enter your PRC details</p>
           </div>
         </div>
       </CardHeader>
