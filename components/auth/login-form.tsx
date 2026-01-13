@@ -14,6 +14,7 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +34,7 @@ export function LoginForm() {
   };
 
   return (
-    <div className="relative flex w-full max-w-md flex-col items-center animate-[fadeIn_0.6s_ease-out]">
+    <div className="relative flex w-full max-w-md flex-col items-center">
       {/* Mobile logo */}
       <div className="mb-6 flex justify-center lg:hidden">
         <Image
@@ -45,17 +46,17 @@ export function LoginForm() {
         />
       </div>
 
-      {/* Welcome heading */}
-      <h1 className="mb-2 text-center text-4xl font-bold text-[#0247ae] animate-[fadeSlideUp_0.6s_ease-out_0.1s_both] font-[family-name:var(--font-arsenal-sc)]">
+      {/* Welcome heading - larger */}
+      <h1 className="mb-2 text-center text-5xl font-bold text-[#0247ae] animate-[fadeInUp_0.6s_ease-out_0.4s_both] font-[family-name:var(--font-arsenal-sc)]">
         Welcome Back
       </h1>
-      <p className="mb-8 text-center text-sm text-gray-500 animate-[fadeSlideUp_0.6s_ease-out_0.2s_both]">
+      <p className="mb-8 text-center text-base text-gray-500 animate-[fadeInUp_0.5s_ease-out_0.5s_both]">
         Log in with Email
       </p>
 
       <form onSubmit={handleSubmit} className="w-full space-y-6">
         {/* Email field with floating label */}
-        <div className="relative animate-[fadeSlideUp_0.6s_ease-out_0.3s_both]">
+        <div className="relative animate-[fadeInUp_0.5s_ease-out_0.55s_both]">
           <div className="relative">
             <label className="absolute -top-2 left-3 bg-white px-1 text-xs text-[#0247ae] z-10">
               Email Id
@@ -67,13 +68,13 @@ export function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="h-14 w-full rounded-lg border-2 border-[#0247ae]/30 bg-white pl-12 pr-4 text-gray-700 placeholder:text-gray-400 focus:border-[#0247ae] focus:outline-none"
+              className="h-14 w-full rounded-lg border-2 border-[#0247ae]/30 bg-white pl-12 pr-4 text-gray-700 placeholder:text-gray-400 focus:border-[#0247ae] focus:outline-none transition-all duration-200"
             />
           </div>
         </div>
 
         {/* Password field with floating label */}
-        <div className="relative animate-[fadeSlideUp_0.6s_ease-out_0.4s_both]">
+        <div className="relative animate-[fadeInUp_0.5s_ease-out_0.6s_both]">
           <div className="relative">
             <label className="absolute -top-2 left-3 bg-white px-1 text-xs text-[#0247ae] z-10">
               Password
@@ -85,7 +86,7 @@ export function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
-              className="h-14 w-full rounded-lg border-2 border-[#0247ae]/30 bg-white pl-12 pr-12 text-gray-700 placeholder:text-gray-400 focus:border-[#0247ae] focus:outline-none"
+              className="h-14 w-full rounded-lg border-2 border-[#0247ae]/30 bg-white pl-12 pr-12 text-gray-700 placeholder:text-gray-400 focus:border-[#0247ae] focus:outline-none transition-all duration-200"
             />
             <button
               type="button"
@@ -98,8 +99,17 @@ export function LoginForm() {
           </div>
         </div>
 
-        {/* Forgot password link */}
-        <div className="text-right animate-[fadeSlideUp_0.6s_ease-out_0.5s_both]">
+        {/* Keep logged in and Forgot password row */}
+        <div className="flex items-center justify-between animate-[fadeInUp_0.5s_ease-out_0.65s_both]">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={keepLoggedIn}
+              onChange={(e) => setKeepLoggedIn(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-[#0247ae] focus:ring-[#0247ae]"
+            />
+            <span className="text-sm text-gray-600">Keep me logged in</span>
+          </label>
           <Link
             href="/forgot-password"
             className="text-sm text-gray-500 transition-colors hover:text-[#0247ae]"
@@ -116,19 +126,19 @@ export function LoginForm() {
           </div>
         )}
 
-        {/* Login button */}
-        <div className="flex justify-center pt-2 animate-[fadeSlideUp_0.6s_ease-out_0.6s_both]">
+        {/* Login button - full width */}
+        <div className="pt-2 animate-[fadeInUp_0.5s_ease-out_0.7s_both]">
           <Button
             type="submit"
             disabled={loading}
-            className="h-12 w-40 rounded-lg bg-[#0247ae] text-base font-semibold uppercase tracking-wide text-white shadow-md transition-all hover:bg-[#023a8a] hover:shadow-lg disabled:opacity-50"
+            className="h-14 w-full rounded-lg bg-[#0247ae] text-base font-semibold uppercase tracking-wide text-white shadow-md transition-all duration-300 hover:bg-[#023a8a] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? "..." : "Login"}
           </Button>
         </div>
 
         {/* Register link */}
-        <p className="pt-4 text-center text-sm text-gray-600 animate-[fadeSlideUp_0.6s_ease-out_0.7s_both]">
+        <p className="pt-4 text-center text-sm text-gray-600 animate-[fadeInUp_0.5s_ease-out_0.75s_both]">
           Don&apos;t have account?{" "}
           <Link
             href="/register"
