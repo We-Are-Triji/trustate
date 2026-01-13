@@ -261,11 +261,6 @@ export function BasicInfoIdForm({ onSubmit, onDevBypass, initialBasicInfo }: Bas
                   </label>
                 </div>
               )}
-
-              <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
-                <p className="font-medium mb-1">Accepted IDs</p>
-                <p>Philippine Passport, Driver's License, UMID, National ID, and other government-issued IDs.</p>
-              </div>
             </div>
           </div>
 
