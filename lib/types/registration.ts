@@ -2,6 +2,7 @@ export interface BasicInfoData {
   firstName: string;
   middleName: string;
   lastName: string;
+  nationality: string;
   dateOfBirth: string;
   mobile: string;
   email: string;
