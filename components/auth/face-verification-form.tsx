@@ -5,13 +5,15 @@ import { Camera, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface FaceVerificationFormProps {
   onComplete: (faceImage: File) => void;
   onBack: () => void;
-  stepInfo?: { current: number; total: number };
+  onDevBypass?: () => void;
 }
 
-export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerificationFormProps) {
+export function FaceVerificationForm({ onComplete, onBack, onDevBypass }: FaceVerificationFormProps) {
   const [faceImage, setFaceImage] = useState<File | null>(null);
   const [showCamera, setShowCamera] = useState(false);
 
@@ -43,9 +45,7 @@ export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerif
             <CardTitle className="text-xl font-semibold text-gray-800">
               Face Verification
             </CardTitle>
-            <p className="text-sm text-gray-500">
-              Step {stepInfo?.current ?? 3} of {stepInfo?.total ?? 3}: Capture your face
-            </p>
+            <p className="text-sm text-gray-500">Step 3 of 3: Capture your face</p>
           </div>
         </div>
       </CardHeader>
@@ -90,8 +90,19 @@ export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerif
           disabled={!faceImage}
           className="w-full bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
         >
-          {stepInfo && stepInfo.current < stepInfo.total ? "Continue" : "Complete Registration"}
+          Continue
         </Button>
+
+        {isDev && onDevBypass && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onDevBypass}
+            className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
+          >
+            [DEV] Skip Face Verification
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
