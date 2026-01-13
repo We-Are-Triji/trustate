@@ -10,8 +10,14 @@ export interface BasicInfoData {
 
 export type AccountType = "client" | "agent" | "broker";
 
+export interface PrcData {
+  prcNumber: string;
+  prcFrontImage: File | null;
+  prcBackImage: File | null;
+}
+
 export interface RegistrationState {
-  step: "account-type" | "basic-info" | "verification" | "id-verification" | "face-verification";
+  step: "account-type" | "basic-info" | "verification" | "id-verification" | "face-verification" | "prc-verification" | "broker-link";
   accountType: AccountType | null;
   basicInfo: BasicInfoData;
   verificationMethod: "email" | "mobile" | null;
