@@ -165,6 +165,26 @@ export default function RegisterPage() {
     setState((prev) => ({ ...prev, step: "account-type" }));
   };
 
+  const handlePrcDevBypass = () => {
+    setState((prev) => ({ ...prev, step: "broker-link" }));
+  };
+
+  const handleBrokerLinkDevBypass = () => {
+    setIsPending(true);
+  };
+
+  const handleBrokerLicenseDevBypass = () => {
+    setState((prev) => ({ ...prev, step: "surety-bond" }));
+  };
+
+  const handleSuretyBondDevBypass = () => {
+    setState((prev) => ({ ...prev, step: "broker-type" }));
+  };
+
+  const handleFirmLegitimacyDevBypass = () => {
+    console.log("Firm registration complete (dev bypass)");
+  };
+
   // Back handlers
   const handleBackToBasicInfo = () => setState((prev) => ({ ...prev, step: "basic-info" }));
   const handleBackToIdVerification = () => setState((prev) => ({ ...prev, step: "id-verification" }));
@@ -218,20 +238,36 @@ export default function RegisterPage() {
 
       {/* Agent flow */}
       {state.step === "prc-verification" && (
-        <PrcVerificationForm onComplete={handlePrcComplete} onBack={handleBackToAccountType} />
+        <PrcVerificationForm
+          onComplete={handlePrcComplete}
+          onBack={handleBackToAccountType}
+          onDevBypass={handlePrcDevBypass}
+        />
       )}
 
       {state.step === "broker-link" && (
-        <BrokerLinkForm onSubmit={handleBrokerLinkSubmit} onBack={handleBackToPrcVerification} />
+        <BrokerLinkForm
+          onSubmit={handleBrokerLinkSubmit}
+          onBack={handleBackToPrcVerification}
+          onDevBypass={handleBrokerLinkDevBypass}
+        />
       )}
 
       {/* Broker flow */}
       {state.step === "broker-license" && (
-        <BrokerLicenseForm onComplete={handleBrokerLicenseComplete} onBack={handleBackToAccountType} />
+        <BrokerLicenseForm
+          onComplete={handleBrokerLicenseComplete}
+          onBack={handleBackToAccountType}
+          onDevBypass={handleBrokerLicenseDevBypass}
+        />
       )}
 
       {state.step === "surety-bond" && (
-        <SuretyBondForm onComplete={handleSuretyBondComplete} onBack={handleBackToBrokerLicense} />
+        <SuretyBondForm
+          onComplete={handleSuretyBondComplete}
+          onBack={handleBackToBrokerLicense}
+          onDevBypass={handleSuretyBondDevBypass}
+        />
       )}
 
       {state.step === "broker-type" && (
@@ -239,7 +275,11 @@ export default function RegisterPage() {
       )}
 
       {state.step === "firm-legitimacy" && (
-        <FirmLegitimacyForm onComplete={handleFirmLegitimacyComplete} onBack={handleBackToBrokerType} />
+        <FirmLegitimacyForm
+          onComplete={handleFirmLegitimacyComplete}
+          onBack={handleBackToBrokerType}
+          onDevBypass={handleFirmLegitimacyDevBypass}
+        />
       )}
 
       <VerificationChoiceModal
