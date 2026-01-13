@@ -1,17 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Camera, CheckCircle, ArrowLeft } from "lucide-react";
+import { Camera, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-type FaceDirection = "front" | "left" | "right";
-
-const FACE_STEPS: { direction: FaceDirection; label: string }[] = [
-  { direction: "front", label: "Look straight" },
-  { direction: "left", label: "Turn left" },
-  { direction: "right", label: "Turn right" },
-];
 
 interface FaceVerificationFormProps {
   onComplete: (faceImage: File) => void;
@@ -20,29 +12,17 @@ interface FaceVerificationFormProps {
 }
 
 export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerificationFormProps) {
-  const [faceStep, setFaceStep] = useState(0);
-  const [faceImages, setFaceImages] = useState<Record<FaceDirection, File | null>>({
-    front: null,
-    left: null,
-    right: null,
-  });
+  const [faceImage, setFaceImage] = useState<File | null>(null);
   const [showCamera, setShowCamera] = useState(false);
 
-  const handleFaceCapture = (file: File) => {
-    const direction = FACE_STEPS[faceStep].direction;
-    setFaceImages((prev) => ({ ...prev, [direction]: file }));
-    if (faceStep < FACE_STEPS.length - 1) {
-      setFaceStep(faceStep + 1);
-    } else {
-      setShowCamera(false);
-    }
+  const handleCapture = (file: File) => {
+    setFaceImage(file);
+    setShowCamera(false);
   };
 
-  const allFacesCaptured = Object.values(faceImages).every(Boolean);
-
   const handleSubmit = () => {
-    if (allFacesCaptured && faceImages.front) {
-      onComplete(faceImages.front);
+    if (faceImage) {
+      onComplete(faceImage);
     }
   };
 
@@ -71,45 +51,43 @@ export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerif
       </CardHeader>
       <CardContent className="space-y-4">
         {!showCamera ? (
-          <div className="space-y-3">
-            {FACE_STEPS.map((step) => (
-              <div
-                key={step.direction}
-                className="flex items-center gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4"
-              >
-                {faceImages[step.direction] ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                ) : (
-                  <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                )}
-                <span className="text-sm text-gray-600">{step.label}</span>
-              </div>
-            ))}
+          <div className="space-y-4">
+            <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
+              <p className="font-medium mb-2">Why do we need this?</p>
+              <p>
+                This step verifies you are a real person and helps us confirm your identity 
+                matches the ID you uploaded. Your photo will be compared against your 
+                government ID for security purposes.
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-sm text-gray-600">
+              <p className="font-medium text-gray-700 mb-2">Instructions:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Ensure good lighting on your face</li>
+                <li>Remove glasses or hats if possible</li>
+                <li>Look directly at the camera</li>
+                <li>Keep a neutral expression</li>
+              </ul>
+            </div>
+
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                setFaceStep(0);
-                setShowCamera(true);
-              }}
+              onClick={() => setShowCamera(true)}
               className="w-full border-[#E2E8F0] hover:bg-gray-50 active:bg-gray-100"
             >
               <Camera className="mr-2 h-4 w-4" />
-              {allFacesCaptured ? "Retake Photos" : "Start Camera"}
+              {faceImage ? "Retake Photo" : "Start Camera"}
             </Button>
           </div>
         ) : (
-          <FaceCapture
-            direction={FACE_STEPS[faceStep].direction}
-            label={FACE_STEPS[faceStep].label}
-            onCapture={handleFaceCapture}
-            onCancel={() => setShowCamera(false)}
-          />
+          <FaceCapture onCapture={handleCapture} onCancel={() => setShowCamera(false)} />
         )}
 
         <Button
           onClick={handleSubmit}
-          disabled={!allFacesCaptured}
+          disabled={!faceImage}
           className="w-full bg-gray-800 hover:bg-gray-900 active:bg-gray-950"
         >
           {stepInfo && stepInfo.current < stepInfo.total ? "Continue" : "Complete Registration"}
@@ -120,13 +98,11 @@ export function FaceVerificationForm({ onComplete, onBack, stepInfo }: FaceVerif
 }
 
 interface FaceCaptureProps {
-  direction: FaceDirection;
-  label: string;
   onCapture: (file: File) => void;
   onCancel: () => void;
 }
 
-function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps) {
+function FaceCapture({ onCapture, onCancel }: FaceCaptureProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -159,7 +135,7 @@ function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps
     canvas.getContext("2d")?.drawImage(video, 0, 0);
     canvas.toBlob((blob) => {
       if (blob) {
-        const file = new File([blob], `face-${direction}.jpg`, { type: "image/jpeg" });
+        const file = new File([blob], "face.jpg", { type: "image/jpeg" });
         onCapture(file);
       }
     }, "image/jpeg");
@@ -181,7 +157,7 @@ function FaceCapture({ direction, label, onCapture, onCancel }: FaceCaptureProps
           className="h-full w-full object-cover"
         />
         <div className="absolute bottom-2 left-0 right-0 text-center">
-          <span className="rounded bg-black/50 px-3 py-1 text-sm text-white">{label}</span>
+          <span className="rounded bg-black/50 px-3 py-1 text-sm text-white">Look straight at the camera</span>
         </div>
       </div>
       <div className="flex gap-2">
