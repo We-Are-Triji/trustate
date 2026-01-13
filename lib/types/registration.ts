@@ -9,7 +9,7 @@ export interface BasicInfoData {
 }
 
 export interface RegistrationState {
-  step: "basic-info" | "verification" | "identity";
+  step: "basic-info" | "verification" | "id-verification" | "face-verification";
   basicInfo: BasicInfoData;
   verificationMethod: "email" | "mobile" | null;
   isVerified: boolean;

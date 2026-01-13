@@ -4,7 +4,8 @@ import { useState } from "react";
 import { BasicInfoForm } from "@/components/auth/basic-info-form";
 import { VerificationChoiceModal } from "@/components/auth/verification-choice-modal";
 import { OtpVerificationModal } from "@/components/auth/otp-verification-modal";
-import { IdentityVerificationForm } from "@/components/auth/identity-verification-form";
+import { IdVerificationForm } from "@/components/auth/id-verification-form";
+import { FaceVerificationForm } from "@/components/auth/face-verification-form";
 import type {
   BasicInfoData,
   RegistrationState,
@@ -28,6 +29,7 @@ export default function RegisterPage() {
     isVerified: false,
   });
 
+  const [idData, setIdData] = useState<{ idType: PhilippineID; idImage: File } | null>(null);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
 
@@ -53,30 +55,35 @@ export default function RegisterPage() {
     await new Promise((r) => setTimeout(r, 1000));
     const success = code === "123456";
     if (success) {
-      setState((prev) => ({ ...prev, isVerified: true, step: "identity" }));
+      setState((prev) => ({ ...prev, isVerified: true, step: "id-verification" }));
       setShowOtpModal(false);
     }
     return success;
   };
 
-  const handleIdentityComplete = async (data: {
-    idType: PhilippineID;
-    idImage: File;
-    faceImage: File;
-  }) => {
-    console.log("Identity verification complete:", data);
+  const handleIdComplete = (data: { idType: PhilippineID; idImage: File }) => {
+    setIdData(data);
+    setState((prev) => ({ ...prev, step: "face-verification" }));
+  };
+
+  const handleFaceComplete = async (faceImage: File) => {
+    console.log("Registration complete:", { ...idData, faceImage });
   };
 
   const handleDevBypass = () => {
     setState((prev) => ({
       ...prev,
       isVerified: true,
-      step: "identity",
+      step: "id-verification",
     }));
   };
 
-  const handleBack = () => {
+  const handleBackToBasicInfo = () => {
     setState((prev) => ({ ...prev, step: "basic-info" }));
+  };
+
+  const handleBackToIdVerification = () => {
+    setState((prev) => ({ ...prev, step: "id-verification" }));
   };
 
   return (
@@ -89,8 +96,12 @@ export default function RegisterPage() {
         />
       )}
 
-      {state.step === "identity" && (
-        <IdentityVerificationForm onComplete={handleIdentityComplete} onBack={handleBack} />
+      {state.step === "id-verification" && (
+        <IdVerificationForm onComplete={handleIdComplete} onBack={handleBackToBasicInfo} />
+      )}
+
+      {state.step === "face-verification" && (
+        <FaceVerificationForm onComplete={handleFaceComplete} onBack={handleBackToIdVerification} />
       )}
 
       <VerificationChoiceModal

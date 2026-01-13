@@ -99,7 +99,7 @@ export function BasicInfoForm({ onSubmit, onDevBypass, initialData }: BasicInfoF
         <CardTitle className="text-center text-xl font-semibold text-gray-800">
           Create Account
         </CardTitle>
-        <p className="text-center text-sm text-gray-500">Step 1 of 2: Basic Information</p>
+        <p className="text-center text-sm text-gray-500">Step 1 of 3: Basic Information</p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
