@@ -155,11 +155,19 @@ export default function RegisterPage() {
       )}
 
       {state.step === "id-verification" && (
-        <IdVerificationForm onComplete={handleIdComplete} onBack={handleBackToBasicInfo} />
+        <IdVerificationForm
+          onComplete={handleIdComplete}
+          onBack={handleBackToBasicInfo}
+          stepInfo={state.accountType === "agent" ? { current: 2, total: 5 } : { current: 2, total: 3 }}
+        />
       )}
 
       {state.step === "face-verification" && (
-        <FaceVerificationForm onComplete={handleFaceComplete} onBack={handleBackToIdVerification} />
+        <FaceVerificationForm
+          onComplete={handleFaceComplete}
+          onBack={handleBackToIdVerification}
+          stepInfo={state.accountType === "agent" ? { current: 3, total: 5 } : { current: 3, total: 3 }}
+        />
       )}
 
       {state.step === "prc-verification" && (
