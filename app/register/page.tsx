@@ -9,14 +9,22 @@ import { IdVerificationForm } from "@/components/auth/id-verification-form";
 import { FaceVerificationForm } from "@/components/auth/face-verification-form";
 import { PrcVerificationForm } from "@/components/auth/prc-verification-form";
 import { BrokerLinkForm } from "@/components/auth/broker-link-form";
+import { BrokerLicenseForm } from "@/components/auth/broker-license-form";
+import { SuretyBondForm } from "@/components/auth/surety-bond-form";
+import { BrokerTypeSelection } from "@/components/auth/broker-type-selection";
+import { FirmLegitimacyForm } from "@/components/auth/firm-legitimacy-form";
 import { PendingApprovalScreen } from "@/components/auth/pending-approval-screen";
 import type {
   AccountType,
   BasicInfoData,
+  BrokerLicenseData,
+  BrokerType,
+  FirmLegitimacyData,
+  PrcData,
   RegistrationState,
+  SuretyBondData,
   VerificationMethod,
   PhilippineID,
-  PrcData,
 } from "@/lib/types/registration";
 
 export default function RegisterPage() {
@@ -40,6 +48,9 @@ export default function RegisterPage() {
   const [idData, setIdData] = useState<{ idType: PhilippineID; idImage: File } | null>(null);
   const [faceData, setFaceData] = useState<File | null>(null);
   const [prcData, setPrcData] = useState<PrcData | null>(null);
+  const [brokerLicenseData, setBrokerLicenseData] = useState<BrokerLicenseData | null>(null);
+  const [suretyBondData, setSuretyBondData] = useState<SuretyBondData | null>(null);
+  const [brokerType, setBrokerType] = useState<BrokerType | null>(null);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -62,7 +73,6 @@ export default function RegisterPage() {
   };
 
   const handleOtpVerify = async (code: string): Promise<boolean> => {
-    console.log(`Verifying code: ${code}`);
     await new Promise((r) => setTimeout(r, 1000));
     const success = code === "123456";
     if (success) {
@@ -87,31 +97,62 @@ export default function RegisterPage() {
 
     if (type === "client") {
       console.log("Client registration complete:", { basicInfo: state.basicInfo, idData, faceData });
-      // TODO: Navigate to main screen
     } else if (type === "agent") {
       setState((prev) => ({ ...prev, step: "prc-verification" }));
     } else if (type === "broker") {
-      // TODO: Broker professional verification
-      console.log("Broker flow - to be implemented");
+      setState((prev) => ({ ...prev, step: "broker-license" }));
     }
   };
 
+  // Agent flow
   const handlePrcComplete = (data: PrcData) => {
     setPrcData(data);
     setState((prev) => ({ ...prev, step: "broker-link" }));
   };
 
   const handleBrokerLinkSubmit = async (nexusLink: string) => {
-    console.log("Agent registration submitted:", {
-      basicInfo: state.basicInfo,
-      idData,
-      faceData,
-      prcData,
-      nexusLink,
-    });
+    console.log("Agent registration submitted:", { basicInfo: state.basicInfo, idData, faceData, prcData, nexusLink });
     setIsPending(true);
   };
 
+  // Broker flow
+  const handleBrokerLicenseComplete = (data: BrokerLicenseData) => {
+    setBrokerLicenseData(data);
+    setState((prev) => ({ ...prev, step: "surety-bond" }));
+  };
+
+  const handleSuretyBondComplete = (data: SuretyBondData) => {
+    setSuretyBondData(data);
+    setState((prev) => ({ ...prev, step: "broker-type" }));
+  };
+
+  const handleBrokerTypeSelect = (type: BrokerType) => {
+    setBrokerType(type);
+    if (type === "individual") {
+      console.log("Individual broker registration complete:", {
+        basicInfo: state.basicInfo,
+        idData,
+        faceData,
+        brokerLicenseData,
+        suretyBondData,
+      });
+    } else {
+      setState((prev) => ({ ...prev, step: "firm-legitimacy" }));
+    }
+  };
+
+  const handleFirmLegitimacyComplete = (data: FirmLegitimacyData) => {
+    console.log("Brokerage firm registration complete:", {
+      basicInfo: state.basicInfo,
+      idData,
+      faceData,
+      brokerLicenseData,
+      suretyBondData,
+      firmData: data,
+    });
+  };
+
+  // Dev bypasses
   const handleDevBypass = () => {
     setState((prev) => ({ ...prev, isVerified: true, step: "id-verification" }));
   };
@@ -124,25 +165,15 @@ export default function RegisterPage() {
     setState((prev) => ({ ...prev, step: "account-type" }));
   };
 
-  const handleBackToBasicInfo = () => {
-    setState((prev) => ({ ...prev, step: "basic-info" }));
-  };
-
-  const handleBackToIdVerification = () => {
-    setState((prev) => ({ ...prev, step: "id-verification" }));
-  };
-
-  const handleBackToFaceVerification = () => {
-    setState((prev) => ({ ...prev, step: "face-verification" }));
-  };
-
-  const handleBackToAccountType = () => {
-    setState((prev) => ({ ...prev, step: "account-type", accountType: null }));
-  };
-
-  const handleBackToPrcVerification = () => {
-    setState((prev) => ({ ...prev, step: "prc-verification" }));
-  };
+  // Back handlers
+  const handleBackToBasicInfo = () => setState((prev) => ({ ...prev, step: "basic-info" }));
+  const handleBackToIdVerification = () => setState((prev) => ({ ...prev, step: "id-verification" }));
+  const handleBackToFaceVerification = () => setState((prev) => ({ ...prev, step: "face-verification" }));
+  const handleBackToAccountType = () => setState((prev) => ({ ...prev, step: "account-type", accountType: null }));
+  const handleBackToPrcVerification = () => setState((prev) => ({ ...prev, step: "prc-verification" }));
+  const handleBackToBrokerLicense = () => setState((prev) => ({ ...prev, step: "broker-license" }));
+  const handleBackToSuretyBond = () => setState((prev) => ({ ...prev, step: "surety-bond" }));
+  const handleBackToBrokerType = () => setState((prev) => ({ ...prev, step: "broker-type" }));
 
   if (isPending) {
     return (
@@ -185,18 +216,30 @@ export default function RegisterPage() {
         />
       )}
 
+      {/* Agent flow */}
       {state.step === "prc-verification" && (
-        <PrcVerificationForm
-          onComplete={handlePrcComplete}
-          onBack={handleBackToAccountType}
-        />
+        <PrcVerificationForm onComplete={handlePrcComplete} onBack={handleBackToAccountType} />
       )}
 
       {state.step === "broker-link" && (
-        <BrokerLinkForm
-          onSubmit={handleBrokerLinkSubmit}
-          onBack={handleBackToPrcVerification}
-        />
+        <BrokerLinkForm onSubmit={handleBrokerLinkSubmit} onBack={handleBackToPrcVerification} />
+      )}
+
+      {/* Broker flow */}
+      {state.step === "broker-license" && (
+        <BrokerLicenseForm onComplete={handleBrokerLicenseComplete} onBack={handleBackToAccountType} />
+      )}
+
+      {state.step === "surety-bond" && (
+        <SuretyBondForm onComplete={handleSuretyBondComplete} onBack={handleBackToBrokerLicense} />
+      )}
+
+      {state.step === "broker-type" && (
+        <BrokerTypeSelection onSelect={handleBrokerTypeSelect} onBack={handleBackToSuretyBond} />
+      )}
+
+      {state.step === "firm-legitimacy" && (
+        <FirmLegitimacyForm onComplete={handleFirmLegitimacyComplete} onBack={handleBackToBrokerType} />
       )}
 
       <VerificationChoiceModal
