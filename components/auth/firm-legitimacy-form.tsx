@@ -15,9 +15,12 @@ import {
 } from "@/components/ui/select";
 import type { FirmLegitimacyData, FirmType } from "@/lib/types/registration";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface FirmLegitimacyFormProps {
   onComplete: (data: FirmLegitimacyData) => void;
   onBack: () => void;
+  onDevBypass?: () => void;
 }
 
 const FIRM_TYPES: { value: FirmType; label: string; regLabel: string }[] = [
@@ -26,7 +29,7 @@ const FIRM_TYPES: { value: FirmType; label: string; regLabel: string }[] = [
   { value: "sole-proprietorship", label: "Sole Proprietorship", regLabel: "DTI Certificate Number" },
 ];
 
-export function FirmLegitimacyForm({ onComplete, onBack }: FirmLegitimacyFormProps) {
+export function FirmLegitimacyForm({ onComplete, onBack, onDevBypass }: FirmLegitimacyFormProps) {
   const [data, setData] = useState<FirmLegitimacyData>({
     firmType: null,
     registrationNumber: "",
@@ -174,6 +177,17 @@ export function FirmLegitimacyForm({ onComplete, onBack }: FirmLegitimacyFormPro
         >
           Complete Registration
         </Button>
+
+        {isDev && onDevBypass && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onDevBypass}
+            className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 active:bg-orange-100"
+          >
+            [DEV] Skip Firm Legitimacy
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
