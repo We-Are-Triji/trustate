@@ -1,19 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FormField } from "./form-field";
 import { PasswordMeter } from "./password-meter";
 import { validators } from "@/lib/validation";
 import type { BasicInfoData } from "@/lib/types/registration";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface BasicInfoFormProps {
   onSubmit: (data: BasicInfoData) => void;
+  onDevBypass?: () => void;
 }
 
-export function BasicInfoForm({ onSubmit }: BasicInfoFormProps) {
+export function BasicInfoForm({ onSubmit, onDevBypass }: BasicInfoFormProps) {
   const [form, setForm] = useState<BasicInfoData>({
     firstName: "",
     middleName: "",
@@ -124,15 +130,44 @@ export function BasicInfoForm({ onSubmit }: BasicInfoFormProps) {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <FormField
-              id="dateOfBirth"
-              label="Date of Birth"
-              type="date"
-              value={form.dateOfBirth}
-              onChange={(v) => updateField("dateOfBirth", v)}
-              error={errors.dateOfBirth}
-              required
-            />
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">
+                Date of Birth <span className="text-red-500">*</span>
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={`w-full justify-start text-left font-normal border-[#E2E8F0] ${
+                      !form.dateOfBirth && "text-muted-foreground"
+                    } ${errors.dateOfBirth ? "border-red-500" : ""}`}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {form.dateOfBirth ? format(new Date(form.dateOfBirth), "PPP") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={form.dateOfBirth ? new Date(form.dateOfBirth) : undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        const formatted = format(date, "yyyy-MM-dd");
+                        updateField("dateOfBirth", formatted);
+                      }
+                    }}
+                    defaultMonth={new Date(2000, 0)}
+                    fromYear={1920}
+                    toYear={new Date().getFullYear() - 18}
+                    captionLayout="dropdown"
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              {errors.dateOfBirth && (
+                <p className="text-xs text-red-500">{errors.dateOfBirth}</p>
+              )}
+            </div>
             <FormField
               id="mobile"
               label="Mobile Number"
@@ -164,7 +199,7 @@ export function BasicInfoForm({ onSubmit }: BasicInfoFormProps) {
               value={form.password}
               onChange={(v) => updateField("password", v)}
               error={errors.password}
-              placeholder="Min 8 characters"
+              placeholder="Create a strong password"
               required
             >
               <button
@@ -177,11 +212,25 @@ export function BasicInfoForm({ onSubmit }: BasicInfoFormProps) {
               </button>
             </FormField>
             <PasswordMeter password={form.password} />
+            <p className="text-xs text-gray-500 mt-1">
+              Use 8+ characters with uppercase, lowercase, numbers, and symbols for a strong password.
+            </p>
           </div>
 
           <Button type="submit" className="w-full bg-gray-800 hover:bg-gray-900">
             Continue
           </Button>
+
+          {isDev && onDevBypass && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onDevBypass}
+              className="w-full border-dashed border-orange-400 text-orange-600 hover:bg-orange-50"
+            >
+              [DEV] Skip to Identity Verification
+            </Button>
+          )}
         </form>
       </CardContent>
     </Card>
