@@ -17,18 +17,21 @@ const isDev = process.env.NODE_ENV === "development";
 interface BasicInfoFormProps {
   onSubmit: (data: BasicInfoData) => void;
   onDevBypass?: () => void;
+  initialData?: BasicInfoData;
 }
 
-export function BasicInfoForm({ onSubmit, onDevBypass }: BasicInfoFormProps) {
-  const [form, setForm] = useState<BasicInfoData>({
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    dateOfBirth: "",
-    mobile: "",
-    email: "",
-    password: "",
-  });
+export function BasicInfoForm({ onSubmit, onDevBypass, initialData }: BasicInfoFormProps) {
+  const [form, setForm] = useState<BasicInfoData>(
+    initialData || {
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      dateOfBirth: "",
+      mobile: "",
+      email: "",
+      password: "",
+    }
+  );
   const [errors, setErrors] = useState<Partial<Record<keyof BasicInfoData, string | null>>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [touched, setTouched] = useState<Set<string>>(new Set());

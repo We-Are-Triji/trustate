@@ -75,14 +75,22 @@ export default function RegisterPage() {
     }));
   };
 
+  const handleBack = () => {
+    setState((prev) => ({ ...prev, step: "basic-info" }));
+  };
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#F8FAFC] p-4">
       {state.step === "basic-info" && (
-        <BasicInfoForm onSubmit={handleBasicInfoSubmit} onDevBypass={handleDevBypass} />
+        <BasicInfoForm
+          onSubmit={handleBasicInfoSubmit}
+          onDevBypass={handleDevBypass}
+          initialData={state.basicInfo}
+        />
       )}
 
       {state.step === "identity" && (
-        <IdentityVerificationForm onComplete={handleIdentityComplete} />
+        <IdentityVerificationForm onComplete={handleIdentityComplete} onBack={handleBack} />
       )}
 
       <VerificationChoiceModal

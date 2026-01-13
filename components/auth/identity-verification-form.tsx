@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Upload, Camera, CheckCircle } from "lucide-react";
+import { Upload, Camera, CheckCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,6 +16,7 @@ import { PH_VALID_IDS, type PhilippineID } from "@/lib/types/registration";
 
 interface IdentityVerificationFormProps {
   onComplete: (data: { idType: PhilippineID; idImage: File; faceImage: File }) => void;
+  onBack: () => void;
 }
 
 type FaceDirection = "front" | "left" | "right";
@@ -26,7 +27,7 @@ const FACE_STEPS: { direction: FaceDirection; label: string }[] = [
   { direction: "right", label: "Turn right" },
 ];
 
-export function IdentityVerificationForm({ onComplete }: IdentityVerificationFormProps) {
+export function IdentityVerificationForm({ onComplete, onBack }: IdentityVerificationFormProps) {
   const [idType, setIdType] = useState<PhilippineID | "">("");
   const [idImage, setIdImage] = useState<File | null>(null);
   const [faceStep, setFaceStep] = useState(0);
@@ -68,10 +69,23 @@ export function IdentityVerificationForm({ onComplete }: IdentityVerificationFor
   return (
     <Card className="w-full max-w-2xl border-[#E2E8F0] bg-white shadow-sm">
       <CardHeader className="pb-4">
-        <CardTitle className="text-center text-xl font-semibold text-gray-800">
-          Identity Verification
-        </CardTitle>
-        <p className="text-center text-sm text-gray-500">Step 3 of 3: Verify your identity</p>
+        <div className="flex items-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="mr-2 h-8 w-8 p-0 text-gray-500 hover:text-gray-700"
+          >
+            <ArrowLeft size={18} />
+          </Button>
+          <div className="flex-1 text-center pr-10">
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Identity Verification
+            </CardTitle>
+            <p className="text-sm text-gray-500">Step 3 of 3: Verify your identity</p>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-2 gap-6">
