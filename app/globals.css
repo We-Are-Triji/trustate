@@ -331,3 +331,336 @@
     opacity: 0.3;
   }
 }
+
+/* Card slide animation */
+@keyframes cardSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(50px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes cardSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50px) scale(0.95);
+  }
+}
+
+/* Bounce animation */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Rotate animation for decorative elements */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glow pulse animation */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(2, 71, 174, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(2, 71, 174, 0.4);
+  }
+}
+
+/* Blob morph animation */
+@keyframes blobMorph {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  50% {
+    border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%;
+  }
+  75% {
+    border-radius: 60% 40% 60% 30% / 70% 30% 50% 60%;
+  }
+}
+
+/* Floating blob animation */
+@keyframes floatBlob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -30px) scale(1.05);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  75% {
+    transform: translate(20px, 10px) scale(1.02);
+  }
+}
+
+/* Rotate float animation */
+@keyframes rotateFloat {
+  0% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(180deg) translateY(-20px);
+  }
+  100% {
+    transform: rotate(360deg) translateY(0);
+  }
+}
+
+/* Mesh gradient animation */
+@keyframes meshMove {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+}
+
+/* Orbit animation */
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(120px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(120px) rotate(-360deg);
+  }
+}
+
+/* Glassmorphism card float */
+@keyframes glassFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    transform: translateY(-15px) rotate(2deg);
+    box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Subtle breathe animation */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* Gradient orb glow */
+@keyframes orbGlow {
+  0%, 100% {
+    filter: blur(40px) brightness(1);
+  }
+  50% {
+    filter: blur(50px) brightness(1.2);
+  }
+}
+
+/* Glassmorphism utility classes */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(2, 71, 174, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(2, 71, 174, 0.1);
+}
+
+.glass-yellow {
+  background: rgba(255, 206, 8, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 206, 8, 0.2);
+}
+
+/* Gradient blob classes */
+.blob-blue {
+  background: linear-gradient(135deg, rgba(2, 71, 174, 0.4) 0%, rgba(5, 96, 212, 0.2) 100%);
+  animation: blobMorph 8s ease-in-out infinite, floatBlob 12s ease-in-out infinite;
+}
+
+.blob-yellow {
+  background: linear-gradient(135deg, rgba(255, 206, 8, 0.5) 0%, rgba(255, 183, 0, 0.2) 100%);
+  animation: blobMorph 10s ease-in-out infinite, floatBlob 15s ease-in-out infinite reverse;
+}
+
+.blob-purple {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(167, 139, 250, 0.1) 100%);
+  animation: blobMorph 12s ease-in-out infinite, floatBlob 18s ease-in-out infinite;
+}
+
+/* Mesh gradient background */
+.mesh-gradient {
+  background: 
+    radial-gradient(at 40% 20%, rgba(2, 71, 174, 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(255, 206, 8, 0.2) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(5, 96, 212, 0.1) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(255, 206, 8, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(2, 71, 174, 0.1) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+  background-size: 200% 200%;
+  animation: meshMove 20s ease infinite;
+}
+
+
+/* Infinite scroll carousel animations */
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scrollRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Marquee animations for continuous scroll */
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 40s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: marquee-right 45s linear infinite;
+}
+
+/* Stagger animation for list items */
+@keyframes staggerFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle hover glow */
+@keyframes subtleGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(2, 71, 174, 0.1);
+  }
+  50% {
+    box-shadow: 0 4px 30px rgba(2, 71, 174, 0.2);
+  }
+}
+
+/* Card entrance animation */
+@keyframes cardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Smooth reveal animation */
+@keyframes smoothReveal {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Ripple effect */
+@keyframes ripple {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Gradient text animation */
+@keyframes gradientText {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-text {
+  background: linear-gradient(90deg, #0247ae, #0560d4, #0247ae);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientText 3s ease infinite;
+}

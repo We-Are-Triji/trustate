@@ -154,18 +154,18 @@ export const topAgents: Agent[] = [
 ];
 
 export const partners: Partner[] = [
-  { id: "1", name: "Ayala Land", logo: "/partners/ayala-land.svg" },
-  { id: "2", name: "SM Development Corporation", logo: "/partners/smdc.svg" },
-  { id: "3", name: "Megaworld", logo: "/partners/megaworld.svg" },
-  { id: "4", name: "DMCI Homes", logo: "/partners/dmci.svg" },
-  { id: "5", name: "Robinsons Land", logo: "/partners/robinsons.svg" },
-  { id: "6", name: "Federal Land", logo: "/partners/federal-land.svg" },
-  { id: "7", name: "Filinvest", logo: "/partners/filinvest.svg" },
-  { id: "8", name: "Vista Land", logo: "/partners/vista-land.svg" },
-  { id: "9", name: "Century Properties", logo: "/partners/century.svg" },
-  { id: "10", name: "Shang Properties", logo: "/partners/shang.svg" },
-  { id: "11", name: "Rockwell Land", logo: "/partners/rockwell.svg" },
-  { id: "12", name: "Alveo Land", logo: "/partners/alveo.svg" },
+  { id: "1", name: "Ayala Land", logo: "https://img.logo.dev/ayalaland.com.ph?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "2", name: "SMDC", logo: "https://img.logo.dev/smdc.com?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "3", name: "Megaworld", logo: "https://img.logo.dev/megaworldcorp.com?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "4", name: "DMCI Homes", logo: "https://img.logo.dev/dmcihomes.com?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "5", name: "Robinsons Land", logo: "https://img.logo.dev/robinsonsland.com?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "6", name: "Federal Land", logo: "https://img.logo.dev/federalland.ph?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "7", name: "Filinvest", logo: "https://img.logo.dev/filinvestland.com?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "8", name: "Vista Land", logo: "https://img.logo.dev/vistaland.com.ph?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "9", name: "Century Properties", logo: "https://img.logo.dev/century-properties.com?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "10", name: "Shang Properties", logo: "https://img.logo.dev/shangproperties.com?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "11", name: "Rockwell Land", logo: "https://img.logo.dev/rockwellland.com?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
+  { id: "12", name: "Alveo Land", logo: "https://img.logo.dev/alveoland.com.ph?token=pk_X-1ZO13GSgeOoUrIuJ6GMQ" },
 ];
 
 export const footerSections: FooterSection[] = [

@@ -1,6 +1,7 @@
 import {
   LandingHeader,
   HeroSection,
+  HowItWorksSection,
   AgentListSection,
   LandingFooter,
 } from "@/components/landing";
@@ -12,10 +13,11 @@ import {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen">
       <LandingHeader />
       <main>
         <HeroSection agents={topAgents} />
+        <HowItWorksSection />
         <AgentListSection agents={topAgents} />
       </main>
       <LandingFooter partners={partners} sections={footerSections} />
