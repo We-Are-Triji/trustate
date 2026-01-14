@@ -98,7 +98,7 @@ export default function LoginPage() {
       </div>
 
 {/* Right Panel - Login Form */}
-<div className="relative flex w-full items-center justify-center overflow-hidden bg-white p-8 lg:w-[52%] lg:-ml-[40px] rounded-tl-[40px] rounded-bl-[40px] z-10 animate-[slideInRight_0.8s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]">
+<div className="relative flex w-full items-center justify-center overflow-hidden bg-white p-8 lg:flex-1 lg:-ml-[40px] rounded-tl-[40px] rounded-bl-[40px] z-10 animate-[slideInRight_0.8s_cubic-bezier(0.16,1,0.3,1)_0.1s_both]">
   
   {/* House and Dotted Trail */}
   <svg 
