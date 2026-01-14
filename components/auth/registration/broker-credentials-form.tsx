@@ -93,7 +93,7 @@ export function BrokerCredentialsForm({ onSubmit, onBack, onDevBypass }: BrokerC
             <ArrowLeft size={18} />
           </Button>
           <div className="flex-1 text-center pr-10">
-            <CardTitle className="text-xl font-semibold text-gray-800">Broker Credentials</CardTitle>
+            <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">Broker Credentials</CardTitle>
             <p className="text-sm text-gray-500">Professional License and Surety Bond</p>
           </div>
         </div>
@@ -101,7 +101,7 @@ export function BrokerCredentialsForm({ onSubmit, onBack, onDevBypass }: BrokerC
       <CardContent className="flex-1 flex flex-col">
         <div className="grid grid-cols-2 gap-x-8 gap-y-4 flex-1">
           <div className="space-y-4">
-            <h3 className="font-medium text-gray-800">PRC Broker License</h3>
+            <h3 className="font-medium text-[#0247ae]">PRC Broker License</h3>
 
             <div className="space-y-1.5">
               <Label className="text-sm text-gray-600">PRC Broker License Number (PIC) *</Label>
@@ -134,7 +134,7 @@ export function BrokerCredentialsForm({ onSubmit, onBack, onDevBypass }: BrokerC
           </div>
 
           <div className="space-y-4">
-            <h3 className="font-medium text-gray-800">Surety Bond (RA 9646)</h3>
+            <h3 className="font-medium text-[#0247ae]">Surety Bond (RA 9646)</h3>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -209,7 +209,7 @@ export function BrokerCredentialsForm({ onSubmit, onBack, onDevBypass }: BrokerC
           <Button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950 px-8"
+            className="bg-[#0247ae] hover:bg-[#023a8a] active:bg-[#022d6e] px-8"
           >
             Continue
           </Button>

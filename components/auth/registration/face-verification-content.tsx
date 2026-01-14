@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Camera, ArrowLeft } from "lucide-react";
+import { Camera, ArrowLeft, CheckCircle, HelpCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -52,61 +58,96 @@ export function FaceVerificationContent({ onComplete, onBack, onDevBypass }: Fac
     if (faceImage) onComplete(faceImage);
   };
 
+  const tips = [
+    "Good lighting on your face",
+    "Remove glasses or hats",
+    "Look directly at camera",
+    "Neutral expression"
+  ];
+
   return (
     <>
-      <CardHeader className="pb-4">
-        <div className="flex items-center">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleBack}
-            className="mr-2 h-8 w-8 p-0 text-gray-500 hover:text-gray-700"
-          >
-            <ArrowLeft size={18} />
-          </Button>
-          <div className="flex-1 text-center pr-10">
-            <CardTitle className="text-xl font-semibold text-gray-800">Face Verification</CardTitle>
-            <p className="text-sm text-gray-500">Capture your face to verify your identity</p>
+      <CardHeader className="pb-1 pt-5 animate-[fadeInUp_0.5s_ease-out]">
+        <div className="flex items-center justify-center">
+          <div className="text-center">
+            <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
+              Face Verification
+            </CardTitle>
+            <p className="text-gray-500 text-sm">Capture your face to verify your identity</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
+      <CardContent className="flex-1 flex flex-col px-6 pb-4">
         {!showCamera ? (
           <div className="grid grid-cols-2 gap-x-8 flex-1">
-            <div className="space-y-4">
-              <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
-                <p className="font-medium mb-2">Why do we need this?</p>
-                <p>This verifies you are a real person and confirms your identity matches the ID you uploaded.</p>
+            {/* Left Column - Tips */}
+            <div className="space-y-3 animate-[fadeInUp_0.5s_ease-out_0.1s_both]">
+              <div className="flex items-center gap-2 pb-1 border-b border-gray-100">
+                <Camera className="h-4 w-4 text-[#0247ae]" />
+                <h3 className="font-semibold text-[#0247ae] text-sm">Tips for best results</h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="ml-auto text-gray-400 hover:text-[#0247ae] transition-colors">
+                        <HelpCircle className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left" className="max-w-xs bg-[#0247ae] text-white p-3 rounded-lg">
+                      <p className="font-semibold mb-1">Why do we need this?</p>
+                      <p className="text-xs leading-relaxed opacity-90">
+                        Face verification confirms you are a real person and that your identity matches the ID you uploaded. 
+                        This protects against fraud and ensures secure transactions.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
 
-              <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4 text-sm text-gray-600">
-                <p className="font-medium text-gray-700 mb-2">Instructions:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Ensure good lighting on your face</li>
-                  <li>Remove glasses or hats if possible</li>
-                  <li>Look directly at the camera</li>
-                  <li>Keep a neutral expression</li>
-                </ul>
+              <div className="grid grid-cols-2 gap-2">
+                {tips.map((tip, i) => (
+                  <div key={i} className="flex items-center gap-2 rounded-lg bg-gray-50 p-2.5">
+                    <div className="h-5 w-5 rounded-full bg-[#ffce08]/20 flex items-center justify-center flex-shrink-0">
+                      <Check className="h-3 w-3 text-[#d4a900]" />
+                    </div>
+                    <span className="text-xs text-gray-600">{tip}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-lg bg-[#0247ae]/5 p-3 border border-[#0247ae]/10">
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  <span className="font-medium text-[#0247ae]">Privacy:</span> Your photo is only used for verification and is securely stored.
+                </p>
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-48 h-48 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center mb-4">
+            {/* Right Column - Camera Preview */}
+            <div className="flex flex-col items-center justify-center animate-[fadeInUp_0.5s_ease-out_0.2s_both]">
+              <div className={`w-36 h-36 rounded-full flex items-center justify-center mb-4 transition-all duration-300 ${
+                faceImage 
+                  ? "bg-[#ffce08]/10 border-4 border-[#ffce08]" 
+                  : "bg-gray-50 border-4 border-dashed border-gray-200"
+              }`}>
                 {faceImage ? (
-                  <span className="text-green-600 text-sm text-center px-4">Photo captured</span>
+                  <div className="flex flex-col items-center">
+                    <CheckCircle className="h-12 w-12 text-[#ffce08]" />
+                    <span className="text-[#d4a900] text-xs font-medium mt-1">Captured</span>
+                  </div>
                 ) : (
-                  <Camera className="h-16 w-16 text-gray-300" />
+                  <Camera className="h-14 w-14 text-gray-300" />
                 )}
               </div>
               <Button
                 type="button"
-                variant="outline"
                 onClick={() => setShowCamera(true)}
-                className="border-[#E2E8F0] hover:bg-gray-50 active:bg-gray-100"
+                className={`h-9 px-6 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                  faceImage
+                    ? "bg-white border-2 border-[#0247ae] text-[#0247ae] hover:bg-[#0247ae]/5"
+                    : "bg-[#0247ae] text-white hover:bg-[#023a8a] shadow-lg shadow-[#0247ae]/25"
+                }`}
               >
                 <Camera className="mr-2 h-4 w-4" />
-                {faceImage ? "Retake Photo" : "Start Camera"}
+                {faceImage ? "Retake" : "Start Camera"}
               </Button>
             </div>
           </div>
@@ -118,24 +159,37 @@ export function FaceVerificationContent({ onComplete, onBack, onDevBypass }: Fac
           />
         )}
 
-        <div className="flex justify-end gap-3 pt-6 mt-4 border-t border-gray-100">
-          {isDev && onDevBypass && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onDevBypass}
-              className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50"
-            >
-              [DEV] Skip
-            </Button>
-          )}
+        <div className="flex items-center justify-between pt-4 mt-3 border-t border-gray-100 animate-[fadeInUp_0.5s_ease-out_0.3s_both]">
           <Button
-            onClick={handleSubmit}
-            disabled={!faceImage}
-            className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950 px-8"
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleBack}
+            className="h-9 px-4 text-gray-600 hover:text-[#0247ae] hover:border-[#0247ae]"
           >
-            Continue
+            <ArrowLeft size={16} className="mr-1" />
+            Previous
           </Button>
+          <div className="flex gap-2">
+            {isDev && onDevBypass && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onDevBypass}
+                className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 h-9"
+              >
+                [DEV] Skip
+              </Button>
+            )}
+            <Button
+              onClick={handleSubmit}
+              disabled={!faceImage}
+              className="bg-[#0247ae] hover:bg-[#023a8a] active:bg-[#022d6e] px-6 h-9 text-sm font-semibold shadow-lg shadow-[#0247ae]/25 hover:shadow-xl hover:shadow-[#0247ae]/30 transition-all duration-200 disabled:opacity-50 disabled:shadow-none"
+            >
+              Continue
+            </Button>
+          </div>
         </div>
       </CardContent>
     </>
@@ -206,18 +260,31 @@ function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center">
-      <div className="relative w-full max-w-lg aspect-video overflow-hidden rounded-lg bg-black">
+    <div className="flex-1 flex flex-col items-center justify-center animate-[fadeInScale_0.3s_ease-out]">
+      <div className="relative w-full max-w-md aspect-video overflow-hidden rounded-xl bg-black shadow-xl">
         <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
-        <div className="absolute bottom-2 left-0 right-0 text-center">
-          <span className="rounded bg-black/50 px-3 py-1 text-sm text-white">Look straight at the camera</span>
+        <div className="absolute inset-0 border-2 border-white/20 rounded-xl pointer-events-none" />
+        <div className="absolute bottom-3 left-0 right-0 text-center">
+          <span className="rounded-full bg-black/60 px-3 py-1.5 text-xs text-white backdrop-blur-sm">
+            Position your face in the center
+          </span>
         </div>
       </div>
       <div className="flex gap-3 mt-4">
-        <Button variant="outline" onClick={handleCancelClick} className="hover:bg-gray-50 active:bg-gray-100 px-6">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleCancelClick} 
+          className="h-9 px-5 rounded-lg border-2"
+        >
           Cancel
         </Button>
-        <Button onClick={capture} className="bg-gray-800 hover:bg-gray-900 active:bg-gray-950 px-6">
+        <Button 
+          size="sm"
+          onClick={capture} 
+          className="h-9 px-5 rounded-lg bg-[#0247ae] hover:bg-[#023a8a] shadow-lg shadow-[#0247ae]/25 font-semibold"
+        >
+          <Camera className="mr-2 h-4 w-4" />
           Capture
         </Button>
       </div>
