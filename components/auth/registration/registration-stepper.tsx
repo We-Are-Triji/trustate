@@ -21,17 +21,17 @@ export function RegistrationStepper({ steps }: RegistrationStepperProps) {
             <div
               className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${
                 step.completed
-                  ? "bg-green-600 text-white"
+                  ? "bg-[#ffce08] text-[#0247ae]"
                   : step.current
-                  ? "bg-gray-800 text-white"
-                  : "bg-gray-200 text-gray-500"
+                  ? "bg-[#ffce08] text-[#0247ae]"
+                  : "bg-white/30 text-white/70"
               }`}
             >
               {step.completed ? <Check size={16} /> : index + 1}
             </div>
             <span
               className={`text-sm hidden sm:block ${
-                step.current ? "font-medium text-gray-800" : "text-gray-500"
+                step.current ? "font-medium text-[#ffce08]" : "text-white/70"
               }`}
             >
               {step.label}
@@ -40,7 +40,7 @@ export function RegistrationStepper({ steps }: RegistrationStepperProps) {
           {index < steps.length - 1 && (
             <div
               className={`w-8 sm:w-12 h-0.5 mx-2 ${
-                step.completed ? "bg-green-600" : "bg-gray-200"
+                step.completed ? "bg-[#ffce08]" : "bg-white/30"
               }`}
             />
           )}
