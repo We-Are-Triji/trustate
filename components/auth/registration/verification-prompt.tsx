@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, ArrowRight, LogIn } from "lucide-react";
+import { ShieldCheck, ArrowRight, LogIn, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AccountType } from "@/lib/types/registration";
@@ -9,6 +9,7 @@ interface VerificationPromptProps {
   accountType: AccountType;
   onStartVerification: () => void;
   onSkipToLogin: () => void;
+  onBack: () => void;
 }
 
 const VERIFICATION_INFO: Record<AccountType, { title: string; steps: string[] }> = {
@@ -37,7 +38,7 @@ const VERIFICATION_INFO: Record<AccountType, { title: string; steps: string[] }>
   },
 };
 
-export function VerificationPrompt({ accountType, onStartVerification, onSkipToLogin }: VerificationPromptProps) {
+export function VerificationPrompt({ accountType, onStartVerification, onSkipToLogin, onBack }: VerificationPromptProps) {
   const info = VERIFICATION_INFO[accountType];
 
   return (
@@ -77,13 +78,6 @@ export function VerificationPrompt({ accountType, onStartVerification, onSkipToL
               </p>
             </div>
 
-            <div className="rounded-xl bg-red-50 border border-red-200 p-4 mb-6">
-              <p className="text-sm text-red-700">
-                <span className="font-semibold">Important:</span> Your account type cannot be changed after registration. 
-                If you need a different account type, you&apos;ll need to register again.
-              </p>
-            </div>
-
             <div className="space-y-3">
               <Button
                 onClick={onStartVerification}
@@ -105,6 +99,19 @@ export function VerificationPrompt({ accountType, onStartVerification, onSkipToL
               </p>
             </div>
           </div>
+        </div>
+
+        <div className="flex items-center pt-4 mt-3 border-t border-gray-100">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onBack}
+            className="h-9 px-4 text-gray-600 hover:text-[#0247ae] hover:border-[#0247ae]"
+          >
+            <ArrowLeft size={16} className="mr-1" />
+            Previous
+          </Button>
         </div>
       </CardContent>
     </>
