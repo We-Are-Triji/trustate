@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { RegistrationContainer } from "@/components/auth/registration/registration-container";
 import { RegistrationStepper } from "@/components/auth/registration/registration-stepper";
@@ -16,6 +16,39 @@ import type { AccountType, BasicInfoData, VerificationMethod } from "@/lib/types
 
 type Step = "basic-info" | "otp-verification" | "account-type" | "verification-prompt";
 
+const STORAGE_KEY = "trustate_registration";
+const STORAGE_EXPIRY = 30 * 60 * 1000; // 30 minutes
+
+interface StoredData {
+  step: Step;
+  basicInfo: BasicInfoData | null;
+  completedSteps: string[];
+  timestamp: number;
+}
+
+function saveToStorage(data: Omit<StoredData, "timestamp">) {
+  sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ ...data, timestamp: Date.now() }));
+}
+
+function loadFromStorage(): StoredData | null {
+  try {
+    const stored = sessionStorage.getItem(STORAGE_KEY);
+    if (!stored) return null;
+    const data: StoredData = JSON.parse(stored);
+    if (Date.now() - data.timestamp > STORAGE_EXPIRY) {
+      sessionStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function clearStorage() {
+  sessionStorage.removeItem(STORAGE_KEY);
+}
+
 export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("basic-info");
@@ -29,6 +62,27 @@ export default function RegisterPage() {
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Load saved data on mount
+  useEffect(() => {
+    const saved = loadFromStorage();
+    if (saved) {
+      setStep(saved.step);
+      setBasicInfo(saved.basicInfo);
+      setCompletedSteps(new Set(saved.completedSteps));
+    }
+  }, []);
+
+  // Save data on changes
+  useEffect(() => {
+    if (basicInfo || completedSteps.size > 0) {
+      saveToStorage({
+        step,
+        basicInfo,
+        completedSteps: Array.from(completedSteps),
+      });
+    }
+  }, [step, basicInfo, completedSteps]);
 
   const markStepComplete = (stepName: string) => {
     setCompletedSteps((prev) => new Set(prev).add(stepName));
@@ -158,10 +212,12 @@ export default function RegisterPage() {
 
   // After account type - verification prompt
   const handleStartVerification = () => {
+    clearStorage();
     router.push("/verify");
   };
 
   const handleSkipToLogin = () => {
+    clearStorage();
     router.push("/app");
   };
 
