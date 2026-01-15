@@ -14,6 +14,7 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -116,8 +117,17 @@ export function LoginForm() {
           </div>
         </div>
 
-        {/* Forgot password link */}
-        <div className="text-right animate-[fadeSlideUp_0.6s_ease-out_0.5s_both]">
+        {/* Keep logged in and Forgot password */}
+        <div className="flex items-center justify-between animate-[fadeSlideUp_0.6s_ease-out_0.5s_both]">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={keepLoggedIn}
+              onChange={(e) => setKeepLoggedIn(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-[#0247ae] focus:ring-[#0247ae]"
+            />
+            <span className="text-sm text-gray-600">Keep me logged in</span>
+          </label>
           <Link
             href="/forgot-password"
             className="text-sm text-gray-500 transition-colors hover:text-[#0247ae]"

@@ -23,17 +23,16 @@ export default function CompleteRegistrationPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await getCurrentUser();
+        setIsCheckingAuth(false);
+      } catch {
+        router.push("/login");
+      }
+    };
     checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      await getCurrentUser();
-      setIsCheckingAuth(false);
-    } catch {
-      router.push("/login");
-    }
-  };
+  }, [router]);
 
   const handleAccountTypeSelect = (type: AccountType) => {
     setPendingAccountType(type);
