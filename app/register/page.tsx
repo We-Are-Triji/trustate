@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { RegistrationContainer } from "@/components/auth/registration/registration-container";
 import { RegistrationStepper } from "@/components/auth/registration/registration-stepper";
-import { BasicInfoIdForm } from "@/components/auth/registration/basic-info-id-form";
-import { FaceVerificationContent } from "@/components/auth/registration/face-verification-content";
+import { BasicInfoForm } from "@/components/auth/registration/basic-info-form";
 import { AccountTypeContent } from "@/components/auth/registration/account-type-content";
+import { VerificationPrompt } from "@/components/auth/registration/verification-prompt";
+import { IdVerificationForm } from "@/components/auth/registration/id-verification-form";
+import { FaceVerificationContent } from "@/components/auth/registration/face-verification-content";
 import { AgentVerificationForm } from "@/components/auth/registration/agent-verification-form";
 import { BrokerCredentialsForm } from "@/components/auth/registration/broker-credentials-form";
 import { BrokerTypeContent } from "@/components/auth/registration/broker-type-content";
@@ -13,6 +16,7 @@ import { FirmLegitimacyContent } from "@/components/auth/registration/firm-legit
 import { PendingApprovalScreen } from "@/components/auth/registration/pending-approval-screen";
 import { VerificationChoiceModal } from "@/components/auth/registration/verification-choice-modal";
 import { OtpVerificationModal } from "@/components/auth/registration/otp-verification-modal";
+import { AnimatedBackground } from "@/components/auth/registration/animated-background";
 import type {
   AccountType,
   BasicInfoData,
@@ -25,21 +29,22 @@ import type {
   PhilippineID,
 } from "@/lib/types/registration";
 
-type Step = 
-  | "basic-info-id"
-  | "face-verification"
+type Step =
+  | "basic-info"
   | "account-type"
+  | "verification-prompt"
+  | "id-verification"
+  | "face-verification"
   | "agent-verification"
   | "broker-credentials"
   | "broker-type"
   | "firm-legitimacy";
 
 export default function RegisterPage() {
-  const [step, setStep] = useState<Step>("basic-info-id");
+  const router = useRouter();
+  const [step, setStep] = useState<Step>("basic-info");
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [basicInfo, setBasicInfo] = useState<BasicInfoData | null>(null);
-  const [idData, setIdData] = useState<{ idType: PhilippineID; idImage: File } | null>(null);
-  const [faceData, setFaceData] = useState<File | null>(null);
   const [verificationMethod, setVerificationMethod] = useState<VerificationMethod | null>(null);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -47,35 +52,46 @@ export default function RegisterPage() {
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
   const markStepComplete = (stepName: string) => {
-    setCompletedSteps(prev => new Set(prev).add(stepName));
+    setCompletedSteps((prev) => new Set(prev).add(stepName));
   };
 
   const getSteps = () => {
-    const baseSteps = [
-      { label: "Info & ID", completed: completedSteps.has("basic-info-id"), current: step === "basic-info-id" },
+    // Registration steps (before verification)
+    if (step === "basic-info" || step === "account-type" || step === "verification-prompt") {
+      return [
+        { label: "Basic Info", completed: completedSteps.has("basic-info"), current: step === "basic-info" },
+        { label: "Account Type", completed: completedSteps.has("account-type"), current: step === "account-type" || step === "verification-prompt" },
+      ];
+    }
+
+    // Verification steps
+    const verificationSteps = [
+      { label: "ID", completed: completedSteps.has("id-verification"), current: step === "id-verification" },
       { label: "Face", completed: completedSteps.has("face-verification"), current: step === "face-verification" },
-      { label: "Account", completed: completedSteps.has("account-type"), current: step === "account-type" },
     ];
 
+    if (accountType === "client") {
+      return verificationSteps;
+    }
+
     if (accountType === "agent") {
-      return [...baseSteps, { label: "Verification", completed: completedSteps.has("agent-verification"), current: step === "agent-verification" }];
+      return [...verificationSteps, { label: "PRC & Nexus", completed: completedSteps.has("agent-verification"), current: step === "agent-verification" }];
     }
 
     if (accountType === "broker") {
-      const brokerSteps = [
+      return [
+        ...verificationSteps,
         { label: "Credentials", completed: completedSteps.has("broker-credentials"), current: step === "broker-credentials" },
-        { label: "Structure", completed: completedSteps.has("broker-type"), current: step === "broker-type" },
+        { label: "Structure", completed: completedSteps.has("broker-type"), current: step === "broker-type" || step === "firm-legitimacy" },
       ];
-      return [...baseSteps, ...brokerSteps];
     }
 
-    return baseSteps;
+    return verificationSteps;
   };
 
-  const handleBasicInfoIdSubmit = (info: BasicInfoData, id: { idType: PhilippineID; idImage: File }) => {
-    setBasicInfo(info);
-    setIdData(id);
-    markStepComplete("basic-info-id");
+  // Step 1: Basic Info
+  const handleBasicInfoSubmit = (data: BasicInfoData) => {
+    setBasicInfo(data);
     setShowChoiceModal(true);
   };
 
@@ -90,128 +106,108 @@ export default function RegisterPage() {
     const success = code === "123456";
     if (success) {
       setShowOtpModal(false);
-      setStep("face-verification");
+      markStepComplete("basic-info");
+      setStep("account-type");
+      // TODO: Create Cognito user here with status="registered"
     }
     return success;
   };
 
-  const handleFaceComplete = (faceImage: File) => {
-    setFaceData(faceImage);
-    markStepComplete("face-verification");
-    setStep("account-type");
-  };
-
+  // Step 2: Account Type
   const handleAccountTypeSelect = (type: AccountType) => {
     setAccountType(type);
     markStepComplete("account-type");
-    if (type === "client") {
-      console.log("Client registration complete:", { basicInfo, idData, faceData });
-    } else if (type === "agent") {
+    setStep("verification-prompt");
+    // TODO: Update Cognito user with account_type
+  };
+
+  // Verification Prompt
+  const handleStartVerification = () => {
+    setStep("id-verification");
+  };
+
+  const handleSkipToLogin = () => {
+    router.push("/app");
+  };
+
+  // ID Verification
+  const handleIdSubmit = (data: { idType: PhilippineID; idImage: File }) => {
+    console.log("ID data:", data);
+    markStepComplete("id-verification");
+    setStep("face-verification");
+  };
+
+  // Face Verification
+  const handleFaceComplete = (faceImage: File) => {
+    console.log("Face image:", faceImage);
+    markStepComplete("face-verification");
+
+    if (accountType === "client") {
+      // Client is verified after face
+      // TODO: Update Cognito status to "verified"
+      router.push("/app");
+    } else if (accountType === "agent") {
       setStep("agent-verification");
-    } else if (type === "broker") {
+    } else if (accountType === "broker") {
       setStep("broker-credentials");
     }
   };
 
+  // Agent Verification
   const handleAgentSubmit = (prcData: PrcData, nexusLink: string) => {
-    console.log("Agent registration submitted:", { basicInfo, idData, faceData, prcData, nexusLink });
+    console.log("Agent data:", { prcData, nexusLink });
     markStepComplete("agent-verification");
+    // TODO: Update Cognito status to "pending_approval"
     setIsPending(true);
   };
 
+  // Broker Credentials
   const handleBrokerCredentialsSubmit = (licenseData: BrokerLicenseData, bondData: SuretyBondData) => {
     console.log("Broker credentials:", { licenseData, bondData });
     markStepComplete("broker-credentials");
     setStep("broker-type");
   };
 
+  // Broker Type
   const handleBrokerTypeSelect = (type: BrokerType) => {
     markStepComplete("broker-type");
     if (type === "individual") {
-      console.log("Individual broker registration complete");
+      // TODO: Update Cognito status to "pending_approval"
+      setIsPending(true);
     } else {
       setStep("firm-legitimacy");
     }
   };
 
+  // Firm Legitimacy
   const handleFirmLegitimacyComplete = (data: FirmLegitimacyData) => {
-    console.log("Firm registration complete:", data);
+    console.log("Firm data:", data);
+    markStepComplete("firm-legitimacy");
+    // TODO: Update Cognito status to "pending_approval"
+    setIsPending(true);
   };
 
   // Dev bypasses
-  const handleBasicInfoDevBypass = () => { markStepComplete("basic-info-id"); setStep("face-verification"); };
-  const handleFaceDevBypass = () => { markStepComplete("face-verification"); setStep("account-type"); };
+  const handleBasicInfoDevBypass = () => { markStepComplete("basic-info"); setStep("account-type"); };
+  const handleIdDevBypass = () => { markStepComplete("id-verification"); setStep("face-verification"); };
+  const handleFaceDevBypass = () => { markStepComplete("face-verification"); setStep(accountType === "agent" ? "agent-verification" : "broker-credentials"); };
   const handleAgentDevBypass = () => { markStepComplete("agent-verification"); setIsPending(true); };
   const handleBrokerCredentialsDevBypass = () => { markStepComplete("broker-credentials"); setStep("broker-type"); };
-  const handleFirmDevBypass = () => { markStepComplete("firm-legitimacy"); console.log("Firm registration complete (dev)"); };
+  const handleFirmDevBypass = () => { markStepComplete("firm-legitimacy"); setIsPending(true); };
 
   // Back handlers
-  const handleBackToBasicInfo = () => setStep("basic-info-id");
-  const handleBackToFace = () => setStep("face-verification");
+  const handleBackToBasicInfo = () => setStep("basic-info");
   const handleBackToAccountType = () => { setStep("account-type"); setAccountType(null); };
+  const handleBackToVerificationPrompt = () => setStep("verification-prompt");
+  const handleBackToId = () => setStep("id-verification");
+  const handleBackToFace = () => setStep("face-verification");
   const handleBackToBrokerCredentials = () => setStep("broker-credentials");
   const handleBackToBrokerType = () => setStep("broker-type");
 
   if (isPending) {
     return (
       <main className="flex min-h-screen bg-[#0247ae]">
-        {/* Full-screen animated background */}
-        <div 
-          className="fixed inset-0 overflow-hidden"
-          style={{
-            background: 'linear-gradient(120deg, #0247ae 0%, #0873c9 20%, #0247ae 40%, #0873c9 60%, #0247ae 80%, #0873c9 100%)',
-            backgroundSize: '300% 100%',
-            animation: 'waveGradient 30s ease-in-out infinite'
-          }}
-        >
-          {/* Grid pattern overlay */}
-          <div className="absolute inset-0 opacity-[0.07]">
-            <div className="h-full w-full" style={{
-              backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
-                               linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`,
-              backgroundSize: '50px 50px'
-            }} />
-          </div>
-
-          {/* Bottom waves */}
-          <svg 
-            className="absolute -bottom-2 -left-20 w-[150%] h-80" 
-            viewBox="0 0 800 320" 
-            preserveAspectRatio="none"
-            style={{ animation: 'waveMove 4s ease-in-out infinite' }}
-          >
-            <path d="M0 200 Q200 120 400 170 Q600 220 800 150 L800 320 L0 320 Z" fill="rgba(255,255,255,0.15)" />
-          </svg>
-          <svg 
-            className="absolute -bottom-2 -left-10 w-[140%] h-80" 
-            viewBox="0 0 800 320" 
-            preserveAspectRatio="none"
-            style={{ animation: 'waveMove2 5s ease-in-out infinite' }}
-          >
-            <path d="M0 240 Q200 180 400 220 Q600 260 800 200 L800 320 L0 320 Z" fill="rgba(255,255,255,0.10)" />
-          </svg>
-
-          {/* Floating circles */}
-          <div className="absolute left-[10%] top-[15%] h-20 w-20 rounded-full bg-white/10 animate-[float_3s_ease-in-out_infinite]" />
-          <div className="absolute left-[25%] top-[8%] h-8 w-8 rounded-full bg-white/15 animate-[float_2.5s_ease-in-out_infinite_0.3s]" />
-          <div className="absolute right-[30%] top-[20%] h-14 w-14 rounded-full border-2 border-white/20 animate-[float_3.5s_ease-in-out_infinite_0.5s]" />
-          <div className="absolute right-[15%] top-[35%] h-10 w-10 rounded-full bg-[#ffce08]/25 animate-[float_4s_ease-in-out_infinite_0.2s]" />
-          <div className="absolute left-[15%] top-[45%] h-6 w-6 rounded-full bg-white/20 animate-[float_2.5s_ease-in-out_infinite_0.8s]" />
-          <div className="absolute right-[40%] top-[12%] h-4 w-4 rounded-full bg-white/25 animate-[float_3s_ease-in-out_infinite_1s]" />
-          <div className="absolute left-[40%] top-[30%] h-12 w-12 rounded-full border border-white/15 animate-[float_3.5s_ease-in-out_infinite_0.4s]" />
-          <div className="absolute right-[20%] top-[55%] h-5 w-5 rounded-full bg-white/15 animate-[float_2.5s_ease-in-out_infinite_0.6s]" />
-          <div className="absolute left-[8%] top-[65%] h-16 w-16 rounded-full border-2 border-white/10 animate-[float_4s_ease-in-out_infinite_0.3s]" />
-          <div className="absolute right-[8%] top-[70%] h-12 w-12 rounded-full bg-white/10 animate-[float_3s_ease-in-out_infinite_0.7s]" />
-          <div className="absolute left-[60%] top-[60%] h-8 w-8 rounded-full border border-white/20 animate-[float_3.5s_ease-in-out_infinite_0.9s]" />
-
-          {/* Small dots */}
-          <div className="absolute left-[50%] top-[18%] h-2 w-2 rounded-full bg-white/35 animate-[pulse_1.5s_ease-in-out_infinite]" />
-          <div className="absolute left-[60%] top-[40%] h-2 w-2 rounded-full bg-white/30 animate-[pulse_2s_ease-in-out_infinite_0.3s]" />
-          <div className="absolute left-[30%] top-[55%] h-2 w-2 rounded-full bg-[#ffce08]/50 animate-[pulse_1.5s_ease-in-out_infinite_0.5s]" />
-          <div className="absolute right-[25%] top-[65%] h-2 w-2 rounded-full bg-white/30 animate-[pulse_2s_ease-in-out_infinite_0.7s]" />
-        </div>
-
-        {/* Centered pending approval card */}
+        <AnimatedBackground />
         <div className="relative z-10 flex w-full items-center justify-center p-6">
           <PendingApprovalScreen />
         </div>
@@ -221,94 +217,54 @@ export default function RegisterPage() {
 
   return (
     <main className="flex min-h-screen bg-[#0247ae]">
-      {/* Full-screen animated background */}
-      <div 
-        className="fixed inset-0 overflow-hidden"
-        style={{
-          background: 'linear-gradient(120deg, #0247ae 0%, #0873c9 20%, #0247ae 40%, #0873c9 60%, #0247ae 80%, #0873c9 100%)',
-          backgroundSize: '300% 100%',
-          animation: 'waveGradient 30s ease-in-out infinite'
-        }}
-      >
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.07]">
-          <div className="h-full w-full" style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
-                             linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }} />
-        </div>
-
-        {/* Bottom waves */}
-        <svg 
-          className="absolute -bottom-2 -left-20 w-[150%] h-80" 
-          viewBox="0 0 800 320" 
-          preserveAspectRatio="none"
-          style={{ animation: 'waveMove 4s ease-in-out infinite' }}
-        >
-          <path d="M0 200 Q200 120 400 170 Q600 220 800 150 L800 320 L0 320 Z" fill="rgba(255,255,255,0.15)" />
-        </svg>
-        <svg 
-          className="absolute -bottom-2 -left-10 w-[140%] h-80" 
-          viewBox="0 0 800 320" 
-          preserveAspectRatio="none"
-          style={{ animation: 'waveMove2 5s ease-in-out infinite' }}
-        >
-          <path d="M0 240 Q200 180 400 220 Q600 260 800 200 L800 320 L0 320 Z" fill="rgba(255,255,255,0.10)" />
-        </svg>
-
-        {/* Floating circles */}
-        <div className="absolute left-[10%] top-[15%] h-20 w-20 rounded-full bg-white/10 animate-[float_3s_ease-in-out_infinite]" />
-        <div className="absolute left-[25%] top-[8%] h-8 w-8 rounded-full bg-white/15 animate-[float_2.5s_ease-in-out_infinite_0.3s]" />
-        <div className="absolute right-[30%] top-[20%] h-14 w-14 rounded-full border-2 border-white/20 animate-[float_3.5s_ease-in-out_infinite_0.5s]" />
-        <div className="absolute right-[15%] top-[35%] h-10 w-10 rounded-full bg-[#ffce08]/25 animate-[float_4s_ease-in-out_infinite_0.2s]" />
-        <div className="absolute left-[15%] top-[45%] h-6 w-6 rounded-full bg-white/20 animate-[float_2.5s_ease-in-out_infinite_0.8s]" />
-        <div className="absolute right-[40%] top-[12%] h-4 w-4 rounded-full bg-white/25 animate-[float_3s_ease-in-out_infinite_1s]" />
-        <div className="absolute left-[40%] top-[30%] h-12 w-12 rounded-full border border-white/15 animate-[float_3.5s_ease-in-out_infinite_0.4s]" />
-        <div className="absolute right-[20%] top-[55%] h-5 w-5 rounded-full bg-white/15 animate-[float_2.5s_ease-in-out_infinite_0.6s]" />
-        <div className="absolute left-[8%] top-[65%] h-16 w-16 rounded-full border-2 border-white/10 animate-[float_4s_ease-in-out_infinite_0.3s]" />
-        <div className="absolute right-[8%] top-[70%] h-12 w-12 rounded-full bg-white/10 animate-[float_3s_ease-in-out_infinite_0.7s]" />
-        <div className="absolute left-[60%] top-[60%] h-8 w-8 rounded-full border border-white/20 animate-[float_3.5s_ease-in-out_infinite_0.9s]" />
-
-        {/* Small dots */}
-        <div className="absolute left-[50%] top-[18%] h-2 w-2 rounded-full bg-white/35 animate-[pulse_1.5s_ease-in-out_infinite]" />
-        <div className="absolute left-[60%] top-[40%] h-2 w-2 rounded-full bg-white/30 animate-[pulse_2s_ease-in-out_infinite_0.3s]" />
-        <div className="absolute left-[30%] top-[55%] h-2 w-2 rounded-full bg-[#ffce08]/50 animate-[pulse_1.5s_ease-in-out_infinite_0.5s]" />
-        <div className="absolute right-[25%] top-[65%] h-2 w-2 rounded-full bg-white/30 animate-[pulse_2s_ease-in-out_infinite_0.7s]" />
-      </div>
-
-      {/* Centered registration card */}
+      <AnimatedBackground />
       <div className="relative z-10 flex w-full items-center justify-center p-6 py-12">
         <div className="w-full max-w-5xl animate-[fadeInScale_0.6s_ease-out_0.2s_both]">
           <RegistrationStepper steps={getSteps()} />
           <RegistrationContainer>
-            {step === "basic-info-id" && (
-              <BasicInfoIdForm
-                onSubmit={handleBasicInfoIdSubmit}
+            {step === "basic-info" && (
+              <BasicInfoForm
+                onSubmit={handleBasicInfoSubmit}
                 onDevBypass={handleBasicInfoDevBypass}
-                initialBasicInfo={basicInfo || undefined}
-              />
-            )}
-
-            {step === "face-verification" && (
-              <FaceVerificationContent
-                onComplete={handleFaceComplete}
-                onBack={handleBackToBasicInfo}
-                onDevBypass={handleFaceDevBypass}
+                initialData={basicInfo || undefined}
               />
             )}
 
             {step === "account-type" && (
               <AccountTypeContent
                 onSelect={handleAccountTypeSelect}
-                onBack={handleBackToFace}
+                onBack={handleBackToBasicInfo}
+              />
+            )}
+
+            {step === "verification-prompt" && accountType && (
+              <VerificationPrompt
+                accountType={accountType}
+                onStartVerification={handleStartVerification}
+                onSkipToLogin={handleSkipToLogin}
+              />
+            )}
+
+            {step === "id-verification" && (
+              <IdVerificationForm
+                onSubmit={handleIdSubmit}
+                onBack={handleBackToVerificationPrompt}
+                onDevBypass={handleIdDevBypass}
+              />
+            )}
+
+            {step === "face-verification" && (
+              <FaceVerificationContent
+                onComplete={handleFaceComplete}
+                onBack={handleBackToId}
+                onDevBypass={handleFaceDevBypass}
               />
             )}
 
             {step === "agent-verification" && (
               <AgentVerificationForm
                 onSubmit={handleAgentSubmit}
-                onBack={handleBackToAccountType}
+                onBack={handleBackToFace}
                 onDevBypass={handleAgentDevBypass}
               />
             )}
@@ -316,7 +272,7 @@ export default function RegisterPage() {
             {step === "broker-credentials" && (
               <BrokerCredentialsForm
                 onSubmit={handleBrokerCredentialsSubmit}
-                onBack={handleBackToAccountType}
+                onBack={handleBackToFace}
                 onDevBypass={handleBrokerCredentialsDevBypass}
               />
             )}
