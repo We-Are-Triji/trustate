@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, CheckCircle, ArrowLeft, CreditCard } from "lucide-react";
+import { CheckCircle, X, CreditCard, Camera, Sun, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -24,6 +24,7 @@ interface IdVerificationFormProps {
 export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerificationFormProps) {
   const [idType, setIdType] = useState<PhilippineID | "">("");
   const [idImage, setIdImage] = useState<File | null>(null);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const handleSubmit = () => {
     if (idType && idImage) {
@@ -31,19 +32,25 @@ export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerifica
     }
   };
 
+  const handleClose = () => {
+    if (idType || idImage) {
+      setShowExitConfirm(true);
+    } else {
+      onBack();
+    }
+  };
+
   return (
     <>
       <CardHeader className="pb-2 pt-6">
         <div className="flex items-center">
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onBack}
-            className="mr-2 h-8 w-8 p-0 text-gray-500 hover:text-gray-700"
+            onClick={handleClose}
+            className="mr-2 h-8 w-8 p-0 text-gray-500 hover:text-gray-700 flex items-center justify-center rounded-full hover:bg-gray-100"
           >
-            <ArrowLeft size={18} />
-          </Button>
+            <X size={18} />
+          </button>
           <div className="flex-1 text-center pr-10">
             <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
               ID Verification
@@ -56,9 +63,22 @@ export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerifica
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-3xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="rounded-xl bg-blue-50 p-4 text-sm text-blue-800">
-                <p className="font-medium mb-1">Accepted IDs</p>
-                <p>Philippine Passport, Driver&apos;s License, UMID, National ID (PhilSys), and other government-issued IDs.</p>
+              <div className="rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+                <p className="font-medium mb-2">Tips for a clear photo</p>
+                <ul className="space-y-1.5">
+                  <li className="flex items-center gap-2">
+                    <Camera size={14} className="shrink-0" />
+                    <span>Ensure all text is readable</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Sun size={14} className="shrink-0" />
+                    <span>Use good lighting, avoid glare</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FileCheck size={14} className="shrink-0" />
+                    <span>Capture all four corners</span>
+                  </li>
+                </ul>
               </div>
 
               <div className="space-y-2">
@@ -110,17 +130,7 @@ export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerifica
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-100">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onBack}
-            className="h-9 px-4 text-gray-600 hover:text-[#0247ae] hover:border-[#0247ae]"
-          >
-            <ArrowLeft size={16} className="mr-1" />
-            Previous
-          </Button>
+        <div className="flex items-center justify-end pt-4 mt-4 border-t border-gray-100">
           <div className="flex gap-2">
             {isDev && onDevBypass && (
               <Button
@@ -143,6 +153,30 @@ export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerifica
           </div>
         </div>
       </CardContent>
+
+      {showExitConfirm && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50 rounded-2xl">
+          <div className="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Exit Verification?</h3>
+            <p className="text-sm text-gray-600 mb-4">Your progress will not be saved. Are you sure you want to exit?</p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowExitConfirm(false)}
+              >
+                Continue
+              </Button>
+              <Button
+                className="flex-1 bg-red-600 hover:bg-red-700"
+                onClick={onBack}
+              >
+                Exit
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
