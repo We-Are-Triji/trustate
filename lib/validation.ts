@@ -38,24 +38,28 @@ export const validators = {
 
 export function getPasswordStrength(password: string): number {
   let score = 0;
-  if (password.length >= 8) score += 25;
-  if (/[a-z]/.test(password)) score += 25;
-  if (/[A-Z]/.test(password)) score += 25;
+  if (password.length >= 8) score += 20;
+  if (password.length >= 12) score += 10;
+  if (password.length >= 16) score += 10;
+  if (/[a-z]/.test(password)) score += 15;
+  if (/[A-Z]/.test(password)) score += 15;
   if (/\d/.test(password)) score += 15;
-  if (/[^a-zA-Z\d]/.test(password)) score += 10;
+  if (/[^a-zA-Z\d]/.test(password)) score += 15;
   return Math.min(score, 100);
 }
 
 export function getStrengthLabel(score: number): string {
-  if (score < 25) return "Weak";
-  if (score < 50) return "Fair";
-  if (score < 75) return "Good";
-  return "Strong";
+  if (score < 20) return "Weak";
+  if (score < 40) return "Fair";
+  if (score < 60) return "Good";
+  if (score < 80) return "Strong";
+  return "Very Strong";
 }
 
 export function getStrengthColor(score: number): string {
-  if (score < 25) return "bg-red-500";
-  if (score < 50) return "bg-orange-500";
-  if (score < 75) return "bg-yellow-500";
-  return "bg-green-500";
+  if (score < 20) return "bg-red-500";
+  if (score < 40) return "bg-orange-500";
+  if (score < 60) return "bg-yellow-500";
+  if (score < 80) return "bg-green-500";
+  return "bg-emerald-400";
 }
