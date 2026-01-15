@@ -54,54 +54,58 @@ export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerifica
       </CardHeader>
       <CardContent className="flex-1 flex flex-col px-6 pb-4">
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-lg space-y-6">
-            <div className="rounded-xl bg-blue-50 p-4 text-sm text-blue-800">
-              <p className="font-medium mb-1">Accepted IDs</p>
-              <p>Philippine Passport, Driver&apos;s License, UMID, National ID (PhilSys), and other government-issued IDs.</p>
-            </div>
+          <div className="w-full max-w-3xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="rounded-xl bg-blue-50 p-4 text-sm text-blue-800">
+                <p className="font-medium mb-1">Accepted IDs</p>
+                <p>Philippine Passport, Driver&apos;s License, UMID, National ID (PhilSys), and other government-issued IDs.</p>
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600">Select ID Type *</label>
-              <Select value={idType} onValueChange={(v) => setIdType(v as PhilippineID)}>
-                <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-[#0247ae]">
-                  <SelectValue placeholder="Choose your ID type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PH_VALID_IDS.map((id) => (
-                    <SelectItem key={id} value={id}>{id}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-600">Select ID Type *</label>
+                <Select value={idType} onValueChange={(v) => setIdType(v as PhilippineID)}>
+                  <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-[#0247ae]">
+                    <SelectValue placeholder="Choose your ID type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PH_VALID_IDS.map((id) => (
+                      <SelectItem key={id} value={id}>{id}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-600">
-                Upload {idType || "ID"} *
-              </label>
-              <label className={`flex h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-gray-50/50 transition-all duration-200 ${!idType ? "border-gray-200 opacity-50 pointer-events-none" : "border-gray-200 hover:border-[#0247ae] hover:bg-[#0247ae]/5"}`}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => e.target.files?.[0] && setIdImage(e.target.files[0])}
-                  className="hidden"
-                  disabled={!idType}
-                />
-                {idImage ? (
-                  <div className="flex flex-col items-center gap-2 text-green-600">
-                    <CheckCircle size={32} />
-                    <span className="text-sm font-medium">{idImage.name}</span>
-                    <span className="text-xs text-gray-500">Click to change</span>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center gap-2 text-gray-500">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100">
-                      <CreditCard size={28} className="text-gray-400" />
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-gray-600">
+                  Upload {idType || "ID"} *
+                </label>
+                <label className={`flex h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-gray-50/50 transition-all duration-200 ${!idType ? "border-gray-200 opacity-50 pointer-events-none" : "border-gray-200 hover:border-[#0247ae] hover:bg-[#0247ae]/5"}`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => e.target.files?.[0] && setIdImage(e.target.files[0])}
+                    className="hidden"
+                    disabled={!idType}
+                  />
+                  {idImage ? (
+                    <div className="flex flex-col items-center gap-1 text-green-600">
+                      <CheckCircle size={28} />
+                      <span className="text-sm font-medium">{idImage.name}</span>
+                      <span className="text-xs text-gray-500">Click to change</span>
                     </div>
-                    <span className="text-sm font-medium">Click to upload</span>
-                    <span className="text-xs">PNG, JPG up to 10MB</span>
-                  </div>
-                )}
-              </label>
+                  ) : (
+                    <div className="flex items-center gap-4 text-gray-500">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100">
+                        <CreditCard size={24} className="text-gray-400" />
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium block">Click to upload</span>
+                        <span className="text-xs">PNG, JPG up to 10MB</span>
+                      </div>
+                    </div>
+                  )}
+                </label>
+              </div>
             </div>
           </div>
         </div>
