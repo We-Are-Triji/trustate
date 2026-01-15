@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { signIn } from "@/lib/cognito";
+import { signIn, fetchUserAttributes } from "@/lib/cognito";
 import { Button } from "@/components/ui/button";
 import trustateLogo from "@/app/assets/trustate.png";
 
@@ -24,6 +24,16 @@ export function LoginForm() {
 
     try {
       await signIn({ username: email, password });
+      
+      // Check if user has account type set
+      const attributes = await fetchUserAttributes();
+      const accountType = attributes["custom:account_type"];
+      
+      if (!accountType) {
+        // User registered but didn't complete account type selection
+        router.push("/complete-registration");
+        return;
+      }
       
       // Check for redirect after login
       const redirectTo = sessionStorage.getItem("redirectAfterLogin");
