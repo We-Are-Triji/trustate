@@ -1,5 +1,14 @@
 import { Amplify } from "aws-amplify";
-import { signIn, resetPassword } from "@aws-amplify/auth";
+import {
+  signIn,
+  signUp,
+  confirmSignUp,
+  resendSignUpCode,
+  updateUserAttributes,
+  fetchUserAttributes,
+  signOut,
+  getCurrentUser,
+} from "@aws-amplify/auth";
 
 Amplify.configure({
   Auth: {
@@ -10,4 +19,15 @@ Amplify.configure({
   },
 });
 
-export { signIn, resetPassword };
+export {
+  signIn,
+  signUp,
+  confirmSignUp,
+  resendSignUpCode,
+  updateUserAttributes,
+  fetchUserAttributes,
+  signOut,
+  getCurrentUser,
+};
+
+export type { SignUpInput } from "@aws-amplify/auth";
