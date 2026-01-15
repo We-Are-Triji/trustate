@@ -14,10 +14,10 @@ interface FirmLegitimacyContentProps {
   onDevBypass?: () => void;
 }
 
-const FIRM_TYPES: { value: FirmType; label: string; regLabel: string; icon: typeof Building2 }[] = [
-  { value: "corporation", label: "Corporation", regLabel: "SEC Number", icon: Building2 },
-  { value: "partnership", label: "Partnership", regLabel: "SEC Number", icon: Users },
-  { value: "sole-proprietorship", label: "Sole Proprietorship", regLabel: "DTI Number", icon: User },
+const FIRM_TYPES: { value: FirmType; label: string; description: string; regLabel: string; icon: typeof Building2 }[] = [
+  { value: "corporation", label: "Corporation", description: "Registered with SEC as a stock or non-stock corporation", regLabel: "SEC Number", icon: Building2 },
+  { value: "partnership", label: "Partnership", description: "Two or more persons bound to contribute to a common fund", regLabel: "SEC Number", icon: Users },
+  { value: "sole-proprietorship", label: "Sole Proprietorship", description: "Single owner registered with DTI", regLabel: "DTI Number", icon: User },
 ];
 
 export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmLegitimacyContentProps) {
@@ -97,7 +97,7 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
           <div className="flex-1 flex flex-col">
             <div className="flex-1 flex items-center justify-center">
               <div className="grid grid-cols-3 gap-6 w-full max-w-4xl">
-              {FIRM_TYPES.map(({ value, label, icon: Icon }, index) => (
+              {FIRM_TYPES.map(({ value, label, description, icon: Icon }, index) => (
                 <button
                   key={value}
                   onClick={() => setSelectedType(value)}
@@ -115,7 +115,10 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
                   }`}>
                     <Icon size={28} />
                   </div>
-                  <p className="font-bold text-[#0247ae] text-base">{label}</p>
+                  <div>
+                    <p className="font-bold text-[#0247ae] text-base mb-1">{label}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed">{description}</p>
+                  </div>
                   <div className={`flex items-center gap-1 text-sm font-medium transition-opacity ${
                     selectedType === value
                       ? "text-[#d4a900] opacity-100"
