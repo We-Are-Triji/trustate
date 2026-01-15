@@ -204,6 +204,7 @@ interface FaceCaptureProps {
 
 function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
 
   const stopStream = useCallback(() => {
     if (videoRef.current) {
@@ -242,16 +243,19 @@ function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
   }, [streamRef, stopStream]);
 
   const capture = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d")?.drawImage(video, 0, 0);
-    stopStream();
-    canvas.toBlob((blob) => {
-      if (blob) onCapture(new File([blob], "face.jpg", { type: "image/jpeg" }));
-    }, "image/jpeg");
+    setIsScanning(true);
+    setTimeout(() => {
+      const video = videoRef.current;
+      if (!video) return;
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d")?.drawImage(video, 0, 0);
+      stopStream();
+      canvas.toBlob((blob) => {
+        if (blob) onCapture(new File([blob], "face.jpg", { type: "image/jpeg" }));
+      }, "image/jpeg");
+    }, 2000);
   };
 
   const handleCancelClick = () => {
@@ -264,9 +268,26 @@ function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
       <div className="relative w-full max-w-md aspect-video overflow-hidden rounded-xl bg-black shadow-xl">
         <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
         <div className="absolute inset-0 border-2 border-white/20 rounded-xl pointer-events-none" />
+        
+        {isScanning && (
+          <>
+            <div className="absolute inset-0 bg-[#0247ae]/10 pointer-events-none" />
+            <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#0247ae] to-transparent animate-[scanLine_1.5s_ease-in-out_infinite]" 
+                 style={{ top: '0%', animation: 'scanLine 1.5s ease-in-out infinite' }} />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2">
+                <p className="text-white text-sm font-medium flex items-center gap-2">
+                  <span className="h-2 w-2 bg-[#0247ae] rounded-full animate-pulse" />
+                  Scanning face...
+                </p>
+              </div>
+            </div>
+          </>
+        )}
+        
         <div className="absolute bottom-3 left-0 right-0 text-center">
           <span className="rounded-full bg-black/60 px-3 py-1.5 text-xs text-white backdrop-blur-sm">
-            Position your face in the center
+            {isScanning ? "Hold still..." : "Position your face in the center"}
           </span>
         </div>
       </div>
@@ -275,6 +296,7 @@ function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
           variant="outline" 
           size="sm"
           onClick={handleCancelClick} 
+          disabled={isScanning}
           className="h-9 px-5 rounded-lg border-2"
         >
           Cancel
@@ -282,12 +304,22 @@ function FaceCapture({ onCapture, onCancel, streamRef }: FaceCaptureProps) {
         <Button 
           size="sm"
           onClick={capture} 
+          disabled={isScanning}
           className="h-9 px-5 rounded-lg bg-[#0247ae] hover:bg-[#023a8a] shadow-lg shadow-[#0247ae]/25 font-semibold"
         >
           <Camera className="mr-2 h-4 w-4" />
-          Capture
+          {isScanning ? "Scanning..." : "Capture"}
         </Button>
       </div>
+      
+      <style jsx>{`
+        @keyframes scanLine {
+          0%, 100% { top: 0%; opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          50% { top: 100%; }
+        }
+      `}</style>
     </div>
   );
 }

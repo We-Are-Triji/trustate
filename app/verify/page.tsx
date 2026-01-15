@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle, User } from "lucide-react";
+import { CheckCircle, User, Loader2 } from "lucide-react";
 import { RegistrationContainer } from "@/components/auth/registration/registration-container";
 import { RegistrationStepper } from "@/components/auth/registration/registration-stepper";
 import { IdVerificationForm } from "@/components/auth/registration/id-verification-form";
@@ -14,6 +14,7 @@ import { FirmLegitimacyContent } from "@/components/auth/registration/firm-legit
 import { PendingApprovalScreen } from "@/components/auth/registration/pending-approval-screen";
 import { AnimatedBackground } from "@/components/auth/registration/animated-background";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { updateUserAttributes } from "@/lib/cognito";
 import type {
   BrokerLicenseData,
   BrokerType,
@@ -31,6 +32,7 @@ type Step =
   | "broker-type"
   | "firm-legitimacy"
   | "pending"
+  | "verifying"
   | "success";
 
 export default function VerifyPage() {
@@ -97,12 +99,20 @@ export default function VerifyPage() {
   };
 
   // Face Verification
-  const handleFaceComplete = (faceImage: File) => {
+  const handleFaceComplete = async (faceImage: File) => {
     console.log("Face image:", faceImage);
     markStepComplete("face-verification");
 
     if (accountType === "client") {
-      // TODO: Update Cognito status to "verified"
+      setStep("verifying");
+      // Simulate verification delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Update Cognito status
+      try {
+        await updateUserAttributes({ userAttributes: { "custom:status": "verified" } });
+      } catch (err) {
+        console.error("Failed to update status:", err);
+      }
       setStep("success");
     } else if (accountType === "agent") {
       setStep("agent-verification");
@@ -147,9 +157,18 @@ export default function VerifyPage() {
 
   // Dev bypasses
   const handleIdDevBypass = () => { markStepComplete("id-verification"); setStep("face-verification"); };
-  const handleFaceDevBypass = () => {
+  const handleFaceDevBypass = async () => {
     markStepComplete("face-verification");
-    if (accountType === "client") setStep("success");
+    if (accountType === "client") {
+      setStep("verifying");
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      try {
+        await updateUserAttributes({ userAttributes: { "custom:status": "verified" } });
+      } catch (err) {
+        console.error("Failed to update status:", err);
+      }
+      setStep("success");
+    }
     else if (accountType === "agent") setStep("agent-verification");
     else setStep("broker-credentials");
   };
@@ -197,6 +216,24 @@ export default function VerifyPage() {
         <AnimatedBackground />
         <div className="relative z-10 flex w-full items-center justify-center p-6">
           <PendingApprovalScreen />
+        </div>
+      </main>
+    );
+  }
+
+  // Verifying screen with delay
+  if (step === "verifying") {
+    return (
+      <main className="flex min-h-screen bg-[#0247ae]">
+        <AnimatedBackground />
+        <div className="relative z-10 flex w-full items-center justify-center p-6">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-2xl max-w-md animate-[fadeInScale_0.3s_ease-out]">
+            <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-[#0247ae]/10 flex items-center justify-center">
+              <Loader2 className="h-10 w-10 text-[#0247ae] animate-spin" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Verifying Your Identity</h2>
+            <p className="text-gray-600">Please wait while we process your verification...</p>
+          </div>
         </div>
       </main>
     );
