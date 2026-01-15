@@ -18,9 +18,10 @@ interface BasicInfoFormProps {
   onSubmit: (data: BasicInfoData) => void;
   onDevBypass?: () => void;
   initialData?: BasicInfoData;
+  isLoading?: boolean;
 }
 
-export function BasicInfoForm({ onSubmit, onDevBypass, initialData }: BasicInfoFormProps) {
+export function BasicInfoForm({ onSubmit, onDevBypass, initialData, isLoading }: BasicInfoFormProps) {
   const [form, setForm] = useState<BasicInfoData>(
     initialData || {
       firstName: "",
@@ -236,9 +237,10 @@ export function BasicInfoForm({ onSubmit, onDevBypass, initialData }: BasicInfoF
               )}
               <Button
                 type="submit"
-                className="bg-[#0247ae] hover:bg-[#023a8a] px-6 h-9 text-sm font-semibold"
+                disabled={isLoading}
+                className="bg-[#0247ae] hover:bg-[#023a8a] px-6 h-9 text-sm font-semibold disabled:opacity-50"
               >
-                Continue
+                {isLoading ? "Creating account..." : "Continue"}
               </Button>
             </div>
           </div>
