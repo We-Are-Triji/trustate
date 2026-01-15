@@ -11,6 +11,7 @@ import { VerificationPrompt } from "@/components/auth/registration/verification-
 import { VerificationChoiceModal } from "@/components/auth/registration/verification-choice-modal";
 import { OtpVerificationModal } from "@/components/auth/registration/otp-verification-modal";
 import { AnimatedBackground } from "@/components/auth/registration/animated-background";
+import { signUp, confirmSignUp, resendSignUpCode, signIn, updateUserAttributes } from "@/lib/cognito";
 import type { AccountType, BasicInfoData, VerificationMethod } from "@/lib/types/registration";
 
 type Step = "basic-info" | "otp-verification" | "account-type" | "verification-prompt";
@@ -26,6 +27,8 @@ export default function RegisterPage() {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const markStepComplete = (stepName: string) => {
     setCompletedSteps((prev) => new Set(prev).add(stepName));
@@ -37,10 +40,36 @@ export default function RegisterPage() {
     { label: "Account Type", completed: completedSteps.has("account-type"), current: step === "account-type" || step === "verification-prompt" },
   ];
 
-  // Step 1: Basic Info
-  const handleBasicInfoSubmit = (data: BasicInfoData) => {
+  // Step 1: Basic Info - Create Cognito user
+  const handleBasicInfoSubmit = async (data: BasicInfoData) => {
     setBasicInfo(data);
-    setShowChoiceModal(true);
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      await signUp({
+        username: data.email,
+        password: data.password,
+        options: {
+          userAttributes: {
+            email: data.email,
+            phone_number: formatPhoneNumber(data.mobile),
+            given_name: data.firstName,
+            family_name: data.lastName,
+            middle_name: data.middleName || "",
+            birthdate: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString().split("T")[0] : "",
+            "custom:nationality": data.nationality,
+            "custom:status": "registered",
+          },
+        },
+      });
+      setShowChoiceModal(true);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Registration failed";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleVerificationMethodSelect = (method: VerificationMethod) => {
@@ -51,17 +80,38 @@ export default function RegisterPage() {
     setShowOtpModal(true);
   };
 
-  // Step 2: OTP Verification
+  // Step 2: OTP Verification - Confirm Cognito signup
   const handleOtpVerify = async (code: string): Promise<boolean> => {
-    await new Promise((r) => setTimeout(r, 1000));
-    const success = code === "123456";
-    if (success) {
+    if (!basicInfo) return false;
+    setError(null);
+
+    try {
+      await confirmSignUp({
+        username: basicInfo.email,
+        confirmationCode: code,
+      });
+
       setShowOtpModal(false);
       markStepComplete("otp-verification");
       setStep("account-type");
-      // TODO: Create Cognito user here with status="registered"
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Verification failed";
+      setError(message);
+      return false;
     }
-    return success;
+  };
+
+  const handleResendCode = async () => {
+    if (!basicInfo) return;
+    setError(null);
+
+    try {
+      await resendSignUpCode({ username: basicInfo.email });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to resend code";
+      setError(message);
+    }
   };
 
   // Step 3: Account Type - show confirmation modal first
@@ -70,13 +120,34 @@ export default function RegisterPage() {
     setShowConfirmModal(true);
   };
 
-  const handleAccountTypeConfirm = () => {
-    if (pendingAccountType) {
+  const handleAccountTypeConfirm = async () => {
+    if (!pendingAccountType || !basicInfo) return;
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      // Sign in the user first to update attributes
+      await signIn({
+        username: basicInfo.email,
+        password: basicInfo.password,
+      });
+
+      // Update account type
+      await updateUserAttributes({
+        userAttributes: {
+          "custom:account_type": pendingAccountType,
+        },
+      });
+
       setAccountType(pendingAccountType);
       markStepComplete("account-type");
       setShowConfirmModal(false);
       setStep("verification-prompt");
-      // TODO: Update Cognito user with account_type
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to set account type";
+      setError(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,12 +158,10 @@ export default function RegisterPage() {
 
   // After account type - verification prompt
   const handleStartVerification = () => {
-    // TODO: Sign in the user first, then redirect
     router.push("/verify");
   };
 
   const handleSkipToLogin = () => {
-    // TODO: Sign in the user, then redirect
     router.push("/app");
   };
 
@@ -117,11 +186,18 @@ export default function RegisterPage() {
         <div className="w-full max-w-5xl animate-[fadeInScale_0.6s_ease-out_0.2s_both]">
           <RegistrationStepper steps={getSteps()} />
           <RegistrationContainer>
+            {error && (
+              <div className="mx-6 mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
             {step === "basic-info" && (
               <BasicInfoForm
                 onSubmit={handleBasicInfoSubmit}
                 onDevBypass={handleBasicInfoDevBypass}
                 initialData={basicInfo || undefined}
+                isLoading={isLoading}
               />
             )}
 
@@ -156,7 +232,7 @@ export default function RegisterPage() {
         method={verificationMethod || "email"}
         destination={verificationMethod === "mobile" ? basicInfo?.mobile || "" : basicInfo?.email || ""}
         onVerify={handleOtpVerify}
-        onResend={() => {}}
+        onResend={handleResendCode}
         onClose={() => setShowOtpModal(false)}
       />
 
@@ -168,4 +244,20 @@ export default function RegisterPage() {
       />
     </main>
   );
+}
+
+function formatPhoneNumber(phone: string): string {
+  // Remove all non-digits
+  const digits = phone.replace(/\D/g, "");
+  // Ensure it starts with +63 for Philippines
+  if (digits.startsWith("63")) {
+    return `+${digits}`;
+  }
+  if (digits.startsWith("0")) {
+    return `+63${digits.slice(1)}`;
+  }
+  if (digits.startsWith("9")) {
+    return `+63${digits}`;
+  }
+  return `+${digits}`;
 }
