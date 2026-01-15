@@ -11,6 +11,8 @@ export interface BasicInfoData {
 
 export type AccountType = "client" | "agent" | "broker";
 
+export type UserStatus = "registered" | "pending_approval" | "verified";
+
 export interface PrcData {
   prcNumber: string;
   prcFrontImage: File | null;
