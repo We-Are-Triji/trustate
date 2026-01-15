@@ -24,7 +24,15 @@ export function LoginForm() {
 
     try {
       await signIn({ username: email, password });
-      router.push("/");
+      
+      // Check for redirect after login
+      const redirectTo = sessionStorage.getItem("redirectAfterLogin");
+      if (redirectTo) {
+        sessionStorage.removeItem("redirectAfterLogin");
+        router.push(redirectTo);
+      } else {
+        router.push("/app");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
