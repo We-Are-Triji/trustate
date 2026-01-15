@@ -74,34 +74,35 @@ export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerifica
               </Select>
             </div>
 
-            {idType && (
-              <div className="space-y-2 animate-[fadeInUp_0.3s_ease-out]">
-                <label className="text-sm font-medium text-gray-600">Upload {idType} *</label>
-                <label className="flex h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:border-[#0247ae] hover:bg-[#0247ae]/5 transition-all duration-200">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => e.target.files?.[0] && setIdImage(e.target.files[0])}
-                    className="hidden"
-                  />
-                  {idImage ? (
-                    <div className="flex flex-col items-center gap-2 text-green-600">
-                      <CheckCircle size={32} />
-                      <span className="text-sm font-medium">{idImage.name}</span>
-                      <span className="text-xs text-gray-500">Click to change</span>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-600">
+                Upload {idType || "ID"} *
+              </label>
+              <label className={`flex h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-gray-50/50 transition-all duration-200 ${!idType ? "border-gray-200 opacity-50 pointer-events-none" : "border-gray-200 hover:border-[#0247ae] hover:bg-[#0247ae]/5"}`}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => e.target.files?.[0] && setIdImage(e.target.files[0])}
+                  className="hidden"
+                  disabled={!idType}
+                />
+                {idImage ? (
+                  <div className="flex flex-col items-center gap-2 text-green-600">
+                    <CheckCircle size={32} />
+                    <span className="text-sm font-medium">{idImage.name}</span>
+                    <span className="text-xs text-gray-500">Click to change</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-gray-500">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100">
+                      <CreditCard size={28} className="text-gray-400" />
                     </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-gray-500">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100">
-                        <CreditCard size={28} className="text-gray-400" />
-                      </div>
-                      <span className="text-sm font-medium">Click to upload</span>
-                      <span className="text-xs">PNG, JPG up to 10MB</span>
-                    </div>
-                  )}
-                </label>
-              </div>
-            )}
+                    <span className="text-sm font-medium">Click to upload</span>
+                    <span className="text-xs">PNG, JPG up to 10MB</span>
+                  </div>
+                )}
+              </label>
+            </div>
           </div>
         </div>
 

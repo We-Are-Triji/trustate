@@ -227,13 +227,13 @@ export default function VerifyPage() {
   }
 
   const AccountBadge = () => (
-    <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur rounded-lg px-4 py-2 shadow-lg flex items-center gap-3">
-      <div className="h-8 w-8 rounded-full bg-[#0247ae]/10 flex items-center justify-center">
+    <div className="absolute top-4 left-4 z-20 bg-white/95 backdrop-blur rounded-lg px-4 py-2 shadow-lg flex items-center gap-3 max-w-xs">
+      <div className="h-8 w-8 rounded-full bg-[#0247ae]/10 flex items-center justify-center shrink-0">
         <User className="h-4 w-4 text-[#0247ae]" />
       </div>
-      <div className="text-left">
+      <div className="text-left min-w-0">
         <p className="text-xs text-gray-500">Verifying</p>
-        <p className="text-sm font-medium text-gray-900 truncate max-w-[180px]">{email}</p>
+        <p className="text-sm font-medium text-gray-900 break-all">{email}</p>
         <p className="text-xs text-[#0247ae] capitalize">{accountType} Account</p>
       </div>
     </div>
