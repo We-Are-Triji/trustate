@@ -77,6 +77,13 @@ export function VerificationPrompt({ accountType, onStartVerification, onSkipToL
               </p>
             </div>
 
+            <div className="rounded-xl bg-red-50 border border-red-200 p-4 mb-6">
+              <p className="text-sm text-red-700">
+                <span className="font-semibold">Important:</span> Your account type cannot be changed after registration. 
+                If you need a different account type, you&apos;ll need to register again.
+              </p>
+            </div>
+
             <div className="space-y-3">
               <Button
                 onClick={onStartVerification}
