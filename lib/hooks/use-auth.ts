@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 import type { UserStatus, AccountType } from "@/lib/types/registration";
 
@@ -19,7 +18,6 @@ export function useAuth() {
     userStatus: null,
     accountType: null,
   });
-  const router = useRouter();
 
   useEffect(() => {
     checkAuth();
@@ -43,7 +41,6 @@ export function useAuth() {
         userStatus: null,
         accountType: null,
       });
-      router.push("/login");
     }
   };
 

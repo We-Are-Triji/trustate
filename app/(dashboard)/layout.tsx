@@ -1,11 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { VerificationBanner } from "@/components/dashboard/verification-banner";
 import { PendingApprovalPage } from "@/components/dashboard/pending-approval-page";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isLoading, isAuthenticated, userStatus, accountType } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   if (isLoading) {
     return (
@@ -16,7 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   if (!isAuthenticated) {
-    return null; // useAuth redirects to login
+    return null;
   }
 
   if (userStatus === "pending_approval" && (accountType === "agent" || accountType === "broker")) {
