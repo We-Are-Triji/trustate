@@ -229,7 +229,6 @@ export default function RegisterPage() {
   };
 
   // Back handlers
-  const handleBackToBasicInfo = () => setStep("basic-info");
   const handleBackToAccountType = () => {
     setStep("account-type");
     setAccountType(null);
@@ -260,7 +259,6 @@ export default function RegisterPage() {
             {step === "account-type" && (
               <AccountTypeContent
                 onSelect={handleAccountTypeSelect}
-                onBack={handleBackToBasicInfo}
               />
             )}
 
@@ -297,6 +295,7 @@ export default function RegisterPage() {
         accountType={pendingAccountType}
         onConfirm={handleAccountTypeConfirm}
         onCancel={handleAccountTypeCancel}
+        isLoading={isLoading}
       />
     </main>
   );

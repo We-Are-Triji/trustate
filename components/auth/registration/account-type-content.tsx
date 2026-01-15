@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { User, Briefcase, Building2, ArrowLeft, Check } from "lucide-react";
+import { User, Briefcase, Building2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AccountType } from "@/lib/types/registration";
 
 interface AccountTypeContentProps {
   onSelect: (type: AccountType) => void;
-  onBack: () => void;
 }
 
 const ACCOUNT_TYPES: { type: AccountType; label: string; description: string; icon: typeof User }[] = [
@@ -32,7 +31,7 @@ const ACCOUNT_TYPES: { type: AccountType; label: string; description: string; ic
   },
 ];
 
-export function AccountTypeContent({ onSelect, onBack }: AccountTypeContentProps) {
+export function AccountTypeContent({ onSelect }: AccountTypeContentProps) {
   const [selected, setSelected] = useState<AccountType | null>(null);
 
   const handleContinue = () => {
@@ -97,17 +96,7 @@ export function AccountTypeContent({ onSelect, onBack }: AccountTypeContentProps
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4 mt-3 border-t border-gray-100 animate-[fadeInUp_0.5s_ease-out_0.3s_both]">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onBack}
-            className="h-9 px-4 text-gray-600 hover:text-[#0247ae] hover:border-[#0247ae]"
-          >
-            <ArrowLeft size={16} className="mr-1" />
-            Previous
-          </Button>
+        <div className="flex items-center justify-end pt-4 mt-3 border-t border-gray-100 animate-[fadeInUp_0.5s_ease-out_0.3s_both]">
           <Button
             onClick={handleContinue}
             disabled={!selected}
