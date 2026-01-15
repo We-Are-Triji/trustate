@@ -5,9 +5,10 @@ import type { AgentProfile } from "@/lib/types/agent";
 
 interface AgentsGridProps {
   agents: AgentProfile[];
+  onViewDetails?: (agentId: string) => void;
 }
 
-export function AgentsGrid({ agents }: AgentsGridProps) {
+export function AgentsGrid({ agents, onViewDetails }: AgentsGridProps) {
   if (agents.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border border-[#E2E8F0] bg-white px-6 py-16">
@@ -39,7 +40,7 @@ export function AgentsGrid({ agents }: AgentsGridProps) {
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {agents.map((agent) => (
-        <AgentCard key={agent.id} agent={agent} />
+        <AgentCard key={agent.id} agent={agent} onViewDetails={onViewDetails} />
       ))}
     </div>
   );

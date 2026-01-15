@@ -7,6 +7,7 @@ import type { AgentProfile } from "@/lib/types/agent";
 
 interface AgentCardProps {
   agent: AgentProfile;
+  onViewDetails?: (agentId: string) => void;
 }
 
 function getStatusColor(status: AgentProfile["status"]) {
@@ -68,7 +69,7 @@ function formatDate(dateString: string) {
   });
 }
 
-export function AgentCard({ agent }: AgentCardProps) {
+export function AgentCard({ agent, onViewDetails }: AgentCardProps) {
   return (
     <Card className="border-[#E2E8F0] bg-white shadow-sm transition-all duration-200 hover:shadow-md">
       <CardContent className="p-0">
@@ -148,7 +149,10 @@ export function AgentCard({ agent }: AgentCardProps) {
         <div className="border-t border-[#E2E8F0] bg-[#F8FAFC] px-5 py-3">
           <div className="flex items-center justify-between text-xs text-gray-500">
             <span>Joined at {formatDate(agent.joinedDate)}</span>
-            <button className="font-medium text-gray-700 hover:text-gray-900 hover:underline">
+            <button 
+              onClick={() => onViewDetails?.(agent.id)}
+              className="font-medium text-gray-700 hover:text-gray-900 hover:underline"
+            >
               View details
             </button>
           </div>
