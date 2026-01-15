@@ -1,2 +1,2 @@
-aws_region     = "us-east-1"
+aws_region     = "ap-southeast-1"
 user_pool_name = "trustate-users"
