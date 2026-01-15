@@ -51,7 +51,7 @@ export default function VerifyPage() {
 
     // Already verified, redirect to app
     if (!isLoading && isAuthenticated && userStatus === "verified") {
-      router.push("/app");
+      router.push("/dashboard");
     }
   }, [isLoading, isAuthenticated, userStatus, router]);
 
@@ -101,7 +101,7 @@ export default function VerifyPage() {
 
     if (accountType === "client") {
       // TODO: Update Cognito status to "verified"
-      router.push("/app");
+      router.push("/dashboard");
     } else if (accountType === "agent") {
       setStep("agent-verification");
     } else if (accountType === "broker") {
@@ -147,7 +147,7 @@ export default function VerifyPage() {
   const handleIdDevBypass = () => { markStepComplete("id-verification"); setStep("face-verification"); };
   const handleFaceDevBypass = () => {
     markStepComplete("face-verification");
-    if (accountType === "client") router.push("/app");
+    if (accountType === "client") router.push("/dashboard");
     else if (accountType === "agent") setStep("agent-verification");
     else setStep("broker-credentials");
   };
@@ -210,7 +210,7 @@ export default function VerifyPage() {
             {step === "id-verification" && (
               <IdVerificationForm
                 onSubmit={handleIdSubmit}
-                onBack={() => router.push("/app")}
+                onBack={() => router.push("/dashboard")}
                 onDevBypass={handleIdDevBypass}
               />
             )}

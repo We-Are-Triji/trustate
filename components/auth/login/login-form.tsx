@@ -41,7 +41,7 @@ export function LoginForm() {
         sessionStorage.removeItem("redirectAfterLogin");
         router.push(redirectTo);
       } else {
-        router.push("/app");
+        router.push("/dashboard");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

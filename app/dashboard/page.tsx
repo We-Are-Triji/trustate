@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuth } from "@/lib/hooks/use-auth";
-import { signOut } from "aws-amplify/auth";
 import { useRouter } from "next/navigation";
+import { signOut } from "@/lib/cognito";
+import { useAuth } from "@/lib/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Home, LogOut } from "lucide-react";
 
@@ -64,9 +64,7 @@ export default function DashboardPage() {
 
       {userStatus === "registered" && (
         <div className="mt-8 rounded-xl border-2 border-dashed border-[#ffce08] bg-[#ffce08]/5 p-6 text-center">
-          <p className="text-gray-700 mb-2">
-            Complete verification to unlock all features
-          </p>
+          <p className="text-gray-700 mb-2">Complete verification to unlock all features</p>
           <Button className="bg-[#0247ae]" onClick={() => router.push("/verify")}>
             Start Verification
           </Button>

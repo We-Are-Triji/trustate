@@ -73,7 +73,7 @@ export default function CompleteRegistrationPage() {
   };
 
   const handleSkipToLogin = () => {
-    router.push("/app");
+    router.push("/dashboard");
   };
 
   const handleBackToAccountType = () => {

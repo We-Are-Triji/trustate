@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/auth/login-form";
+import { LoginForm } from "@/components/auth/login/login-form";
 import Image from "next/image";
 import trustateLogo from "@/app/assets/trustate.png";
 

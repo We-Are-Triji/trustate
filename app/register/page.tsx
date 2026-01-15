@@ -218,7 +218,7 @@ export default function RegisterPage() {
 
   const handleSkipToLogin = () => {
     clearStorage();
-    router.push("/app");
+    router.push("/dashboard");
   };
 
   // Dev bypass
