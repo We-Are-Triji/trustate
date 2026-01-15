@@ -2,17 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PasswordMeter } from "@/components/auth/shared/password-meter";
 import { validators } from "@/lib/validation";
 import type { BasicInfoData } from "@/lib/types/registration";
 
 const isDev = process.env.NODE_ENV === "development";
+
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const currentYear = new Date().getFullYear();
+const YEARS = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
 interface BasicInfoFormProps {
   onSubmit: (data: BasicInfoData) => void;
@@ -140,26 +145,47 @@ export function BasicInfoForm({ onSubmit, onDevBypass, initialData, isLoading }:
 
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-600">Date of Birth *</label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className={`${inputClass} flex items-center justify-between text-left ${!form.dateOfBirth && "text-gray-400"}`}
-                    >
-                      {form.dateOfBirth ? format(new Date(form.dateOfBirth), "PPP") : "Select date"}
-                      <CalendarIcon className="h-4 w-4 text-gray-400" />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={form.dateOfBirth ? new Date(form.dateOfBirth) : undefined}
-                      onSelect={(date) => updateField("dateOfBirth", date?.toISOString() || "")}
-                      disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="grid grid-cols-3 gap-2">
+                  <select
+                    value={form.dateOfBirth ? new Date(form.dateOfBirth).getMonth() : ""}
+                    onChange={(e) => {
+                      const month = parseInt(e.target.value);
+                      const current = form.dateOfBirth ? new Date(form.dateOfBirth) : new Date(2000, 0, 1);
+                      current.setMonth(month);
+                      updateField("dateOfBirth", current.toISOString());
+                    }}
+                    className={`${inputClass} px-2`}
+                  >
+                    <option value="" disabled>Month</option>
+                    {MONTHS.map((m, i) => <option key={m} value={i}>{m}</option>)}
+                  </select>
+                  <select
+                    value={form.dateOfBirth ? new Date(form.dateOfBirth).getDate() : ""}
+                    onChange={(e) => {
+                      const day = parseInt(e.target.value);
+                      const current = form.dateOfBirth ? new Date(form.dateOfBirth) : new Date(2000, 0, 1);
+                      current.setDate(day);
+                      updateField("dateOfBirth", current.toISOString());
+                    }}
+                    className={`${inputClass} px-2`}
+                  >
+                    <option value="" disabled>Day</option>
+                    {Array.from({ length: 31 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
+                  </select>
+                  <select
+                    value={form.dateOfBirth ? new Date(form.dateOfBirth).getFullYear() : ""}
+                    onChange={(e) => {
+                      const year = parseInt(e.target.value);
+                      const current = form.dateOfBirth ? new Date(form.dateOfBirth) : new Date(2000, 0, 1);
+                      current.setFullYear(year);
+                      updateField("dateOfBirth", current.toISOString());
+                    }}
+                    className={`${inputClass} px-2`}
+                  >
+                    <option value="" disabled>Year</option>
+                    {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+                  </select>
+                </div>
                 {errors.dateOfBirth && <p className="text-xs text-red-500">{errors.dateOfBirth}</p>}
               </div>
             </div>
