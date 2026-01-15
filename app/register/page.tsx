@@ -6,6 +6,7 @@ import { RegistrationContainer } from "@/components/auth/registration/registrati
 import { RegistrationStepper } from "@/components/auth/registration/registration-stepper";
 import { BasicInfoForm } from "@/components/auth/registration/basic-info-form";
 import { AccountTypeContent } from "@/components/auth/registration/account-type-content";
+import { AccountTypeConfirmModal } from "@/components/auth/registration/account-type-confirm-modal";
 import { VerificationPrompt } from "@/components/auth/registration/verification-prompt";
 import { VerificationChoiceModal } from "@/components/auth/registration/verification-choice-modal";
 import { OtpVerificationModal } from "@/components/auth/registration/otp-verification-modal";
@@ -18,10 +19,12 @@ export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("basic-info");
   const [accountType, setAccountType] = useState<AccountType | null>(null);
+  const [pendingAccountType, setPendingAccountType] = useState<AccountType | null>(null);
   const [basicInfo, setBasicInfo] = useState<BasicInfoData | null>(null);
   const [verificationMethod, setVerificationMethod] = useState<VerificationMethod | null>(null);
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
   const markStepComplete = (stepName: string) => {
@@ -61,12 +64,25 @@ export default function RegisterPage() {
     return success;
   };
 
-  // Step 3: Account Type
+  // Step 3: Account Type - show confirmation modal first
   const handleAccountTypeSelect = (type: AccountType) => {
-    setAccountType(type);
-    markStepComplete("account-type");
-    setStep("verification-prompt");
-    // TODO: Update Cognito user with account_type
+    setPendingAccountType(type);
+    setShowConfirmModal(true);
+  };
+
+  const handleAccountTypeConfirm = () => {
+    if (pendingAccountType) {
+      setAccountType(pendingAccountType);
+      markStepComplete("account-type");
+      setShowConfirmModal(false);
+      setStep("verification-prompt");
+      // TODO: Update Cognito user with account_type
+    }
+  };
+
+  const handleAccountTypeCancel = () => {
+    setPendingAccountType(null);
+    setShowConfirmModal(false);
   };
 
   // After account type - verification prompt
@@ -89,6 +105,10 @@ export default function RegisterPage() {
 
   // Back handlers
   const handleBackToBasicInfo = () => setStep("basic-info");
+  const handleBackToAccountType = () => {
+    setStep("account-type");
+    setAccountType(null);
+  };
 
   return (
     <main className="flex min-h-screen bg-[#0247ae]">
@@ -117,6 +137,7 @@ export default function RegisterPage() {
                 accountType={accountType}
                 onStartVerification={handleStartVerification}
                 onSkipToLogin={handleSkipToLogin}
+                onBack={handleBackToAccountType}
               />
             )}
           </RegistrationContainer>
@@ -137,6 +158,13 @@ export default function RegisterPage() {
         onVerify={handleOtpVerify}
         onResend={() => {}}
         onClose={() => setShowOtpModal(false)}
+      />
+
+      <AccountTypeConfirmModal
+        open={showConfirmModal}
+        accountType={pendingAccountType}
+        onConfirm={handleAccountTypeConfirm}
+        onCancel={handleAccountTypeCancel}
       />
     </main>
   );
