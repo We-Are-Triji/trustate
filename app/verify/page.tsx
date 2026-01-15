@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle, User } from "lucide-react";
 import { RegistrationContainer } from "@/components/auth/registration/registration-container";
 import { RegistrationStepper } from "@/components/auth/registration/registration-stepper";
 import { IdVerificationForm } from "@/components/auth/registration/id-verification-form";
@@ -29,11 +30,12 @@ type Step =
   | "broker-credentials"
   | "broker-type"
   | "firm-legitimacy"
-  | "pending";
+  | "pending"
+  | "success";
 
 export default function VerifyPage() {
   const router = useRouter();
-  const { isLoading, isAuthenticated, userStatus, accountType } = useAuth();
+  const { isLoading, isAuthenticated, userStatus, accountType, email } = useAuth();
   const [step, setStep] = useState<Step>("id-verification");
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const [showRedirectMessage, setShowRedirectMessage] = useState(false);
@@ -101,7 +103,7 @@ export default function VerifyPage() {
 
     if (accountType === "client") {
       // TODO: Update Cognito status to "verified"
-      router.push("/dashboard");
+      setStep("success");
     } else if (accountType === "agent") {
       setStep("agent-verification");
     } else if (accountType === "broker") {
@@ -147,7 +149,7 @@ export default function VerifyPage() {
   const handleIdDevBypass = () => { markStepComplete("id-verification"); setStep("face-verification"); };
   const handleFaceDevBypass = () => {
     markStepComplete("face-verification");
-    if (accountType === "client") router.push("/dashboard");
+    if (accountType === "client") setStep("success");
     else if (accountType === "agent") setStep("agent-verification");
     else setStep("broker-credentials");
   };
@@ -200,9 +202,47 @@ export default function VerifyPage() {
     );
   }
 
+  // Success screen for clients
+  if (step === "success") {
+    return (
+      <main className="flex min-h-screen bg-[#0247ae]">
+        <AnimatedBackground />
+        <div className="relative z-10 flex w-full items-center justify-center p-6">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-2xl max-w-md animate-[fadeInScale_0.3s_ease-out]">
+            <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center">
+              <CheckCircle className="h-10 w-10 text-emerald-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Complete!</h2>
+            <p className="text-gray-600 mb-6">Your account has been successfully verified.</p>
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="w-full py-3 bg-[#0247ae] text-white rounded-lg font-medium hover:bg-[#023a8a] transition-colors"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const AccountBadge = () => (
+    <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur rounded-lg px-4 py-2 shadow-lg flex items-center gap-3">
+      <div className="h-8 w-8 rounded-full bg-[#0247ae]/10 flex items-center justify-center">
+        <User className="h-4 w-4 text-[#0247ae]" />
+      </div>
+      <div className="text-left">
+        <p className="text-xs text-gray-500">Verifying</p>
+        <p className="text-sm font-medium text-gray-900 truncate max-w-[180px]">{email}</p>
+        <p className="text-xs text-[#0247ae] capitalize">{accountType} Account</p>
+      </div>
+    </div>
+  );
+
   return (
     <main className="flex min-h-screen bg-[#0247ae]">
       <AnimatedBackground />
+      <AccountBadge />
       <div className="relative z-10 flex w-full items-center justify-center p-6 py-12">
         <div className="w-full max-w-5xl animate-[fadeInScale_0.6s_ease-out_0.2s_both]">
           <RegistrationStepper steps={getSteps()} />
