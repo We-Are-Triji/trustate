@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, CheckCircle, ArrowLeft, Building2, Users, User, ArrowRight, FileText } from "lucide-react";
+import { Upload, CheckCircle, ArrowLeft, Building2, Users, User, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { FirmLegitimacyData, FirmType } from "@/lib/types/registration";
@@ -21,6 +21,7 @@ const FIRM_TYPES: { value: FirmType; label: string; regLabel: string; icon: type
 ];
 
 export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmLegitimacyContentProps) {
+  const [selectedType, setSelectedType] = useState<FirmType | null>(null);
   const [data, setData] = useState<FirmLegitimacyData>({
     firmType: null,
     registrationNumber: "",
@@ -43,6 +44,10 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
     data.dhsudNumber.trim() &&
     data.dhsudRegistration &&
     data.corporateBondImage;
+
+  const handleContinueToForm = () => {
+    if (selectedType) setData((prev) => ({ ...prev, firmType: selectedType }));
+  };
 
   const handleSubmit = () => {
     if (canSubmit) onComplete(data);
@@ -95,23 +100,42 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
               {FIRM_TYPES.map(({ value, label, icon: Icon }, index) => (
                 <button
                   key={value}
-                  onClick={() => setData((prev) => ({ ...prev, firmType: value }))}
-                  className="group flex flex-col items-center gap-5 rounded-2xl border-2 border-gray-100 bg-white p-8 text-center transition-all duration-300 hover:border-[#0247ae] hover:shadow-xl hover:shadow-[#0247ae]/10 hover:-translate-y-1 active:translate-y-0 animate-[fadeInUp_0.5s_ease-out_both]"
+                  onClick={() => setSelectedType(value)}
+                  className={`group flex flex-col items-center gap-4 rounded-xl border-2 bg-white p-6 text-center transition-all duration-300 hover:-translate-y-1 active:translate-y-0 animate-[fadeInUp_0.5s_ease-out_both] ${
+                    selectedType === value
+                      ? "border-[#0247ae] shadow-lg shadow-[#0247ae]/20 ring-2 ring-[#0247ae]/20"
+                      : "border-gray-100 hover:border-[#0247ae] hover:shadow-lg hover:shadow-[#0247ae]/10"
+                  }`}
                   style={{ animationDelay: `${0.1 + index * 0.1}s` }}
                 >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0247ae] to-[#0560d4] text-white shadow-lg shadow-[#0247ae]/30 group-hover:scale-110 transition-transform duration-300">
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-xl text-white shadow-lg transition-transform duration-300 ${
+                    selectedType === value
+                      ? "bg-gradient-to-br from-[#0247ae] to-[#0560d4] shadow-[#0247ae]/30 scale-110"
+                      : "bg-gradient-to-br from-[#0247ae] to-[#0560d4] shadow-[#0247ae]/30 group-hover:scale-110"
+                  }`}>
                     <Icon size={28} />
                   </div>
-                  <p className="font-bold text-[#0247ae] text-lg">{label}</p>
-                  <div className="flex items-center gap-1 text-sm font-medium text-[#0247ae] opacity-0 group-hover:opacity-100 transition-opacity">
-                    Select <ArrowRight size={16} />
+                  <p className="font-bold text-[#0247ae] text-base">{label}</p>
+                  <div className={`flex items-center gap-1 text-sm font-medium transition-opacity ${
+                    selectedType === value
+                      ? "text-[#d4a900] opacity-100"
+                      : "text-[#0247ae] opacity-0 group-hover:opacity-100"
+                  }`}>
+                    {selectedType === value ? (
+                      <>
+                        <CheckCircle size={14} className="text-[#ffce08]" />
+                        Selected
+                      </>
+                    ) : (
+                      "Click to select"
+                    )}
                   </div>
                 </button>
               ))}
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 mt-auto border-t border-gray-100 animate-[fadeInUp_0.5s_ease-out_0.3s_both]">
+            <div className="flex items-center justify-between pt-4 mt-3 border-t border-gray-100 animate-[fadeInUp_0.5s_ease-out_0.3s_both]">
               <Button
                 type="button"
                 variant="outline"
@@ -122,7 +146,13 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
                 <ArrowLeft size={16} className="mr-1" />
                 Previous
               </Button>
-              <p className="text-sm text-gray-400">Select a business type to continue</p>
+              <Button
+                onClick={handleContinueToForm}
+                disabled={!selectedType}
+                className="bg-[#0247ae] hover:bg-[#023a8a] active:bg-[#022d6e] px-6 h-9 text-sm font-semibold shadow-lg shadow-[#0247ae]/25 hover:shadow-xl hover:shadow-[#0247ae]/30 transition-all duration-200 disabled:opacity-50 disabled:shadow-none"
+              >
+                Continue
+              </Button>
             </div>
           </div>
         ) : (
@@ -136,7 +166,7 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
                 <span className="font-semibold text-[#0247ae] ml-2">{selectedFirmType?.label}</span>
               </div>
               <button
-                onClick={() => setData((prev) => ({ ...prev, firmType: null }))}
+                onClick={() => { setSelectedType(null); setData((prev) => ({ ...prev, firmType: null })); }}
                 className="text-sm font-medium text-[#0247ae] hover:text-[#ffce08] transition-colors ml-auto"
               >
                 Change
