@@ -44,22 +44,27 @@ export default function RegisterPage() {
   const [showChoiceModal, setShowChoiceModal] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isPending, setIsPending] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
+
+  const markStepComplete = (stepName: string) => {
+    setCompletedSteps(prev => new Set(prev).add(stepName));
+  };
 
   const getSteps = () => {
     const baseSteps = [
-      { label: "Info & ID", completed: !!basicInfo && !!idData, current: step === "basic-info-id" },
-      { label: "Face", completed: !!faceData, current: step === "face-verification" },
-      { label: "Account", completed: !!accountType, current: step === "account-type" },
+      { label: "Info & ID", completed: completedSteps.has("basic-info-id"), current: step === "basic-info-id" },
+      { label: "Face", completed: completedSteps.has("face-verification"), current: step === "face-verification" },
+      { label: "Account", completed: completedSteps.has("account-type"), current: step === "account-type" },
     ];
 
     if (accountType === "agent") {
-      return [...baseSteps, { label: "Verification", completed: false, current: step === "agent-verification" }];
+      return [...baseSteps, { label: "Verification", completed: completedSteps.has("agent-verification"), current: step === "agent-verification" }];
     }
 
     if (accountType === "broker") {
       const brokerSteps = [
-        { label: "Credentials", completed: step === "broker-type" || step === "firm-legitimacy", current: step === "broker-credentials" },
-        { label: "Structure", completed: step === "firm-legitimacy", current: step === "broker-type" },
+        { label: "Credentials", completed: completedSteps.has("broker-credentials"), current: step === "broker-credentials" },
+        { label: "Structure", completed: completedSteps.has("broker-type"), current: step === "broker-type" },
       ];
       return [...baseSteps, ...brokerSteps];
     }
@@ -70,6 +75,7 @@ export default function RegisterPage() {
   const handleBasicInfoIdSubmit = (info: BasicInfoData, id: { idType: PhilippineID; idImage: File }) => {
     setBasicInfo(info);
     setIdData(id);
+    markStepComplete("basic-info-id");
     setShowChoiceModal(true);
   };
 
@@ -91,11 +97,13 @@ export default function RegisterPage() {
 
   const handleFaceComplete = (faceImage: File) => {
     setFaceData(faceImage);
+    markStepComplete("face-verification");
     setStep("account-type");
   };
 
   const handleAccountTypeSelect = (type: AccountType) => {
     setAccountType(type);
+    markStepComplete("account-type");
     if (type === "client") {
       console.log("Client registration complete:", { basicInfo, idData, faceData });
     } else if (type === "agent") {
@@ -107,15 +115,18 @@ export default function RegisterPage() {
 
   const handleAgentSubmit = (prcData: PrcData, nexusLink: string) => {
     console.log("Agent registration submitted:", { basicInfo, idData, faceData, prcData, nexusLink });
+    markStepComplete("agent-verification");
     setIsPending(true);
   };
 
   const handleBrokerCredentialsSubmit = (licenseData: BrokerLicenseData, bondData: SuretyBondData) => {
     console.log("Broker credentials:", { licenseData, bondData });
+    markStepComplete("broker-credentials");
     setStep("broker-type");
   };
 
   const handleBrokerTypeSelect = (type: BrokerType) => {
+    markStepComplete("broker-type");
     if (type === "individual") {
       console.log("Individual broker registration complete");
     } else {
@@ -128,11 +139,11 @@ export default function RegisterPage() {
   };
 
   // Dev bypasses
-  const handleBasicInfoDevBypass = () => setStep("face-verification");
-  const handleFaceDevBypass = () => setStep("account-type");
-  const handleAgentDevBypass = () => setIsPending(true);
-  const handleBrokerCredentialsDevBypass = () => setStep("broker-type");
-  const handleFirmDevBypass = () => console.log("Firm registration complete (dev)");
+  const handleBasicInfoDevBypass = () => { markStepComplete("basic-info-id"); setStep("face-verification"); };
+  const handleFaceDevBypass = () => { markStepComplete("face-verification"); setStep("account-type"); };
+  const handleAgentDevBypass = () => { markStepComplete("agent-verification"); setIsPending(true); };
+  const handleBrokerCredentialsDevBypass = () => { markStepComplete("broker-credentials"); setStep("broker-type"); };
+  const handleFirmDevBypass = () => { markStepComplete("firm-legitimacy"); console.log("Firm registration complete (dev)"); };
 
   // Back handlers
   const handleBackToBasicInfo = () => setStep("basic-info-id");
