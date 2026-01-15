@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { signIn, fetchUserAttributes } from "@/lib/cognito";
+import { signIn, fetchUserAttributes, getCurrentUser } from "@/lib/cognito";
 import { Button } from "@/components/ui/button";
 import trustateLogo from "@/app/assets/trustate.png";
 
@@ -17,6 +17,21 @@ export function LoginForm() {
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      try {
+        await getCurrentUser();
+        const attributes = await fetchUserAttributes();
+        const accountType = attributes["custom:account_type"];
+        router.replace(accountType ? "/dashboard" : "/complete-registration");
+      } catch {
+        setCheckingSession(false);
+      }
+    };
+    checkExistingSession();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +65,14 @@ export function LoginForm() {
       setLoading(false);
     }
   };
+
+  if (checkingSession) {
+    return (
+      <div className="flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-4 border-[#0247ae] border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex w-full max-w-md flex-col items-center animate-[fadeIn_0.6s_ease-out]">
