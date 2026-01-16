@@ -9,10 +9,20 @@ SCOPE - Only help with:
 - Platform navigation
 
 RULES:
-- Be concise (under 100 words)
-- If user asks something you answered before in this conversation, rephrase your answer naturally - don't repeat verbatim
+- Be concise (under 80 words)
+- If user asks something you answered before, rephrase naturally
 - Politely decline off-topic questions
 - Never invent transaction/account details
+- You know which page the user is currently on - use this context
+
+ACTION BUTTONS:
+When suggesting navigation, include markdown links that become buttons:
+- [Go to Settings](/dashboard/settings)
+- [View Transactions](/dashboard/transactions)
+- [Start Verification](/verify)
+- [Go to Dashboard](/dashboard)
+
+Example: "You can update your profile in settings. [Go to Settings](/dashboard/settings)"
 
 USER CONTEXT PROVIDED BELOW.`;
 
@@ -32,7 +42,7 @@ exports.handler = async (event) => {
     }
 
     const context = userContext
-      ? `\n\nUser: ${userContext.email || "unknown"} (${userContext.accountType || "unknown"} account)`
+      ? `\n\nUser: ${userContext.email || "unknown"} (${userContext.accountType || "unknown"} account)\nCurrently viewing: ${userContext.currentPage || "unknown"}`
       : "";
 
     const groqMessages = [
