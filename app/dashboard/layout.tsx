@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { AiAssistantFab } from "@/components/dashboard/ai-assistant-fab";
 import { VerificationBanner } from "@/components/dashboard/verification-banner";
 import { PendingApprovalPage } from "@/components/dashboard/pending-approval-page";
 
@@ -44,6 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {userStatus === "registered" && <VerificationBanner />}
         <main className="flex-1">{children}</main>
       </div>
+      <AiAssistantFab />
     </div>
   );
 }

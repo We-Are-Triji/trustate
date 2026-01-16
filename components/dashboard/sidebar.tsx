@@ -3,14 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, FileText, Bot, Settings, ChevronLeft, ChevronRight, LogOut, User } from "lucide-react";
+import { Home, FileText, Settings, ChevronLeft, ChevronRight, LogOut, User } from "lucide-react";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { signOut } from "@/lib/cognito";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/dashboard/transactions", label: "Transactions", icon: FileText },
-  { href: "/dashboard/assistant", label: "AI Assistant", icon: Bot },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
