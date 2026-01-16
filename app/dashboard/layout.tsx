@@ -3,12 +3,17 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { VerificationBanner } from "@/components/dashboard/verification-banner";
 import { PendingApprovalPage } from "@/components/dashboard/pending-approval-page";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { isLoading, isAuthenticated, userStatus, accountType } = useAuth();
+  const { isLoading, isAuthenticated, userStatus, accountType, refetch } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -33,9 +38,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      {userStatus === "registered" && <VerificationBanner />}
-      {children}
+    <div className="min-h-screen bg-[#F8FAFC] flex">
+      <DashboardSidebar />
+      <div className="flex-1 flex flex-col">
+        {userStatus === "registered" && <VerificationBanner />}
+        <main className="flex-1">{children}</main>
+      </div>
     </div>
   );
 }

@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import { signOut } from "@/lib/cognito";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Home, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 export default function DashboardPage() {
-  const { userStatus, accountType } = useAuth();
+  const { userStatus, accountType, email } = useAuth();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -16,19 +16,14 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="p-8">
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-[#0247ae] flex items-center justify-center">
-            <Home className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-sm text-gray-500">
-              {accountType ? `${accountType.charAt(0).toUpperCase() + accountType.slice(1)} Account` : "Welcome"}
-              {userStatus === "registered" && " (Unverified)"}
-            </p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500">
+            {email} · {accountType ? `${accountType.charAt(0).toUpperCase() + accountType.slice(1)}` : "User"}
+            {userStatus === "registered" && " · Unverified"}
+          </p>
         </div>
         <Button variant="outline" onClick={handleSignOut} className="gap-2">
           <LogOut size={16} />
