@@ -48,4 +48,5 @@ next-env.d.ts
 .terraform.lock.hcl
 *.tfvars
 !*.tfvars.example
+*.zip
 .github/copilot-instructions.md
