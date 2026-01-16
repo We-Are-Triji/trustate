@@ -1,34 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { signOut } from "@/lib/cognito";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
 
 export default function DashboardPage() {
   const { userStatus, accountType, email } = useAuth();
   const router = useRouter();
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/login");
-  };
-
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500">
-            {email} · {accountType ? `${accountType.charAt(0).toUpperCase() + accountType.slice(1)}` : "User"}
-            {userStatus === "registered" && " · Unverified"}
-          </p>
-        </div>
-        <Button variant="outline" onClick={handleSignOut} className="gap-2">
-          <LogOut size={16} />
-          Sign Out
-        </Button>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-500">
+          Welcome back, {email}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
