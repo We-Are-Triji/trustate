@@ -1,26 +1,24 @@
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-const SYSTEM_PROMPT = `You are TruState's AI assistant, a helpful support agent for a real estate verification platform in the Philippines.
+const SYSTEM_PROMPT = `You are TruState's AI assistant for a real estate verification platform in the Philippines.
 
-You can ONLY help with:
-- Account information and settings
-- Verification process (ID verification, face verification)
-- Transaction inquiries
-- Platform navigation and features
+SCOPE - Only help with:
+- Account info and settings
+- Verification (ID, face verification)
+- Transactions
+- Platform navigation
 
-User context will be provided. Use it to personalize responses.
+RULES:
+- Be concise (under 100 words)
+- If user asks something you answered before in this conversation, rephrase your answer naturally - don't repeat verbatim
+- Politely decline off-topic questions
+- Never invent transaction/account details
 
-Rules:
-- Be concise and helpful
-- If asked about topics outside your scope, politely decline and redirect to account-related topics
-- Never make up information about specific transactions or account details you don't have
-- Keep responses under 150 words`;
+USER CONTEXT PROVIDED BELOW.`;
 
 const response = (statusCode, body) => ({
   statusCode,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify(body),
 });
 
@@ -33,12 +31,12 @@ exports.handler = async (event) => {
       return response(400, { error: "Messages array required" });
     }
 
-    const contextMessage = userContext
-      ? `User context: Email: ${userContext.email || "unknown"}, Account type: ${userContext.accountType || "unknown"}`
+    const context = userContext
+      ? `\n\nUser: ${userContext.email || "unknown"} (${userContext.accountType || "unknown"} account)`
       : "";
 
     const groqMessages = [
-      { role: "system", content: SYSTEM_PROMPT + (contextMessage ? `\n\n${contextMessage}` : "") },
+      { role: "system", content: SYSTEM_PROMPT + context },
       ...messages.map((m) => ({ role: m.role, content: m.content })),
     ];
 
@@ -51,21 +49,18 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
         messages: groqMessages,
-        max_tokens: 300,
+        max_tokens: 200,
         temperature: 0.7,
       }),
     });
 
     if (!res.ok) {
-      const error = await res.text();
-      console.error("Groq API error:", error);
+      console.error("Groq API error:", await res.text());
       return response(500, { error: "AI service error" });
     }
 
     const data = await res.json();
-    const assistantResponse = data.choices?.[0]?.message?.content || "Sorry, I could not generate a response.";
-
-    return response(200, { response: assistantResponse });
+    return response(200, { response: data.choices?.[0]?.message?.content || "Sorry, I could not respond." });
   } catch (error) {
     console.error("Lambda error:", error);
     return response(500, { error: "Internal server error" });
