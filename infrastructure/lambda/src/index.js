@@ -16,16 +16,21 @@ Rules:
 - Never make up information about specific transactions or account details you don't have
 - Keep responses under 150 words`;
 
+const response = (statusCode, body) => ({
+  statusCode,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(body),
+});
+
 exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
     const { messages, userContext } = body;
 
     if (!messages || !Array.isArray(messages)) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Messages array required" }),
-      };
+      return response(400, { error: "Messages array required" });
     }
 
     const contextMessage = userContext
@@ -37,7 +42,7 @@ exports.handler = async (event) => {
       ...messages.map((m) => ({ role: m.role, content: m.content })),
     ];
 
-    const response = await fetch(GROQ_API_URL, {
+    const res = await fetch(GROQ_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,27 +56,18 @@ exports.handler = async (event) => {
       }),
     });
 
-    if (!response.ok) {
-      const error = await response.text();
+    if (!res.ok) {
+      const error = await res.text();
       console.error("Groq API error:", error);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "AI service error" }),
-      };
+      return response(500, { error: "AI service error" });
     }
 
-    const data = await response.json();
+    const data = await res.json();
     const assistantResponse = data.choices?.[0]?.message?.content || "Sorry, I could not generate a response.";
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ response: assistantResponse }),
-    };
+    return response(200, { response: assistantResponse });
   } catch (error) {
     console.error("Lambda error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return response(500, { error: "Internal server error" });
   }
 };

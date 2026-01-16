@@ -65,19 +65,46 @@ resource "aws_lambda_function" "assistant" {
   }
 }
 
-# Lambda Function URL (simpler than API Gateway)
-resource "aws_lambda_function_url" "assistant_url" {
-  function_name      = aws_lambda_function.assistant.function_name
-  authorization_type = "NONE"
+# API Gateway
+resource "aws_apigatewayv2_api" "assistant_api" {
+  name          = "trustate-assistant-api"
+  protocol_type = "HTTP"
 
-  cors {
-    allow_origins     = ["*"]
-    allow_methods     = ["POST"]
-    allow_headers     = ["content-type"]
-    max_age           = 86400
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["POST", "OPTIONS"]
+    allow_headers = ["content-type"]
+    max_age       = 86400
   }
 }
 
-output "assistant_url" {
-  value = aws_lambda_function_url.assistant_url.function_url
+resource "aws_apigatewayv2_stage" "default" {
+  api_id      = aws_apigatewayv2_api.assistant_api.id
+  name        = "$default"
+  auto_deploy = true
+}
+
+resource "aws_apigatewayv2_integration" "lambda" {
+  api_id                 = aws_apigatewayv2_api.assistant_api.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.assistant.invoke_arn
+  payload_format_version = "2.0"
+}
+
+resource "aws_apigatewayv2_route" "post" {
+  api_id    = aws_apigatewayv2_api.assistant_api.id
+  route_key = "POST /chat"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+resource "aws_lambda_permission" "api_gateway" {
+  statement_id  = "AllowAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.assistant.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.assistant_api.execution_arn}/*/*"
+}
+
+output "assistant_api_url" {
+  value = "${aws_apigatewayv2_api.assistant_api.api_endpoint}/chat"
 }
