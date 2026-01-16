@@ -12,6 +12,7 @@ interface Message {
 }
 
 const STORAGE_KEY = "trustate_assistant_messages";
+const ASSISTANT_API_URL = process.env.NEXT_PUBLIC_ASSISTANT_API_URL;
 
 function getStoredMessages(): Message[] {
   if (typeof window === "undefined") return [];
@@ -33,39 +34,25 @@ async function sendToAssistant(
   messages: Message[],
   userContext: { email: string | null; accountType: string | null }
 ): Promise<string> {
-  // TODO: Replace with Lambda invocation
-  // const response = await fetch('/api/assistant', {
-  //   method: 'POST',
-  //   body: JSON.stringify({ messages, userContext })
-  // });
-  
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  const lastMessage = messages[messages.length - 1]?.content.toLowerCase() || "";
-  
-  // Mock responses based on keywords
-  if (lastMessage.includes("account") || lastMessage.includes("profile")) {
-    return `Your account email is ${userContext.email} and you're registered as a ${userContext.accountType}. Is there anything specific about your account you'd like to know?`;
+  if (!ASSISTANT_API_URL) {
+    throw new Error("Assistant API URL not configured");
   }
-  
-  if (lastMessage.includes("verify") || lastMessage.includes("verification")) {
-    return "To verify your account, go to the verification section from your dashboard. You'll need to upload a valid government ID and complete face verification.";
+
+  const response = await fetch(ASSISTANT_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messages: messages.map((m) => ({ role: m.role, content: m.content })),
+      userContext,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to get response");
   }
-  
-  if (lastMessage.includes("transaction") || lastMessage.includes("payment")) {
-    return "You can view your transactions in the Transactions section. If you have questions about a specific transaction, please provide the transaction ID.";
-  }
-  
-  if (lastMessage.includes("help") || lastMessage.includes("what can you do")) {
-    return "I can help you with:\n• Account information and settings\n• Verification process\n• Transaction inquiries\n• General platform questions\n\nWhat would you like to know?";
-  }
-  
-  if (lastMessage.includes("hello") || lastMessage.includes("hi") || lastMessage.includes("hey")) {
-    return `Hello! I'm your TruState assistant. I can help you with account-related questions. What would you like to know?`;
-  }
-  
-  // Default response for unrelated questions
-  return "I can only assist with questions related to your TruState account, transactions, and verification. Could you please ask something about these topics?";
+
+  const data = await response.json();
+  return data.response;
 }
 
 export function AiAssistantFab() {
