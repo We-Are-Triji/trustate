@@ -16,6 +16,7 @@ interface VerificationChoiceModalProps {
   email: string;
   mobile: string;
   onSelect: (method: VerificationMethod) => void;
+  onClose?: () => void;
 }
 
 export function VerificationChoiceModal({
@@ -23,10 +24,11 @@ export function VerificationChoiceModal({
   email,
   mobile,
   onSelect,
+  onClose,
 }: VerificationChoiceModalProps) {
   return (
-    <Dialog open={open}>
-      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose?.()}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-gray-800">Verify Your Account</DialogTitle>
           <DialogDescription>

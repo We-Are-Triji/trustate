@@ -279,6 +279,10 @@ export default function RegisterPage() {
         email={basicInfo?.email || ""}
         mobile={basicInfo?.mobile || ""}
         onSelect={handleVerificationMethodSelect}
+        onClose={() => {
+          setShowChoiceModal(false);
+          setStep("basic-info");
+        }}
       />
 
       <OtpVerificationModal
