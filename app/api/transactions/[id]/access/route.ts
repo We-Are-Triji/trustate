@@ -5,10 +5,10 @@ import { cookies } from "next/headers";
 // GET - Check if user has access
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const transactionId = params.id;
+    const { id: transactionId } = await params;
     const userId = request.headers.get("x-user-id");
 
     // Check if user is a participant
@@ -43,10 +43,10 @@ export async function GET(
 // POST - Verify access code and grant access
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const transactionId = params.id;
+    const { id: transactionId } = await params;
     const body = await request.json();
     const { access_code } = body;
 
