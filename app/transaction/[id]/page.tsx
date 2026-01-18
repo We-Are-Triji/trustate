@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { TransactionLayout, TransactionMenu } from "@/components/transaction/transaction-layout";
+import { OverviewTab } from "@/components/transaction/overview-tab";
+import { ToolsPanel } from "@/components/transaction/tools-panel";
+import type { Transaction } from "@/lib/types/transaction";
 
 export default function TransactionPage() {
   const params = useParams();
@@ -12,6 +16,8 @@ export default function TransactionPage() {
   const [needsCode, setNeedsCode] = useState(false);
   const [accessCode, setAccessCode] = useState("");
   const [error, setError] = useState("");
+  const [transaction, setTransaction] = useState<Transaction | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     checkAccess();
@@ -24,7 +30,8 @@ export default function TransactionPage() {
       });
 
       if (response.ok) {
-        // User already has access
+        // User has access, fetch transaction data
+        await fetchTransaction();
         setIsVerifying(false);
       } else if (response.status === 403) {
         // Needs access code
@@ -37,6 +44,18 @@ export default function TransactionPage() {
     } catch {
       setError("Failed to verify access");
       setIsVerifying(false);
+    }
+  };
+
+  const fetchTransaction = async () => {
+    try {
+      const response = await fetch(`/api/transactions/${transactionId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTransaction(data.transaction);
+      }
+    } catch {
+      console.error("Failed to fetch transaction");
     }
   };
 
@@ -53,8 +72,7 @@ export default function TransactionPage() {
 
       if (response.ok) {
         setNeedsCode(false);
-        // Reload to show transaction interface
-        window.location.reload();
+        await fetchTransaction();
       } else {
         const data = await response.json();
         setError(data.error || "Invalid access code");
@@ -136,9 +154,43 @@ export default function TransactionPage() {
     );
   }
 
+  if (!transaction) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0247ae]" />
+      </div>
+    );
+  }
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "overview":
+        return <OverviewTab transaction={transaction} />;
+      case "conversation":
+        return <div className="p-6">Conversation tab coming soon</div>;
+      case "documents":
+        return <div className="p-6">Documents tab coming soon</div>;
+      case "escrow":
+        return <div className="p-6">Escrow tab coming soon</div>;
+      case "activity":
+        return <div className="p-6">Activity log coming soon</div>;
+      default:
+        return <OverviewTab transaction={transaction} />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <p className="p-8 text-center text-gray-600">Transaction interface will be here</p>
-    </div>
+    <TransactionLayout
+      leftMenu={
+        <TransactionMenu
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          transactionId={transactionId}
+        />
+      }
+      rightTools={<ToolsPanel activeTab={activeTab} />}
+    >
+      {renderContent()}
+    </TransactionLayout>
   );
 }
