@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { TransactionLayout, TransactionMenu } from "@/components/transaction/transaction-layout";
 import { OverviewTab } from "@/components/transaction/overview-tab";
+import { ConversationTab } from "@/components/transaction/conversation-tab";
 import { ToolsPanel } from "@/components/transaction/tools-panel";
 import type { Transaction } from "@/lib/types/transaction";
 
@@ -167,7 +168,7 @@ export default function TransactionPage() {
       case "overview":
         return <OverviewTab transaction={transaction} />;
       case "conversation":
-        return <div className="p-6">Conversation tab coming soon</div>;
+        return <ConversationTab transactionId={transactionId} />;
       case "documents":
         return <div className="p-6">Documents tab coming soon</div>;
       case "escrow":
