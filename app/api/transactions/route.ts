@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { fetchUserAttributes } from "aws-amplify/auth";
 import type { CreateTransactionInput } from "@/lib/types/transaction";
 
 function generateAccessCode(): string {
@@ -9,10 +8,16 @@ function generateAccessCode(): string {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get authenticated user from Cognito
-    const attributes = await fetchUserAttributes();
-    const agentId = attributes.sub;
-    const accountType = attributes["custom:account_type"];
+    // Get user ID from request header (set by middleware or client)
+    const agentId = request.headers.get("x-user-id");
+    const accountType = request.headers.get("x-account-type");
+
+    if (!agentId) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     if (accountType !== "agent") {
       return NextResponse.json(
