@@ -2,12 +2,14 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { LandingHeader } from "@/components/landing/header";
-import { LandingFooter } from "@/components/landing/footer";
+import dynamic from "next/dynamic";
 import { AgentsHeader, AgentsGrid } from "@/components/agents";
 import { agentsData } from "@/lib/mock/agents-data";
 import { partners, footerSections } from "@/lib/mock/landing-data";
 import type { AgentFilters } from "@/lib/types/agent";
+
+const LandingHeader = dynamic(() => import("@/components/landing/header").then(m => ({ default: m.LandingHeader })), { ssr: false });
+const LandingFooter = dynamic(() => import("@/components/landing/footer").then(m => ({ default: m.LandingFooter })), { ssr: false });
 
 const ITEMS_PER_PAGE = 12;
 

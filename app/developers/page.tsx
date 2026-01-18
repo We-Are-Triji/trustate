@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { LandingHeader } from "@/components/landing/header";
-import { LandingFooter } from "@/components/landing/footer";
+import dynamic from "next/dynamic";
 import {
   DevelopersHeader,
   DevelopersGrid,
   DeveloperModal,
 } from "@/components/developers";
+
+const LandingHeader = dynamic(() => import("@/components/landing/header").then(m => ({ default: m.LandingHeader })), { ssr: false });
+const LandingFooter = dynamic(() => import("@/components/landing/footer").then(m => ({ default: m.LandingFooter })), { ssr: false });
 import { developersData } from "@/lib/mock/developers-data";
 import { partners, footerSections } from "@/lib/mock/landing-data";
 import type { Developer } from "@/lib/types/developer";
