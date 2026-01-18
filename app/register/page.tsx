@@ -67,7 +67,12 @@ export default function RegisterPage() {
   useEffect(() => {
     const saved = loadFromStorage();
     if (saved) {
-      setStep(saved.step);
+      // If step is otp-verification but no completed steps, reset to basic-info
+      if (saved.step === "otp-verification" && saved.completedSteps.length === 0) {
+        setStep("basic-info");
+      } else {
+        setStep(saved.step);
+      }
       setBasicInfo(saved.basicInfo);
       setCompletedSteps(new Set(saved.completedSteps));
     }
