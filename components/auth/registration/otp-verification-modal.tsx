@@ -48,6 +48,7 @@ export function OtpVerificationModal({
       setTimeout(() => {
         setVerified(false);
         setCode("");
+        onClose(); // Close modal after success animation
       }, 1500);
     } else {
       setError("Invalid code. Please try again.");
