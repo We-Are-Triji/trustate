@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, ChevronDown } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface DevelopersHeaderProps {
@@ -15,31 +15,28 @@ export function DevelopersHeader({
   onSearchChange,
 }: DevelopersHeaderProps) {
   return (
-    <div className="mb-6">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
-            Developer Partners
-            <span className="ml-2 text-lg font-normal text-gray-500">
-              ({totalDevelopers})
+    <div className="mb-8">
+      {/* Filter Container */}
+      <div className="rounded-2xl bg-white p-6 shadow-md border border-gray-200">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          {/* Stats Badge */}
+          <div className="px-4 py-2 rounded-lg bg-blue-50 border border-blue-200">
+            <span className="text-sm font-bold text-blue-600">
+              {totalDevelopers} Developers
             </span>
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Browse our trusted real estate development partners
-          </p>
-        </div>
-      </div>
+          </div>
 
-      <div className="flex flex-col gap-4">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Search developers by name or location..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full border-[#E2E8F0] bg-white pl-9 focus:border-gray-300 focus:ring-gray-300"
-          />
+          {/* Search Bar */}
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search developers..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full h-11 rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm font-medium placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+            />
+          </div>
         </div>
       </div>
     </div>
