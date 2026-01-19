@@ -8,6 +8,7 @@ import { LandingHeader } from "@/components/landing/header";
 import { LandingFooter } from "@/components/landing/footer";
 import { agentsData } from "@/lib/mock/agents-data";
 import { partners, footerSections } from "@/lib/mock/landing-data";
+import { getAgentPhoto } from "@/components/agents/agent-card";
 
 interface AgentDetailPageProps {
   params: Promise<{ id: string }>;
@@ -35,6 +36,7 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
   }
 
   const statusColor = agent.status === "active" ? "bg-emerald-500" : agent.status === "invited" ? "bg-amber-500" : "bg-gray-400";
+  const photoUrl = getAgentPhoto(agent.name);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -56,11 +58,15 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
             <div className="rounded-2xl border border-gray-200 bg-white p-6 sticky top-24">
               <div className="flex flex-col items-center">
                 <div className="mb-4 flex h-48 w-48 items-center justify-center overflow-hidden rounded-full border-4 border-gray-100 bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg">
-                  {agent.photo ? (
-                    <img src={agent.photo} alt={agent.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <User className="h-24 w-24 text-gray-400" />
-                  )}
+                  <img 
+                    src={photoUrl} 
+                    alt={agent.name} 
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(agent.name)}&size=400&background=0247ae&color=fff&bold=true`;
+                    }}
+                  />
                 </div>
 
                 <div className="flex items-center gap-2 mb-2">

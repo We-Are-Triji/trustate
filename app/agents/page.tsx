@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 import { AgentsHeader, AgentsGrid } from "@/components/agents";
 import { agentsData } from "@/lib/mock/agents-data";
 import { partners, footerSections } from "@/lib/mock/landing-data";
@@ -71,50 +72,96 @@ export default function AgentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#f8faff]">
       <LandingHeader />
-      <main className="mx-auto max-w-7xl px-4 pt-24 pb-8 sm:px-6 lg:px-8">
-        <AgentsHeader
-          totalAgents={agentsData.length}
-          activeCount={activeCount}
-          inactiveCount={inactiveCount}
-          filters={filters}
-          onFiltersChange={(f) => { setFilters(f); setCurrentPage(1); }}
-        />
+      
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative overflow-hidden bg-gradient-to-br from-[#f8faff] via-white to-[#f5f7ff] pt-24 pb-12"
+      >
+        {/* Background decorations */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-[#0247ae]/10 via-[#0560d4]/5 to-transparent blur-3xl" />
+          <div className="absolute left-0 bottom-0 h-[400px] w-[400px] rounded-full bg-gradient-to-tr from-[#ffce08]/10 via-[#f5c000]/5 to-transparent blur-3xl" />
+        </div>
+        
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
+          <div 
+            className="h-full w-full"
+            style={{
+              backgroundImage: `linear-gradient(rgba(2, 71, 174, 1) 1px, transparent 1px),
+                               linear-gradient(90deg, rgba(2, 71, 174, 1) 1px, transparent 1px)`,
+              backgroundSize: '80px 80px'
+            }}
+          />
+        </div>
+        
+        <main className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <AgentsHeader
+            totalAgents={agentsData.length}
+            activeCount={activeCount}
+            inactiveCount={inactiveCount}
+            filters={filters}
+            onFiltersChange={(f) => { setFilters(f); setCurrentPage(1); }}
+          />
+        </main>
+      </motion.div>
 
+      {/* Main Content */}
+      <main className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Pagination info */}
-        <div className="mb-4 flex items-center justify-between text-sm text-gray-500">
-          <p>
-            Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredAgents.length)} of {filteredAgents.length} agents
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mb-6 flex items-center justify-between text-sm text-gray-600"
+        >
+          <p className="font-medium">
+            Showing <span className="text-[#0247ae]">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredAgents.length)}</span> of <span className="text-[#0247ae]">{filteredAgents.length}</span> agents
           </p>
           {totalPages > 1 && (
-            <p>Page {currentPage} of {totalPages}</p>
+            <p>Page <span className="font-semibold text-[#0247ae]">{currentPage}</span> of {totalPages}</p>
           )}
-        </div>
+        </motion.div>
 
-        <AgentsGrid agents={paginatedAgents} onViewDetails={handleViewDetails} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+        >
+          <AgentsGrid agents={paginatedAgents} onViewDetails={handleViewDetails} />
+        </motion.div>
 
         {/* Pagination controls */}
         {totalPages > 1 && (
-          <div className="mt-8 flex items-center justify-center gap-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="mt-10 flex items-center justify-center gap-2"
+          >
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-full border-2 border-[#0247ae]/20 bg-white px-6 py-2.5 text-sm font-semibold text-[#0247ae] hover:bg-[#0247ae] hover:text-white hover:border-[#0247ae] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-[#0247ae] transition-all duration-300 shadow-sm hover:shadow-lg"
             >
               Previous
             </button>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 const page = i + 1;
                 return (
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`h-9 w-9 rounded-lg text-sm font-medium ${
+                    className={`h-11 w-11 rounded-full text-sm font-bold transition-all duration-300 ${
                       currentPage === page
-                        ? "bg-[#0247ae] text-white"
-                        : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                        ? "bg-gradient-to-br from-[#0247ae] to-[#0560d4] text-white shadow-lg shadow-[#0247ae]/30 scale-110"
+                        : "border-2 border-[#0247ae]/20 bg-white text-[#0247ae] hover:bg-[#0247ae]/5 hover:border-[#0247ae]/40 hover:scale-105"
                     }`}
                   >
                     {page}
@@ -125,13 +172,14 @@ export default function AgentsPage() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-full border-2 border-[#0247ae]/20 bg-white px-6 py-2.5 text-sm font-semibold text-[#0247ae] hover:bg-[#0247ae] hover:text-white hover:border-[#0247ae] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-[#0247ae] transition-all duration-300 shadow-sm hover:shadow-lg"
             >
               Next
             </button>
-          </div>
+          </motion.div>
         )}
       </main>
+      
       <LandingFooter partners={partners} sections={footerSections} />
     </div>
   );

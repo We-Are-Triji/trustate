@@ -23,14 +23,14 @@ export function LandingHeader() {
 
   return (
     <header 
-      className={`fixed top-0 z-50 w-full transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
         isScrolled 
-          ? 'bg-white/90 backdrop-blur-xl shadow-lg shadow-black/5 border-b border-gray-100/50' 
-          : 'bg-white/70 backdrop-blur-md'
+          ? 'bg-white/95 backdrop-blur-xl shadow-lg shadow-black/5 border-b border-gray-100/50' 
+          : 'bg-white/80 backdrop-blur-md'
       }`}
     >
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex items-center gap-6 animate-[fadeInUp_0.6s_ease-out]">
+        <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 group">
             <Image
               src={trustateLogo}
@@ -79,7 +79,7 @@ export function LandingHeader() {
           </nav>
         </div>
 
-        <div className="hidden items-center gap-4 md:flex animate-[fadeInUp_0.6s_ease-out_0.2s_both]">
+        <div className="hidden items-center gap-4 md:flex">
           <div className="relative group">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 transition-colors duration-300 group-focus-within:text-[#0247ae]" />
             <Input
@@ -117,7 +117,7 @@ export function LandingHeader() {
       </div>
 
       {isMenuOpen && (
-        <div className="border-t border-gray-100/50 bg-white/95 backdrop-blur-xl px-4 py-5 md:hidden animate-[fadeInUp_0.3s_ease-out]">
+        <div className="border-t border-gray-100/50 bg-white/95 backdrop-blur-xl px-4 py-5 md:hidden">
           <div className="relative mb-4">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <Input

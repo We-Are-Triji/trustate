@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { AgentCard } from "./agent-card";
 import type { AgentProfile } from "@/lib/types/agent";
 
@@ -11,10 +12,10 @@ interface AgentsGridProps {
 export function AgentsGrid({ agents, onViewDetails }: AgentsGridProps) {
   if (agents.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-[#E2E8F0] bg-white px-6 py-16">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+      <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 bg-white/50 backdrop-blur-sm px-6 py-20">
+        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
           <svg
-            className="h-8 w-8 text-gray-400"
+            className="h-10 w-10 text-gray-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -27,20 +28,32 @@ export function AgentsGrid({ agents, onViewDetails }: AgentsGridProps) {
             />
           </svg>
         </div>
-        <h3 className="mb-1 text-lg font-semibold text-gray-800">
+        <h3 className="mb-2 text-xl font-bold text-gray-800">
           No agents found
         </h3>
-        <p className="text-center text-sm text-gray-500">
-          Try adjusting your search or filter criteria
+        <p className="text-center text-sm text-gray-500 max-w-md">
+          Try adjusting your search or filter criteria to find the perfect agent for your needs
         </p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {agents.map((agent) => (
-        <AgentCard key={agent.id} agent={agent} onViewDetails={onViewDetails} />
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {agents.map((agent, index) => (
+        <motion.div
+          key={agent.id}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ 
+            duration: 0.5, 
+            delay: index * 0.1,
+            ease: "easeOut"
+          }}
+        >
+          <AgentCard agent={agent} onViewDetails={onViewDetails} />
+        </motion.div>
       ))}
     </div>
   );
