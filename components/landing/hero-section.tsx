@@ -5,7 +5,6 @@ import { Star, MapPin, ArrowRight, Phone, MessageCircle, CheckCircle, Video, Mai
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import type { Agent } from "@/lib/types/landing";
-import { useSectionContext } from "@/lib/contexts/section-context";
 
 // Stock photos for agents
 const agentPhotos = [
@@ -28,7 +27,6 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ agents }: HeroSectionProps) {
-  const { navigateToSection } = useSectionContext();
   const [activeIndex, setActiveIndex] = useState(0);
   const [typedText, setTypedText] = useState("");
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -261,15 +259,16 @@ export function HeroSection({ agents }: HeroSectionProps) {
                   <ArrowRight className="relative ml-2 h-5 w-5 transition-all duration-500 group-hover:translate-x-2 group-hover:scale-110" />
                 </Button>
               </Link>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                onClick={() => navigateToSection(1)}
-                className="relative border-2 border-[#0247ae]/20 text-gray-700 hover:border-[#0247ae] hover:text-[#0247ae] px-8 rounded-full h-12 text-sm font-bold transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-[#0247ae]/10 backdrop-blur-md bg-white/60 hover:bg-white/90 overflow-hidden group"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-[#0247ae]/0 via-[#0247ae]/5 to-[#0247ae]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
-                <span className="relative">How It Works</span>
-              </Button>
+              <Link href="#how-it-works">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="relative border-2 border-[#0247ae]/20 text-gray-700 hover:border-[#0247ae] hover:text-[#0247ae] px-8 rounded-full h-12 text-sm font-bold transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-[#0247ae]/10 backdrop-blur-md bg-white/60 hover:bg-white/90 overflow-hidden group"
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-[#0247ae]/0 via-[#0247ae]/5 to-[#0247ae]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+                  <span className="relative">How It Works</span>
+                </Button>
+              </Link>
             </div>
 
             {/* Communication ways card */}

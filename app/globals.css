@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./scroll-animations.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -136,6 +137,66 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+  
+  /* Performance optimizations */
+  .will-change-transform {
+    will-change: transform, opacity;
+  }
+  
+  /* GPU acceleration for smooth animations */
+  [data-scroll-section] {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+/* Smooth reveal animation */
+@keyframes smoothReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Slide in from left */
+@keyframes slideInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from right */
+@keyframes slideInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Zoom in animation */
+@keyframes zoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Float animation for decorative elements */
@@ -201,43 +262,6 @@
   }
   100% {
     stroke-dashoffset: 0;
-  }
-}
-
-/* Wave animation - smoother, more fluid movement with enhanced easing */
-@keyframes waveMove {
-  0% {
-    transform: translateX(0) translateY(0);
-  }
-  25% {
-    transform: translateX(-25px) translateY(-5px);
-  }
-  50% {
-    transform: translateX(-50px) translateY(0);
-  }
-  75% {
-    transform: translateX(-25px) translateY(5px);
-  }
-  100% {
-    transform: translateX(0) translateY(0);
-  }
-}
-
-@keyframes waveMove2 {
-  0% {
-    transform: translateX(0) translateY(0);
-  }
-  25% {
-    transform: translateX(20px) translateY(3px);
-  }
-  50% {
-    transform: translateX(40px) translateY(0);
-  }
-  75% {
-    transform: translateX(20px) translateY(-3px);
-  }
-  100% {
-    transform: translateX(0) translateY(0);
   }
 }
 
