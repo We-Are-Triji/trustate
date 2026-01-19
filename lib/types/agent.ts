@@ -19,7 +19,8 @@ export interface AgentProfile {
   joinedDate: string;
   specializations: string[];
   location: string;
-  licenseNumber: string;
+  brokerName: string;
+  brokerLicense: string;
   rating: number;
   reviewCount: number;
   propertiesSold: number;

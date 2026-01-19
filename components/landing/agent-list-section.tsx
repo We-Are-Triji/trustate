@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
 import { Star, MapPin, ChevronRight, ChevronLeft, Phone, Mail, Award } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -312,15 +313,17 @@ export function AgentListSection({ agents }: AgentListSectionProps) {
 
         {/* View all button */}
         <div className={`mt-12 text-center transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="relative rounded-full border-2 border-[#0247ae] text-[#0247ae] font-bold hover:bg-gradient-to-r hover:from-[#0247ae] hover:to-[#0560d4] hover:text-white hover:border-transparent px-10 h-14 text-base transition-all duration-500 hover:shadow-2xl hover:shadow-[#0247ae]/30 group hover:scale-105 overflow-hidden"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 opacity-0 group-hover:opacity-100"></span>
-            <span className="relative">View All Agents</span>
-            <ChevronRight className="relative ml-2 h-5 w-5 transition-transform duration-500 group-hover:translate-x-2" />
-          </Button>
+          <Link href="/agents">
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="relative rounded-full border-2 border-[#0247ae] text-[#0247ae] font-bold hover:bg-gradient-to-r hover:from-[#0247ae] hover:to-[#0560d4] hover:text-white hover:border-transparent px-10 h-14 text-base transition-all duration-500 hover:shadow-2xl hover:shadow-[#0247ae]/30 group hover:scale-105 overflow-hidden"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 opacity-0 group-hover:opacity-100"></span>
+              <span className="relative">View All Agents</span>
+              <ChevronRight className="relative ml-2 h-5 w-5 transition-transform duration-500 group-hover:translate-x-2" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
