@@ -7,13 +7,11 @@ import { Search, Menu, X, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import trustateLogo from "@/app/assets/trustate.png";
-import { useSectionContext } from "@/lib/contexts/section-context";
 
 export function LandingHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
-  const { currentSection, navigateToSection } = useSectionContext();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,48 +44,35 @@ export function LandingHeader() {
           
           {/* Navigation Links - beside logo */}
           <nav className="hidden md:flex items-center gap-1">
-            <button
-              onClick={() => navigateToSection(0)}
-              className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-500 relative overflow-hidden group ${
-                currentSection === 0
-                  ? 'text-[#0247ae] bg-[#0247ae]/10'
-                  : 'text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5'
-              }`}
-            >
-              <span className="relative z-10">Home</span>
-              {currentSection !== 0 && (
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0247ae]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-              )}
-            </button>
-            <Link href="#how-it-works">
+            <Link href="/">
               <button
-                onClick={() => {
-                  if (currentSection === 0) {
-                    navigateToSection(1);
-                  }
-                }}
-                className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-500 relative overflow-hidden group ${
-                  currentSection === 1
-                    ? 'text-[#0247ae] bg-[#0247ae]/10'
-                    : 'text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5'
-                }`}
+                className="px-4 py-2 text-sm font-semibold rounded-full transition-all duration-500 relative overflow-hidden group text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5"
               >
-                <span className="relative z-10">How It Works</span>
-                {currentSection !== 1 && (
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0247ae]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                )}
+                <span className="relative z-10">Home</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0247ae]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
               </button>
             </Link>
-            <Link href="#find-partners">
+            <Link href="/agents">
               <button
-                onClick={() => {
-                  if (currentSection === 0) {
-                    navigateToSection(1);
-                  }
-                }}
-                className="px-4 py-2 text-sm font-semibold rounded-full transition-all duration-500 text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5 relative overflow-hidden group"
+                className="px-4 py-2 text-sm font-semibold rounded-full transition-all duration-500 relative overflow-hidden group text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5"
               >
-                <span className="relative z-10">Find Partners</span>
+                <span className="relative z-10">Agents</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0247ae]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+              </button>
+            </Link>
+            <Link href="/brokers">
+              <button
+                className="px-4 py-2 text-sm font-semibold rounded-full transition-all duration-500 relative overflow-hidden group text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5"
+              >
+                <span className="relative z-10">Brokers</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0247ae]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+              </button>
+            </Link>
+            <Link href="/developers">
+              <button
+                className="px-4 py-2 text-sm font-semibold rounded-full transition-all duration-500 relative overflow-hidden group text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5"
+              >
+                <span className="relative z-10">Developers</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0247ae]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
               </button>
             </Link>
@@ -146,47 +131,32 @@ export function LandingHeader() {
           
           {/* Mobile Navigation Links */}
           <nav className="flex flex-col gap-2 mb-4">
-            <button
-              onClick={() => {
-                navigateToSection(0);
-                setIsMenuOpen(false);
-              }}
-              className={`w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 text-left ${
-                currentSection === 0
-                  ? 'text-[#0247ae] bg-[#0247ae]/10'
-                  : 'text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5'
-              }`}
-            >
-              Home
-            </button>
-            <Link href="#how-it-works" className="w-full">
+            <Link href="/" className="w-full" onClick={() => setIsMenuOpen(false)}>
               <button
-                onClick={() => {
-                  if (currentSection === 0) {
-                    navigateToSection(1);
-                  }
-                  setIsMenuOpen(false);
-                }}
-                className={`w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 text-left ${
-                  currentSection === 1
-                    ? 'text-[#0247ae] bg-[#0247ae]/10'
-                    : 'text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5'
-                }`}
-              >
-                How It Works
-              </button>
-            </Link>
-            <Link href="#find-partners" className="w-full">
-              <button
-                onClick={() => {
-                  if (currentSection === 0) {
-                    navigateToSection(1);
-                  }
-                  setIsMenuOpen(false);
-                }}
                 className="w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 text-left text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5"
               >
-                Find Partners
+                Home
+              </button>
+            </Link>
+            <Link href="/agents" className="w-full" onClick={() => setIsMenuOpen(false)}>
+              <button
+                className="w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 text-left text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5"
+              >
+                Agents
+              </button>
+            </Link>
+            <Link href="/brokers" className="w-full" onClick={() => setIsMenuOpen(false)}>
+              <button
+                className="w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 text-left text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5"
+              >
+                Brokers
+              </button>
+            </Link>
+            <Link href="/developers" className="w-full" onClick={() => setIsMenuOpen(false)}>
+              <button
+                className="w-full px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 text-left text-gray-600 hover:text-[#0247ae] hover:bg-[#0247ae]/5"
+              >
+                Developers
               </button>
             </Link>
           </nav>
