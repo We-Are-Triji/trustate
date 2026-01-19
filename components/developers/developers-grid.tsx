@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { DeveloperCard } from "./developer-card";
 import type { Developer } from "@/lib/types/developer";
 
@@ -34,7 +35,7 @@ export function DevelopersGrid({
           No developers found
         </h3>
         <p className="text-sm text-gray-500">
-          Try adjusting your search or filter criteria
+          Try adjusting your search criteria
         </p>
       </div>
     );
@@ -42,12 +43,19 @@ export function DevelopersGrid({
 
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {developers.map((developer) => (
-        <DeveloperCard
+      {developers.map((developer, index) => (
+        <motion.div
           key={developer.id}
-          developer={developer}
-          onClick={onDeveloperClick}
-        />
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.4, delay: index * 0.05 }}
+        >
+          <DeveloperCard
+            developer={developer}
+            onClick={onDeveloperClick}
+          />
+        </motion.div>
       ))}
     </div>
   );

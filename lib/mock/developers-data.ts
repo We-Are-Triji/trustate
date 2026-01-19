@@ -4,7 +4,7 @@ export const developersData: Developer[] = [
   {
     id: "1",
     name: "Ayala Land",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Ayala+Land&font=raleway",
     description:
       "Leading Philippine real estate developer with over 30 years of experience in creating sustainable and thriving communities.",
     fullDescription:
@@ -29,7 +29,7 @@ export const developersData: Developer[] = [
   {
     id: "2",
     name: "SM Development Corporation",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=SMDC&font=raleway",
     description:
       "One of the largest integrated property developers in the Philippines, known for transforming communities through innovative developments.",
     fullDescription:
@@ -54,7 +54,7 @@ export const developersData: Developer[] = [
   {
     id: "3",
     name: "Megaworld Corporation",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Megaworld&font=raleway",
     description:
       "Pioneer in the development of township communities in the Philippines with world-class mixed-use developments.",
     fullDescription:
@@ -79,7 +79,7 @@ export const developersData: Developer[] = [
   {
     id: "4",
     name: "Robinsons Land Corporation",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Robinsons+Land&font=raleway",
     description:
       "A premier real estate company in the Philippines with diverse portfolio spanning residential, commercial, and hospitality sectors.",
     fullDescription:
@@ -104,7 +104,7 @@ export const developersData: Developer[] = [
   {
     id: "5",
     name: "DMCI Homes",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=DMCI+Homes&font=raleway",
     description:
       "Known for resort-style living with signature Lumiventt design technology providing natural light and ventilation.",
     fullDescription:
@@ -129,7 +129,7 @@ export const developersData: Developer[] = [
   {
     id: "6",
     name: "Vista Land & Lifescapes",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Vista+Land&font=raleway",
     description:
       "The largest homebuilder in the Philippines offering a wide range of housing products for various market segments.",
     fullDescription:
@@ -154,7 +154,7 @@ export const developersData: Developer[] = [
   {
     id: "7",
     name: "Federal Land",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Federal+Land&font=raleway",
     description:
       "A joint venture developer known for premium developments in partnership with global real estate leaders.",
     fullDescription:
@@ -179,7 +179,7 @@ export const developersData: Developer[] = [
   {
     id: "8",
     name: "Alveo Land",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Alveo+Land&font=raleway",
     description:
       "The upscale residential development arm of Ayala Land, creating distinctive homes for young professionals and families.",
     fullDescription:
@@ -204,7 +204,7 @@ export const developersData: Developer[] = [
   {
     id: "9",
     name: "Shang Properties",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Shang+Properties&font=raleway",
     description:
       "Developer of ultra-luxury residential towers and premium commercial properties in exclusive locations.",
     fullDescription:
@@ -229,7 +229,7 @@ export const developersData: Developer[] = [
   {
     id: "10",
     name: "Century Properties",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Century+Properties&font=raleway",
     description:
       "Known for iconic themed developments and innovative real estate projects across the Philippines.",
     fullDescription:
@@ -254,7 +254,7 @@ export const developersData: Developer[] = [
   {
     id: "11",
     name: "Filinvest Land",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Filinvest+Land&font=raleway",
     description:
       "A trusted developer with a diverse portfolio of township developments and integrated communities.",
     fullDescription:
@@ -279,7 +279,7 @@ export const developersData: Developer[] = [
   {
     id: "12",
     name: "Rockwell Land",
-    logo: "",
+    logo: "https://placehold.co/300x120/0D47A1/white?text=Rockwell+Land&font=raleway",
     description:
       "Premium developer known for exclusive communities and the renowned Rockwell Center lifestyle destination.",
     fullDescription:

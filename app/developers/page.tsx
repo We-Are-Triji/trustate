@@ -44,38 +44,49 @@ export default function DevelopersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f8f9ff] to-white">
+    <div className="min-h-screen bg-[#f8faff]">
       <LandingHeader />
 
-      <main className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:px-8">
-        <div className="mb-8 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#0247ae]/10 to-[#0247ae]/5 px-5 py-2.5 border border-[#0247ae]/10">
-            <span className="text-sm font-semibold text-[#0247ae] tracking-wide">
-              Trusted Partners
-            </span>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden pt-24 pb-12">
+        {/* Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0247ae]/5 via-transparent to-[#ffce08]/5" />
+        
+        {/* Decorative Elements */}
+        <div className="absolute top-20 right-10 h-72 w-72 rounded-full bg-[#0247ae]/5 blur-3xl" />
+        <div className="absolute bottom-0 left-10 h-72 w-72 rounded-full bg-[#ffce08]/10 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur-sm px-6 py-3 border-2 border-[#0247ae]/10 shadow-lg">
+              <span className="text-sm font-extrabold text-[#0247ae] tracking-wide uppercase">
+                Trusted Partners
+              </span>
+            </div>
+            <h1 className="mb-6 text-5xl font-[family-name:var(--font-arsenal-sc)] font-bold text-gray-900 sm:text-6xl lg:text-7xl leading-tight">
+              Our Developer
+              <span className="block bg-gradient-to-r from-[#0247ae] to-[#0560d4] bg-clip-text text-transparent">
+                Partners
+              </span>
+            </h1>
+            <p className="mx-auto max-w-3xl text-lg text-gray-600 leading-relaxed">
+              Discover the Philippines&apos; most trusted real estate developers committed to delivering quality properties and exceptional service.
+            </p>
           </div>
-          <h1 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl lg:text-5xl">
-            Our Developer Partners
-          </h1>
-          <p className="mx-auto max-w-2xl text-lg text-gray-600">
-            Discover the Philippines&apos; most trusted real estate developers.
-            Our partners are committed to delivering quality properties and
-            exceptional service.
-          </p>
         </div>
+      </section>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
-          <DevelopersHeader
-            totalDevelopers={filteredDevelopers.length}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
+      <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <DevelopersHeader
+          totalDevelopers={filteredDevelopers.length}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
 
-          <DevelopersGrid
-            developers={filteredDevelopers}
-            onDeveloperClick={handleDeveloperClick}
-          />
-        </div>
+        <DevelopersGrid
+          developers={filteredDevelopers}
+          onDeveloperClick={handleDeveloperClick}
+        />
       </main>
 
       <LandingFooter partners={partners} sections={footerSections} />
