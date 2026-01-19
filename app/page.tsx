@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   LandingHeader,
   HeroSection,
@@ -8,102 +8,93 @@ import {
   AgentListSection,
   LandingFooter,
 } from "@/components/landing";
-import { SectionProvider } from "@/lib/contexts/section-context";
-import { WaveTransition } from "@/components/landing/wave-transition";
-import { motion } from "framer-motion";
-import { useSectionContext } from "@/lib/contexts/section-context";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   topAgents,
   partners,
   footerSections,
 } from "@/lib/mock/landing-data";
 
-function HomeContent() {
-  const { currentSection, navigateToSection } = useSectionContext();
+export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+  
+  // Optimized parallax effects - removed blur and reduced complexity
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -80]);
 
-  // Simple scroll tracking - only when user is on "How It Works" section
   useEffect(() => {
-    // Don't track scroll on Hero (section 0) since it's locked
-    if (currentSection === 0) return;
-
-    // Reset scroll to top when transitioning to section 1
-    const scrollContainer = document.querySelector('.overflow-y-auto');
-    if (scrollContainer && currentSection === 1) {
-      scrollContainer.scrollTop = 0;
-    }
-
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      
-      // If scrolled to very top, go back to Hero
-      if (scrollY < 50) {
-        navigateToSection(0);
-      }
+    // Smooth scroll behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    return () => {
+      document.documentElement.style.scrollBehavior = '';
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [currentSection, navigateToSection]);
+  }, []);
 
   return (
-    <div className="relative h-screen overflow-hidden">
+    <div ref={containerRef} className="relative">
       <LandingHeader />
-      <WaveTransition />
       
-      {/* Hero Section - Fixed layer, always on top initially */}
+      {/* Hero Section with optimized parallax */}
       <motion.div
-        className="fixed inset-0 z-20"
-        initial={false}
-        animate={{
-          opacity: currentSection === 0 ? 1 : 0,
-          scale: currentSection === 0 ? 1 : 1.05,
-          pointerEvents: currentSection === 0 ? "auto" : "none",
+        style={{ 
+          opacity: heroOpacity,
+          y: heroY
         }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: currentSection === 0 ? 0.8 : 0,
-        }}
+        className="relative z-10 will-change-transform"
       >
-        <section id="hero" className="h-screen w-screen flex items-center overflow-hidden">
+        <section id="hero" className="min-h-screen flex items-center overflow-hidden">
           <HeroSection agents={topAgents} />
         </section>
       </motion.div>
       
-      {/* How It Works Section - Revealed underneath, becomes scrollable */}
-      <motion.div
-        className="absolute inset-0 z-10"
-        initial={false}
-        animate={{
-          opacity: currentSection === 1 ? 1 : 0,
-          pointerEvents: currentSection === 1 ? "auto" : "none",
-        }}
-        transition={{
-          duration: 0.8,
-          ease: [0.25, 0.1, 0.25, 1],
-          delay: currentSection === 1 ? 0.8 : 0,
-        }}
-      >
-        <div className="h-screen overflow-y-auto overflow-x-hidden">
-          {/* How It Works Section */}
-          <section id="how-it-works" className="min-h-screen">
-            <HowItWorksSection />
-          </section>
-          
-          {/* Find Partners Section */}
+      {/* Content sections with optimized scroll animations */}
+      <div className="relative z-20 bg-[#f8faff]">
+        {/* How It Works Section */}
+        <motion.section
+          id="how-it-works"
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2, margin: "0px 0px -100px 0px" }}
+          transition={{ 
+            duration: 0.7, 
+            ease: [0.25, 0.1, 0.25, 1]
+          }}
+        >
+          <HowItWorksSection />
+        </motion.section>
+        
+        {/* Agent List Section */}
+        <motion.section
+          id="find-partners"
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2, margin: "0px 0px -100px 0px" }}
+          transition={{ 
+            duration: 0.7, 
+            ease: [0.25, 0.1, 0.25, 1]
+          }}
+        >
           <AgentListSection agents={topAgents} />
-          
+        </motion.section>
+        
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1, margin: "0px 0px -50px 0px" }}
+          transition={{ 
+            duration: 0.6, 
+            ease: [0.25, 0.1, 0.25, 1]
+          }}
+        >
           <LandingFooter partners={partners} sections={footerSections} />
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
-  );
-}
-
-export default function Home() {
-  return (
-    <SectionProvider>
-      <HomeContent />
-    </SectionProvider>
   );
 }

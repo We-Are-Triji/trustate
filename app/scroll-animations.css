@@ -1,0 +1,90 @@
+/* Professional Scroll Animation Utilities */
+
+/* Staggered fade-in animations */
+@keyframes staggerFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes staggerFadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes staggerFadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale and fade */
+@keyframes scaleInFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Rotate and fade */
+@keyframes rotateInFade {
+  0% {
+    opacity: 0;
+    transform: rotateY(-15deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateY(0);
+  }
+}
+
+/* Utility classes for scroll animations */
+.animate-scroll-fade-up {
+  animation: staggerFadeInUp 0.8s ease-out forwards;
+}
+
+.animate-scroll-fade-left {
+  animation: staggerFadeInLeft 0.8s ease-out forwards;
+}
+
+.animate-scroll-fade-right {
+  animation: staggerFadeInRight 0.8s ease-out forwards;
+}
+
+.animate-scroll-scale {
+  animation: scaleInFade 0.9s ease-out forwards;
+}
+
+.animate-scroll-rotate {
+  animation: rotateInFade 1s ease-out forwards;
+}
+
+/* Delay utilities */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+.delay-800 { animation-delay: 800ms; }
