@@ -285,8 +285,8 @@ export default function RegisterPage() {
         mobile={basicInfo?.mobile || ""}
         onSelect={handleVerificationMethodSelect}
         onClose={() => {
-          setShowChoiceModal(false);
-          setStep("basic-info");
+          // Don't allow closing - user must verify
+          // Modal will stay open
         }}
       />
 
