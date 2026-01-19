@@ -57,7 +57,7 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
           <div className="lg:col-span-2">
             <div className="rounded-3xl border-2 border-gray-200 bg-white p-8 sticky top-24 shadow-lg">
               <div className="flex flex-col items-center">
-                <div className="mb-6 flex h-56 w-56 items-center justify-center overflow-hidden rounded-full border-4 border-gray-100 bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg">
+                <div className="mb-4 flex h-48 w-48 items-center justify-center overflow-hidden rounded-full border-4 border-gray-100 bg-gradient-to-br from-gray-100 to-gray-200 shadow-lg">
                   <img 
                     src={photoUrl} 
                     alt={agent.name} 
