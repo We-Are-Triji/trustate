@@ -3,10 +3,41 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Building2, Users, TrendingUp, FileText, MessageSquare, Briefcase } from "lucide-react";
 
 export default function DashboardPage() {
   const { userStatus, accountType, firstName } = useAuth();
   const router = useRouter();
+
+  const getQuickActions = () => {
+    if (accountType === "client") {
+      return [
+        { title: "Browse Properties", desc: "Find your dream property", icon: Building2, href: "/properties", disabled: userStatus === "registered" },
+        { title: "My Transactions", desc: "View active transactions", icon: FileText, href: "/dashboard/transactions", disabled: userStatus === "registered" },
+        { title: "Messages", desc: "Chat with agents", icon: MessageSquare, href: "/dashboard/messages", disabled: userStatus === "registered" },
+      ];
+    }
+
+    if (accountType === "agent") {
+      return [
+        { title: "My Clients", desc: "Manage client relationships", icon: Users, href: "/dashboard/clients", disabled: userStatus === "registered" },
+        { title: "Transactions", desc: "Track ongoing deals", icon: FileText, href: "/dashboard/transactions", disabled: userStatus === "registered" },
+        { title: "Listings", desc: "Manage property listings", icon: Building2, href: "/dashboard/listings", disabled: userStatus === "registered" },
+      ];
+    }
+
+    if (accountType === "broker") {
+      return [
+        { title: "My Agents", desc: "Manage your agent network", icon: Users, href: "/dashboard/agents", disabled: userStatus === "registered" },
+        { title: "Analytics", desc: "View performance metrics", icon: TrendingUp, href: "/dashboard/analytics", disabled: userStatus === "registered" },
+        { title: "Firm Management", desc: "Manage firm operations", icon: Briefcase, href: "/dashboard/firm", disabled: userStatus === "registered" },
+      ];
+    }
+
+    return [];
+  };
+
+  const quickActions = getQuickActions();
 
   return (
     <div className="p-8">
@@ -18,29 +49,25 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className={`rounded-xl border bg-white p-6 ${userStatus === "registered" ? "opacity-50 pointer-events-none" : ""}`}>
-          <h3 className="font-semibold text-gray-900 mb-2">My Listings</h3>
-          <p className="text-sm text-gray-500 mb-4">Manage your property listings</p>
-          <Button disabled={userStatus === "registered"} className="w-full bg-[#0247ae]">
-            View Listings
-          </Button>
-        </div>
-
-        <div className={`rounded-xl border bg-white p-6 ${userStatus === "registered" ? "opacity-50 pointer-events-none" : ""}`}>
-          <h3 className="font-semibold text-gray-900 mb-2">Messages</h3>
-          <p className="text-sm text-gray-500 mb-4">Chat with clients and agents</p>
-          <Button disabled={userStatus === "registered"} className="w-full bg-[#0247ae]">
-            Open Messages
-          </Button>
-        </div>
-
-        <div className={`rounded-xl border bg-white p-6 ${userStatus === "registered" ? "opacity-50 pointer-events-none" : ""}`}>
-          <h3 className="font-semibold text-gray-900 mb-2">Analytics</h3>
-          <p className="text-sm text-gray-500 mb-4">View your performance metrics</p>
-          <Button disabled={userStatus === "registered"} className="w-full bg-[#0247ae]">
-            View Analytics
-          </Button>
-        </div>
+        {quickActions.map((action) => (
+          <div
+            key={action.title}
+            className={`rounded-xl border bg-white p-6 ${action.disabled ? "opacity-50 pointer-events-none" : ""}`}
+          >
+            <div className="mb-4 h-12 w-12 rounded-lg bg-[#0247ae]/10 flex items-center justify-center">
+              <action.icon className="h-6 w-6 text-[#0247ae]" />
+            </div>
+            <h3 className="font-semibold text-gray-900 mb-2">{action.title}</h3>
+            <p className="text-sm text-gray-500 mb-4">{action.desc}</p>
+            <Button
+              disabled={action.disabled}
+              onClick={() => router.push(action.href)}
+              className="w-full bg-[#0247ae]"
+            >
+              Open
+            </Button>
+          </div>
+        ))}
       </div>
 
       {userStatus === "registered" && (

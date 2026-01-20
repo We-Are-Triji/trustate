@@ -27,6 +27,11 @@ export function LoginForm() {
         await getCurrentUser();
         const attributes = await fetchUserAttributes();
         const accountType = attributes["custom:account_type"];
+        
+        if (accountType) {
+          document.cookie = `accountType=${accountType}; path=/; max-age=2592000; SameSite=Strict`;
+        }
+        
         router.replace(accountType ? "/dashboard" : "/complete-registration");
       } catch {
         setCheckingSession(false);
@@ -52,6 +57,9 @@ export function LoginForm() {
         router.push("/complete-registration");
         return;
       }
+
+      // Set account type cookie for middleware
+      document.cookie = `accountType=${accountType}; path=/; max-age=2592000; SameSite=Strict`;
       
       // Check for redirect after login
       const redirectTo = sessionStorage.getItem("redirectAfterLogin");

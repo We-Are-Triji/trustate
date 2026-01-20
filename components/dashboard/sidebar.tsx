@@ -3,15 +3,51 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, FileText, Settings, ChevronLeft, ChevronRight, LogOut, User } from "lucide-react";
+import { Home, FileText, Settings, ChevronLeft, ChevronRight, LogOut, User, Users, Building2, TrendingUp, MessageSquare, Briefcase } from "lucide-react";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { signOut } from "@/lib/cognito";
+import type { AccountType } from "@/lib/types/registration";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/dashboard/transactions", label: "Transactions", icon: FileText },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
-];
+const getNavItems = (accountType: AccountType | null) => {
+  const baseItems = [
+    { href: "/dashboard", label: "Dashboard", icon: Home },
+    { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  ];
+
+  if (accountType === "client") {
+    return [
+      baseItems[0],
+      { href: "/dashboard/transactions", label: "My Transactions", icon: FileText },
+      { href: "/dashboard/properties", label: "Saved Properties", icon: Building2 },
+      { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
+      baseItems[1],
+    ];
+  }
+
+  if (accountType === "agent") {
+    return [
+      baseItems[0],
+      { href: "/dashboard/transactions", label: "Transactions", icon: FileText },
+      { href: "/dashboard/clients", label: "My Clients", icon: Users },
+      { href: "/dashboard/listings", label: "Listings", icon: Building2 },
+      { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
+      baseItems[1],
+    ];
+  }
+
+  if (accountType === "broker") {
+    return [
+      baseItems[0],
+      { href: "/dashboard/agents", label: "My Agents", icon: Users },
+      { href: "/dashboard/transactions", label: "Transactions", icon: FileText },
+      { href: "/dashboard/analytics", label: "Analytics", icon: TrendingUp },
+      { href: "/dashboard/firm", label: "Firm Management", icon: Briefcase },
+      baseItems[1],
+    ];
+  }
+
+  return baseItems;
+};
 
 export function DashboardSidebar() {
   const pathname = usePathname();
@@ -20,11 +56,13 @@ export function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const handleSignOut = async () => {
+    document.cookie = "accountType=; path=/; max-age=0";
     await signOut();
     router.push("/login");
   };
 
   const fullName = [firstName, lastName].filter(Boolean).join(" ") || "User";
+  const navItems = getNavItems(accountType);
 
   return (
     <aside className={`bg-white border-r border-gray-200 min-h-screen flex flex-col transition-all duration-300 ${collapsed ? "w-16" : "w-64"}`}>
