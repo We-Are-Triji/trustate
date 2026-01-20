@@ -122,10 +122,14 @@ export default function VerifyPage() {
   };
 
   // Agent Verification
-  const handleAgentSubmit = (prcData: PrcData, nexusLink: string) => {
+  const handleAgentSubmit = async (prcData: PrcData, nexusLink: string) => {
     console.log("Agent data:", { prcData, nexusLink });
     markStepComplete("agent-verification");
-    // TODO: Update Cognito status to "pending_approval"
+    try {
+      await updateUserAttributes({ userAttributes: { "custom:status": "pending_approval" } });
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
     setStep("pending");
   };
 
@@ -137,22 +141,34 @@ export default function VerifyPage() {
   };
 
   // Broker Type
-  const handleBrokerTypeSelect = (type: BrokerType) => {
+  const handleBrokerTypeSelect = async (type: BrokerType) => {
     markStepComplete("broker-type");
     if (type === "individual") {
-      // TODO: Update Cognito status to "pending_approval"
-      setStep("pending");
+      setStep("verifying");
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      try {
+        await updateUserAttributes({ userAttributes: { "custom:status": "verified" } });
+      } catch (err) {
+        console.error("Failed to update status:", err);
+      }
+      setStep("success");
     } else {
       setStep("firm-legitimacy");
     }
   };
 
   // Firm Legitimacy
-  const handleFirmLegitimacyComplete = (data: FirmLegitimacyData) => {
+  const handleFirmLegitimacyComplete = async (data: FirmLegitimacyData) => {
     console.log("Firm data:", data);
     markStepComplete("firm-legitimacy");
-    // TODO: Update Cognito status to "pending_approval"
-    setStep("pending");
+    setStep("verifying");
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    try {
+      await updateUserAttributes({ userAttributes: { "custom:status": "verified" } });
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
+    setStep("success");
   };
 
   // Dev bypasses
@@ -239,7 +255,7 @@ export default function VerifyPage() {
     );
   }
 
-  // Success screen for clients
+  // Success screen for clients and brokers
   if (step === "success") {
     return (
       <main className="flex min-h-screen bg-[#0247ae]">
@@ -250,7 +266,11 @@ export default function VerifyPage() {
               <CheckCircle className="h-10 w-10 text-emerald-500" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Complete!</h2>
-            <p className="text-gray-600 mb-6">Your account has been successfully verified.</p>
+            <p className="text-gray-600 mb-6">
+              {accountType === "broker" 
+                ? "Your broker account has been successfully verified. You can now access all broker features."
+                : "Your account has been successfully verified."}
+            </p>
             <button
               onClick={() => router.push("/dashboard")}
               className="w-full py-3 bg-[#0247ae] text-white rounded-lg font-medium hover:bg-[#023a8a] transition-colors"
