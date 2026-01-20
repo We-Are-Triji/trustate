@@ -57,9 +57,8 @@ export default function AgentsPage() {
         const data = await res.json();
         setNexusCode(data.nexus_code);
         setTotpSecret(data.totp_secret);
-      } else if (res.status === 404) {
-        // No nexus yet
       }
+      // 404 is expected when no nexus exists yet
     } catch (error) {
       console.error("Failed to fetch nexus:", error);
     } finally {
