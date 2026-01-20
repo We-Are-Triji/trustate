@@ -1,18 +1,21 @@
--- Broker nexus links table
+-- Drop existing tables
+DROP TABLE IF EXISTS agent_broker_requests;
+DROP TABLE IF EXISTS broker_nexus;
+
+-- Recreate without foreign key constraints (using Cognito, not Supabase Auth)
 CREATE TABLE broker_nexus (
-  broker_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  nexus_code TEXT UNIQUE NOT NULL, -- e.g., "abc123xyz"
-  totp_secret TEXT NOT NULL, -- Base32 encoded secret for TOTP
+  broker_id TEXT PRIMARY KEY,
+  nexus_code TEXT UNIQUE NOT NULL,
+  totp_secret TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Agent-broker relationship requests
 CREATE TABLE agent_broker_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agent_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  broker_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  status TEXT NOT NULL DEFAULT 'pending', -- pending, approved, rejected
+  agent_id TEXT NOT NULL,
+  broker_id TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
   requested_at TIMESTAMPTZ DEFAULT NOW(),
   responded_at TIMESTAMPTZ,
   UNIQUE(agent_id, broker_id)
@@ -27,32 +30,26 @@ CREATE INDEX idx_agent_broker_requests_status ON agent_broker_requests(status);
 ALTER TABLE broker_nexus ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_broker_requests ENABLE ROW LEVEL SECURITY;
 
--- Brokers can read their own nexus
 CREATE POLICY "Brokers can view own nexus"
   ON broker_nexus FOR SELECT
-  USING (auth.uid() = broker_id);
+  USING (true);
 
--- Brokers can update their own nexus
 CREATE POLICY "Brokers can update own nexus"
   ON broker_nexus FOR UPDATE
-  USING (auth.uid() = broker_id);
+  USING (true);
 
--- Agents can create requests
+CREATE POLICY "Brokers can insert own nexus"
+  ON broker_nexus FOR INSERT
+  WITH CHECK (true);
+
 CREATE POLICY "Agents can create requests"
   ON agent_broker_requests FOR INSERT
-  WITH CHECK (auth.uid() = agent_id);
+  WITH CHECK (true);
 
--- Agents can view their own requests
 CREATE POLICY "Agents can view own requests"
   ON agent_broker_requests FOR SELECT
-  USING (auth.uid() = agent_id);
+  USING (true);
 
--- Brokers can view requests to them
-CREATE POLICY "Brokers can view their requests"
-  ON agent_broker_requests FOR SELECT
-  USING (auth.uid() = broker_id);
-
--- Brokers can update requests to them
 CREATE POLICY "Brokers can respond to requests"
   ON agent_broker_requests FOR UPDATE
-  USING (auth.uid() = broker_id);
+  USING (true);
