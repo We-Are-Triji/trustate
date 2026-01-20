@@ -42,11 +42,13 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
+      console.error("Supabase error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ nexusCode });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to generate nexus" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Generate nexus error:", error);
+    return NextResponse.json({ error: error.message || "Failed to generate nexus" }, { status: 500 });
   }
 }
