@@ -57,7 +57,11 @@ export function ForgotPasswordModal({ open, onClose }: ForgotPasswordModalProps)
       await resetPassword({ username: email });
       setStep("otp");
     } catch (err: any) {
-      setError(err.message || "Failed to send code");
+      if (err.message?.includes("no registered/verified email")) {
+        setError("This account hasn't been verified. Please check your email for the verification code.");
+      } else {
+        setError(err.message || "Failed to send code");
+      }
     } finally {
       setLoading(false);
     }
