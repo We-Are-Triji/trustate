@@ -1,2 +1,0 @@
-cognito_user_pool_id = "ap-southeast-1_xxxxxxxxx"
-aws_region          = "ap-southeast-1"

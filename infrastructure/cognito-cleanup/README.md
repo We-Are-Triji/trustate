@@ -10,11 +10,10 @@ cd infrastructure/lambda/cognito-cleanup
 npm install
 ```
 
-2. Create `terraform.tfvars`:
+2. Generate terraform.tfvars from root .env:
 ```bash
 cd infrastructure/cognito-cleanup
-cp terraform.tfvars.example terraform.tfvars
-# Edit with your Cognito User Pool ID
+./setup.sh
 ```
 
 3. Deploy:
