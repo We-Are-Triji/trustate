@@ -250,7 +250,6 @@ resource "aws_lambda_function" "cognito_cleanup" {
   environment {
     variables = {
       COGNITO_USER_POOL_ID = aws_cognito_user_pool.main.id
-      AWS_REGION          = var.aws_region
     }
   }
 }

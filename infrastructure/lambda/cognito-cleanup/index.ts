@@ -1,6 +1,6 @@
 import { CognitoIdentityProviderClient, ListUsersCommand, AdminDeleteUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 
-const client = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION });
+const client = new CognitoIdentityProviderClient({});
 const USER_POOL_ID = process.env.COGNITO_USER_POOL_ID!;
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
