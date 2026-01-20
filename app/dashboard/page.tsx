@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
-  const { userStatus, accountType, email } = useAuth();
+  const { userStatus, accountType, firstName } = useAuth();
   const router = useRouter();
 
   return (
@@ -13,7 +13,7 @@ export default function DashboardPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-500">
-          Welcome back, {email}
+          Welcome back, {firstName || "User"}
         </p>
       </div>
 

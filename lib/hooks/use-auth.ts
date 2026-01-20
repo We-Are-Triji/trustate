@@ -10,6 +10,8 @@ interface AuthState {
   userStatus: UserStatus | null;
   accountType: AccountType | null;
   email: string | null;
+  firstName: string | null;
+  lastName: string | null;
 }
 
 export function useAuth() {
@@ -19,6 +21,8 @@ export function useAuth() {
     userStatus: null,
     accountType: null,
     email: null,
+    firstName: null,
+    lastName: null,
   });
 
   const checkAuth = useCallback(async () => {
@@ -32,6 +36,8 @@ export function useAuth() {
         userStatus: (attributes["custom:status"] as UserStatus) || "registered",
         accountType: (attributes["custom:account_type"] as AccountType) || null,
         email: attributes.email || null,
+        firstName: attributes.given_name || null,
+        lastName: attributes.family_name || null,
       });
     } catch {
       setState({
@@ -40,6 +46,8 @@ export function useAuth() {
         userStatus: null,
         accountType: null,
         email: null,
+        firstName: null,
+        lastName: null,
       });
     }
   }, []);

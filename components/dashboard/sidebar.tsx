@@ -16,13 +16,15 @@ const navItems = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { email, accountType } = useAuth();
+  const { firstName, lastName, accountType } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
     router.push("/login");
   };
+
+  const fullName = [firstName, lastName].filter(Boolean).join(" ") || "User";
 
   return (
     <aside className={`bg-white border-r border-gray-200 min-h-screen flex flex-col transition-all duration-300 ${collapsed ? "w-16" : "w-64"}`}>
@@ -71,7 +73,7 @@ export function DashboardSidebar() {
           </div>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{email}</p>
+              <p className="text-sm font-medium text-gray-900 truncate">{fullName}</p>
               <p className="text-xs text-gray-500 capitalize">{accountType}</p>
             </div>
           )}
