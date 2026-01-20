@@ -5,9 +5,11 @@ import { useAuth } from "@/lib/hooks/use-auth";
 import { Copy, RefreshCw, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { generateTOTPCode, getTOTPTimeRemaining } from "@/lib/totp";
+import { getCurrentUser } from "@/lib/cognito";
 
 export default function AgentsPage() {
   const { isLoading } = useAuth();
+  const [userId, setUserId] = useState<string | null>(null);
   const [nexusCode, setNexusCode] = useState<string | null>(null);
   const [totpSecret, setTotpSecret] = useState<string | null>(null);
   const [currentCode, setCurrentCode] = useState("");
@@ -16,8 +18,14 @@ export default function AgentsPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetchNexus();
+    initUser();
   }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchNexus();
+    }
+  }, [userId]);
 
   useEffect(() => {
     if (totpSecret) {
@@ -33,15 +41,24 @@ export default function AgentsPage() {
     }
   }, [totpSecret]);
 
+  const initUser = async () => {
+    try {
+      const user = await getCurrentUser();
+      setUserId(user.userId);
+    } catch (error) {
+      console.error("Failed to get user:", error);
+    }
+  };
+
   const fetchNexus = async () => {
     try {
-      const res = await fetch(`/api/broker/nexus?brokerId=${/* get from auth */}`);
+      const res = await fetch(`/api/broker/nexus?brokerId=${userId}`);
       if (res.ok) {
         const data = await res.json();
         setNexusCode(data.nexus_code);
         setTotpSecret(data.totp_secret);
       } else if (res.status === 404) {
-        // No nexus yet, will show generate button
+        // No nexus yet
       }
     } catch (error) {
       console.error("Failed to fetch nexus:", error);
@@ -56,7 +73,7 @@ export default function AgentsPage() {
       const res = await fetch("/api/broker/nexus/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brokerId: /* get from auth */ }),
+        body: JSON.stringify({ brokerId: userId }),
       });
       if (res.ok) {
         await fetchNexus();
@@ -127,7 +144,7 @@ export default function AgentsPage() {
               <input
                 type="text"
                 readOnly
-                value={`${window.location.origin}/nexus/${nexusCode}`}
+                value={`${typeof window !== 'undefined' ? window.location.origin : ''}/nexus/${nexusCode}`}
                 className="flex-1 px-4 py-2 border rounded-lg bg-gray-50 text-gray-700"
               />
               <Button onClick={copyNexusLink} variant="outline">
