@@ -8,6 +8,8 @@ import {
   fetchUserAttributes,
   signOut,
   getCurrentUser,
+  resetPassword,
+  confirmResetPassword,
 } from "@aws-amplify/auth";
 
 Amplify.configure({
@@ -28,6 +30,8 @@ export {
   fetchUserAttributes,
   signOut,
   getCurrentUser,
+  resetPassword,
+  confirmResetPassword,
 };
 
 export type { SignUpInput } from "@aws-amplify/auth";

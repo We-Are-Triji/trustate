@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Eye, EyeOff, Mail, Lock, CheckCircle } from "lucide-react";
 import { signIn, fetchUserAttributes, getCurrentUser } from "@/lib/cognito";
 import { Button } from "@/components/ui/button";
+import { ForgotPasswordModal } from "@/components/auth/forgot-password-modal";
 import trustateLogo from "@/app/assets/trustate.png";
 
 export function LoginForm() {
@@ -18,6 +19,7 @@ export function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   useEffect(() => {
     const checkExistingSession = async () => {
@@ -191,12 +193,13 @@ export function LoginForm() {
               </div>
               <span className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors">Keep me logged in</span>
             </label>
-            <Link
-              href="/forgot-password"
+            <button
+              type="button"
+              onClick={() => setShowForgotPassword(true)}
               className="text-sm font-medium text-gray-500 transition-colors hover:text-[#0247ae] hover:underline"
             >
               Forgot password?
-            </Link>
+            </button>
           </div>
 
           {error && (
@@ -239,6 +242,11 @@ export function LoginForm() {
           </div>
         </form>
       </div>
+
+      <ForgotPasswordModal 
+        open={showForgotPassword} 
+        onClose={() => setShowForgotPassword(false)} 
+      />
     </div>
   );
 }
