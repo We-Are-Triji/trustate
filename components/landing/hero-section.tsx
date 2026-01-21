@@ -13,24 +13,12 @@ const agentPhotos = [
   "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&h=300&fit=crop&crop=face", 
 ];
 
-// Rotating text phrases for typing animation
-const rotatingPhrases = [
-  "Platform",
-  "Agents",
-  "Brokers",
-  "Professionals",
-  "Transactions",
-];
-
 interface HeroSectionProps {
   agents: Agent[];
 }
 
 export function HeroSection({ agents }: HeroSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [typedText, setTypedText] = useState("");
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
   
   // Guard against undefined agents prop
   const safeAgents = agents || [];
@@ -55,32 +43,6 @@ export function HeroSection({ agents }: HeroSectionProps) {
     const interval = setInterval(nextSlide, 4500);
     return () => clearInterval(interval);
   }, [nextSlide]);
-
-  // Typing animation effect
-  useEffect(() => {
-    const currentPhrase = rotatingPhrases[phraseIndex];
-    const typingSpeed = isDeleting ? 50 : 100;
-    const pauseTime = isDeleting ? 500 : 2000;
-
-    const timer = setTimeout(() => {
-      if (!isDeleting) {
-        if (typedText.length < currentPhrase.length) {
-          setTypedText(currentPhrase.slice(0, typedText.length + 1));
-        } else {
-          setTimeout(() => setIsDeleting(true), pauseTime);
-        }
-      } else {
-        if (typedText.length > 0) {
-          setTypedText(currentPhrase.slice(0, typedText.length - 1));
-        } else {
-          setIsDeleting(false);
-          setPhraseIndex((prev) => (prev + 1) % rotatingPhrases.length);
-        }
-      }
-    }, typingSpeed);
-
-    return () => clearTimeout(timer);
-  }, [typedText, isDeleting, phraseIndex]);
 
   return (
     <section className="relative overflow-hidden min-h-screen max-h-screen flex items-center py-4 lg:py-6 w-screen bg-[#f8faff]">
@@ -197,82 +159,46 @@ export function HeroSection({ agents }: HeroSectionProps) {
          <div className="absolute top-[30%] left-[20%] w-[30vw] h-[30vw] bg-cyan-100/30 mix-blend-multiply filter blur-[50px] fluid-blob" style={{ animationDelay: '-10s' }} />
       </div>
 
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute left-[8%] top-[25%] h-48 w-48 rounded-full border-2 border-dashed border-[#0247ae]/10 animate-[spin_60s_linear_infinite]" />
-        <div className="absolute right-[12%] top-[15%] h-32 w-32 rounded-full border border-[#ffce08]/20 animate-[spin_45s_linear_infinite_reverse]" />
-        
-        {/* Floating circles with organic sway */}
-        <div className="absolute left-[10%] top-[15%] h-20 w-20 rounded-full bg-[#0247ae]/5 animate-organic-sway backdrop-blur-sm" style={{ animationDelay: '0s' }} />
-        <div className="absolute right-[30%] top-[20%] h-16 w-16 rounded-full border-2 border-[#0247ae]/10 animate-organic-sway" style={{ animationDelay: '-2s' }} />
-        <div className="absolute left-[50%] bottom-[20%] h-10 w-10 rounded-full bg-[#ffce08]/10 animate-organic-sway" style={{ animationDelay: '-4s' }} />
-      </div>
-
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full py-2">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 items-center mt-8 lg:mt-12">
           
           {/* --- LEFT CONTENT --- */}
           <div className="animate-[slideInLeft_0.8s_ease-out]">
 
-            {/* UPGRADED BADGE: Holographic Glass Prism */}
-            <div className="mb-8 inline-block animate-[fadeInUp_0.8s_ease-out_both]">
-               <div className="relative group cursor-pointer">
-                  {/* The Glow Aura */}
-                  <div className="absolute -inset-1 rounded-full vibe-gradient blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
-                  
-                  {/* The Glass Container */}
-                  <div className="relative flex items-center gap-3 px-6 py-2 bg-white/80 backdrop-blur-xl rounded-full border border-white/50 shadow-sm overflow-hidden">
-                    {/* Moving Shine Effect on surface */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite]"></div>
-                    
-                    <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-[#0247ae] text-white">
-                      <ShieldCheck className="w-3 h-3" />
-                    </div>
-                    <span className="text-[11px] font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#0247ae] to-[#0560d4] uppercase">
-                      The Transaction Integrity Layer
-                    </span>
-                  </div>
+            {/* Clean Badge */}
+            <div className="mb-6 inline-block animate-[fadeInUp_0.8s_ease-out_both]">
+               <div className="flex items-center gap-2 px-3 py-1.5 bg-[#0247ae]/5 rounded-full border border-[#0247ae]/10">
+                 <div className="flex items-center justify-center w-4 h-4 rounded-full bg-[#0247ae]">
+                   <ShieldCheck className="w-2.5 h-2.5 text-white" />
+                 </div>
+                 <span className="text-xs font-medium text-[#0247ae] uppercase tracking-wider">
+                   Transaction Integrity Layer
+                 </span>
                </div>
             </div>
             
-            <h1 className="mb-5 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl font-[family-name:var(--font-arsenal-sc)] leading-[1.1]">
-              <span className="bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent animate-[fadeInUp_0.8s_ease-out_both] bg-[length:200%_100%] hover:bg-[length:100%_100%] transition-all duration-700">Trusted Real Estate</span>
-              
-              <span className="block mt-2 relative">
-                <span className="clean-gradient-text pb-2 inline-block">
-                  {typedText}
-                </span>
-                <span className="inline-block w-[4px] h-[0.85em] bg-[#0247ae] ml-2 rounded-full cursor-solid align-baseline relative top-1"></span>
+            <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-5xl leading-[1.1]">
+              <span className="block text-gray-900">Your Trusted Partner in</span>
+              <span className="block mt-1 bg-gradient-to-r from-[#0247ae] via-[#0560d4] to-[#0247ae] bg-clip-text text-transparent lg:text-6xl">
+                Real Estate Excellence
               </span>
             </h1>
             
-            <p className="mb-7 max-w-xl text-base leading-relaxed text-gray-600 font-medium animate-[fadeInUp_0.8s_ease-out_0.3s_both]">
+            <p className="mb-8 max-w-xl text-base leading-relaxed text-gray-600">
               Ensuring transaction integrity through verified, licensed real estate professionals. Connect with trusted agents and brokers who meet our rigorous standards.
             </p>
 
-            <div className="flex flex-col gap-3 sm:flex-row animate-[fadeInUp_1s_ease-out_0.4s_both]">
+            <div className="animate-[fadeInUp_1s_ease-out_0.4s_both]">
               <Link href="/register">
-                <Button size="lg" className="relative bg-gradient-to-r from-[#ffce08] via-[#f5c000] to-[#ffce08] text-[#0247ae] font-bold hover:from-[#f5c000] hover:via-[#ffce08] hover:to-[#f5c000] shadow-2xl shadow-[#ffce08]/40 px-8 rounded-full h-12 text-sm transition-all duration-500 hover:shadow-[0_20px_40px_-10px_rgba(255,206,8,0.6)] hover:scale-105 group overflow-hidden bg-[length:200%_100%] hover:bg-[length:100%_100%]">
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></span>
-                  <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-black/5 to-transparent"></span>
-                  <span className="relative font-bold">Get Started</span>
-                  <ArrowRight className="relative ml-2 h-5 w-5 transition-all duration-500 group-hover:translate-x-2 group-hover:scale-110" />
-                </Button>
-              </Link>
-              <Link href="#how-it-works">
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="relative border-2 border-[#0247ae]/20 text-gray-700 hover:border-[#0247ae] hover:text-[#0247ae] px-8 rounded-full h-12 text-sm font-bold transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-[#0247ae]/10 backdrop-blur-md bg-white/60 hover:bg-white/90 overflow-hidden group"
-                >
-                  <span className="absolute inset-0 bg-gradient-to-r from-[#0247ae]/0 via-[#0247ae]/5 to-[#0247ae]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
-                  <span className="relative">How It Works</span>
+                <Button size="lg" className="relative bg-[#0247ae] hover:bg-[#0560d4] text-white font-semibold shadow-lg shadow-[#0247ae]/25 px-8 rounded-lg h-12 text-sm transition-all duration-300 hover:shadow-xl hover:shadow-[#0247ae]/40 hover:scale-[1.02] group">
+                  <span className="relative">Get Started</span>
+                  <ArrowRight className="relative ml-2 h-4 w-4 transition-all duration-300 group-hover:translate-x-1" />
                 </Button>
               </Link>
             </div>
 
             {/* Communication ways card */}
-            <div className="mt-8 max-w-md animate-[fadeInUp_1s_ease-out_0.6s_both]">
+            <div className="mt-10 max-w-md animate-[fadeInUp_1s_ease-out_0.6s_both]">
               <div className="rounded-3xl bg-gradient-to-br from-[#0247ae] via-[#0560d4] to-[#0873c9] p-5 shadow-2xl shadow-[#0247ae]/40 hover:shadow-[0_30px_70px_-15px_rgba(2,71,174,0.6)] transition-all duration-700 hover:-translate-y-3 hover:rotate-[0.5deg] border border-white/10 backdrop-blur-sm relative overflow-hidden group/comm">
                 {/* Animated background effects within card */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover/comm:opacity-100 transition-opacity duration-700"></div>
