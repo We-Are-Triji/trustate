@@ -76,8 +76,9 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   origin {
-    domain_name = replace(var.api_endpoint, "https://", "")
+    domain_name = replace(replace(var.api_endpoint, "https://", ""), "/prod", "")
     origin_id   = "API-trustate"
+    origin_path = "/prod"
 
     custom_origin_config {
       http_port              = 80
