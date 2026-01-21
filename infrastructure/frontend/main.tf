@@ -66,7 +66,6 @@ resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  aliases             = [var.domain_name]
   price_class         = "PriceClass_100"
 
   origin {
