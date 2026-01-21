@@ -21,7 +21,8 @@ variable "aws_region" {
 }
 
 variable "domain_name" {
-  type = string
+  type    = string
+  default = "trustate.triji.me"
 }
 
 variable "api_endpoint" {
