@@ -117,40 +117,26 @@ export function AgentListSection({ agents }: AgentListSectionProps) {
       {/* Background Orbs & Decorations */}
       <div className="absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-gradient-to-br from-[#ffce08]/15 via-[#f5c000]/10 to-transparent blur-3xl animate-[floatBlob_25s_ease-in-out_infinite] pointer-events-none" />
       <div className="absolute left-0 bottom-0 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-[#0247ae]/12 via-[#0560d4]/8 to-transparent blur-3xl animate-[floatBlob_30s_ease-in-out_infinite_reverse] pointer-events-none" />
-      
-      {/* Decorative Circles */}
-      <div className="absolute right-[10%] top-[10%] h-40 w-40 rounded-full border-2 border-dashed border-[#ffce08]/20 animate-[spin_50s_linear_infinite] pointer-events-none" />
-      <div className="absolute left-[8%] bottom-[15%] h-32 w-32 rounded-full border-2 border-[#0247ae]/10 animate-[spin_40s_linear_infinite_reverse] pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className={`mb-14 flex flex-col items-center justify-between gap-6 sm:flex-row transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div>
             
-            {/* UPGRADED BADGE: Holographic Glass Prism (Matching "Simple Process") */}
+            {/* Clean Badge */}
             <div className="mb-4 inline-block">
-               <div className="relative group cursor-pointer">
-                  {/* The Glow Aura */}
-                  <div className="absolute -inset-1 rounded-full vibe-gradient blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
-                  
-                  {/* The Glass Container */}
-                  <div className="relative flex items-center gap-3 px-6 py-2 bg-white/80 backdrop-blur-xl rounded-full border border-white/50 shadow-sm overflow-hidden">
-                    {/* Moving Shine Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite]"></div>
-                    
-                    <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-[#0247ae] text-white">
-                      <Award className="w-3 h-3" />
-                    </div>
-                    <span className="text-[11px] font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#0247ae] to-[#0560d4] uppercase">
-                      Top Performers
-                    </span>
-                  </div>
+               <div className="flex items-center gap-2 px-3 py-1.5 bg-[#0247ae]/5 rounded-full border border-[#0247ae]/10">
+                 <div className="flex items-center justify-center w-4 h-4 rounded-full bg-[#0247ae]">
+                   <Award className="w-2.5 h-2.5 text-white" />
+                 </div>
+                 <span className="text-xs font-medium text-[#0247ae] uppercase tracking-wider">
+                   Top Performers
+                 </span>
                </div>
             </div>
 
-            <h2 className="text-3xl font-bold sm:text-4xl lg:text-5xl">
-              <span className="bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 bg-clip-text text-transparent">Find </span>
-              <span className="bg-gradient-to-r from-[#0247ae] to-[#0560d4] bg-clip-text text-transparent">Partners</span>
+            <h2 className="text-3xl font-bold sm:text-4xl lg:text-5xl text-gray-900">
+              Find Your Perfect Partner
             </h2>
             <p className="mt-3 text-gray-600 text-lg">
               Connect with our top-rated real estate agents
