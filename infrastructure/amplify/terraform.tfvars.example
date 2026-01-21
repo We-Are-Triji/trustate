@@ -1,0 +1,11 @@
+github_repo    = "https://github.com/YOUR_USERNAME/trustate"
+github_token   = "ghp_YOUR_GITHUB_TOKEN"
+domain_name    = "trustate.com"
+aws_region     = "ap-southeast-1"
+
+cognito_user_pool_id  = "ap-southeast-1_Z6k5ZEqK8"
+cognito_client_id     = "60jg99ho5lb3av30155revcphs"
+supabase_url          = "https://ebcgyhzyhhbyxqihjuus.supabase.co"
+supabase_anon_key     = "YOUR_ANON_KEY"
+supabase_service_key  = "YOUR_SERVICE_KEY"
+websocket_url         = "wss://a7l893ukti.execute-api.ap-southeast-1.amazonaws.com/prod"
