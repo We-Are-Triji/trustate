@@ -1,5 +1,5 @@
 "use client";
 
-export function Spotlight() {
+export function Spotlight({ className, fill }: { className?: string; fill?: string }) {
   return null;
 }

@@ -1,5 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 
-export { Button };
+export function Button({ children, ...props }: ButtonProps & { borderRadius?: string; containerClassName?: string; borderClassName?: string }) {
+  return <Button {...props}>{children}</Button>;
+}
+
+export { Button as MovingBorderButton };
