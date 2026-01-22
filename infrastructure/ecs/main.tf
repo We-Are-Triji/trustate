@@ -178,8 +178,29 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied"
+      status_code  = "403"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "cloudfront_only" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 100
+
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app.arn
+  }
+
+  condition {
+    http_header {
+      http_header_name = "X-Custom-Header"
+      values           = [random_password.cloudfront_secret.result]
+    }
   }
 }
 
@@ -230,12 +251,6 @@ resource "aws_ecs_task_definition" "app" {
     }]
 
     environment = [
-      { name = "NEXT_PUBLIC_COGNITO_USER_POOL_ID", value = var.cognito_user_pool_id },
-      { name = "NEXT_PUBLIC_COGNITO_CLIENT_ID", value = var.cognito_client_id },
-      { name = "NEXT_PUBLIC_SUPABASE_URL", value = var.supabase_url },
-      { name = "NEXT_PUBLIC_SUPABASE_ANON_KEY", value = var.supabase_anon_key },
-      { name = "NEXT_PUBLIC_WEBSOCKET_URL", value = var.websocket_url },
-      { name = "NEXT_PUBLIC_API_URL", value = "http://localhost:3000" },
       { name = "SUPABASE_SERVICE_ROLE_KEY", value = var.supabase_service_key }
     ]
 
@@ -275,7 +290,7 @@ resource "aws_ecs_service" "app" {
 resource "aws_cloudfront_distribution" "main" {
   enabled         = true
   is_ipv6_enabled = true
-  price_class     = "PriceClass_100"
+  price_class     = "PriceClass_200"
 
   origin {
     domain_name = aws_lb.main.dns_name
@@ -300,18 +315,19 @@ resource "aws_cloudfront_distribution" "main" {
     target_origin_id       = "ALB-trustate"
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
+    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # CachingDisabled
 
-    forwarded_values {
-      query_string = true
-      headers      = ["Host", "Authorization", "CloudFront-Forwarded-Proto"]
-      cookies {
-        forward = "all"
-      }
-    }
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # AllViewer
+  }
 
-    min_ttl     = 0
-    default_ttl = 0
-    max_ttl     = 0
+  ordered_cache_behavior {
+    path_pattern           = "/_next/*"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "ALB-trustate"
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
+    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" # CachingOptimized
   }
 
   restrictions {
