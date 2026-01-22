@@ -71,7 +71,7 @@ export function BrokerageCard({ brokerage, onClick }: BrokerageCardProps) {
   
   return (
     <Card
-      className="group cursor-pointer overflow-hidden rounded-3xl border-0 bg-white shadow-lg transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(2,71,174,0.35)] hover:-translate-y-3"
+      className="group cursor-pointer overflow-hidden rounded-3xl border-0 bg-white shadow-lg transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(2,71,174,0.35)] hover:-translate-y-3 p-0 gap-0"
       onClick={() => onClick?.(brokerage)}
     >
       <CardContent className="p-0 relative">

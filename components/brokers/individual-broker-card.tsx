@@ -50,7 +50,7 @@ export function IndividualBrokerCard({ broker, onViewDetails }: IndividualBroker
   const photoUrl = getPersonPhoto(broker.name);
   
   return (
-    <Card className="group overflow-hidden rounded-3xl border-0 bg-white shadow-lg transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(2,71,174,0.35)] hover:-translate-y-3">
+    <Card className="group overflow-hidden rounded-3xl border-0 bg-white shadow-lg transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(2,71,174,0.35)] hover:-translate-y-3 p-0 gap-0">
       <CardContent className="p-0 relative">
         {/* Shine effect on hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10 rounded-3xl"></div>
