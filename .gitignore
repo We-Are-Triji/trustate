@@ -54,5 +54,6 @@ next-env.d.ts
 supabase/.temp/
 .github/copilot-instructions.md
 
-.vscode
-.idea
+# IDE
+.vscode/
+.idea/
