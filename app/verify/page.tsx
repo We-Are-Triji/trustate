@@ -8,6 +8,7 @@ import { RegistrationStepper } from "@/components/auth/registration/registration
 import { IdVerificationForm } from "@/components/auth/registration/id-verification-form";
 import { FaceVerificationContent } from "@/components/auth/registration/face-verification-content";
 import { AgentVerificationForm } from "@/components/auth/registration/agent-verification-form";
+import { BrokerConnectionForm } from "@/components/auth/registration/broker-connection-form";
 import { BrokerCredentialsForm } from "@/components/auth/registration/broker-credentials-form";
 import { BrokerTypeContent } from "@/components/auth/registration/broker-type-content";
 import { FirmLegitimacyContent } from "@/components/auth/registration/firm-legitimacy-content";
@@ -28,6 +29,7 @@ type Step =
   | "id-verification"
   | "face-verification"
   | "agent-verification"
+  | "broker-connection"
   | "broker-credentials"
   | "broker-type"
   | "firm-legitimacy"
@@ -127,10 +129,18 @@ export default function VerifyPage() {
     }
   };
 
-  // Agent Verification
-  const handleAgentSubmit = async (prcData: PrcData, nexusLink: string) => {
-    console.log("Agent data:", { prcData, nexusLink });
-    markStepComplete("agent-verification");
+  // Agent PRC
+  const handleAgentPrcSubmit = (prcData: PrcData) => {
+    console.log("Agent PRC data:", prcData);
+    markStepComplete("prc-details");
+    // Ensure prc-details is marked in completedSteps for logic checks
+    setStep("broker-connection");
+  };
+
+  // Agent Broker Connection
+  const handleBrokerConnectSubmit = async (nexusLink: string) => {
+    console.log("Broker Link:", nexusLink);
+    markStepComplete("broker-connection");
     try {
       await updateUserAttributes({ userAttributes: { "custom:status": "pending_approval" } });
     } catch (err) {
@@ -201,6 +211,7 @@ export default function VerifyPage() {
   // Back handlers
   const handleBackToId = () => setStep("id-verification");
   const handleBackToFace = () => setStep("face-verification");
+  const handleBackToPrc = () => setStep("agent-verification");
   const handleBackToBrokerCredentials = () => setStep("broker-credentials");
   const handleBackToBrokerType = () => setStep("broker-type");
 
@@ -352,10 +363,16 @@ export default function VerifyPage() {
 
             {step === "agent-verification" && (
               <AgentVerificationForm
-                onSubmit={handleAgentSubmit}
+                onSubmit={handleAgentPrcSubmit}
                 onBack={handleBackToFace}
                 onDevBypass={handleAgentDevBypass}
-                onPrcComplete={() => markStepComplete("prc-details")}
+              />
+            )}
+
+            {step === "broker-connection" && (
+              <BrokerConnectionForm
+                onSubmit={handleBrokerConnectSubmit}
+                onBack={handleBackToPrc}
               />
             )}
 

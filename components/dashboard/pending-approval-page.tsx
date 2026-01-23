@@ -34,7 +34,7 @@ export function PendingApprovalPage({ accountType }: PendingApprovalPageProps) {
       }
 
       // Redirect to verify page to re-enter details
-      router.push("/verify");
+      router.push("/verify?step=connect-broker");
     } catch (error) {
       console.error("Reset error:", error);
       alert("An unexpected error occurred");
