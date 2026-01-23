@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Arsenal_SC } from "next/font/google";
+import ConfigureAmplify from "@/components/configure-amplify";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${arsenalSC.variable} antialiased`}
       >
+        <ConfigureAmplify />
         {children}
       </body>
     </html>
