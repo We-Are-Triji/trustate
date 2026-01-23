@@ -37,7 +37,7 @@ type Step =
 
 export default function VerifyPage() {
   const router = useRouter();
-  const { isLoading, isAuthenticated, userStatus, accountType, email } = useAuth();
+  const { isLoading, isAuthenticated, userStatus, accountType, email, userId } = useAuth();
   const [step, setStep] = useState<Step>("id-verification");
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const [showRedirectMessage, setShowRedirectMessage] = useState(false);
@@ -56,6 +56,11 @@ export default function VerifyPage() {
     // Already verified, redirect to app
     if (!isLoading && isAuthenticated && userStatus === "verified") {
       router.push("/dashboard");
+    }
+
+    // Already pending approval, show pending screen
+    if (!isLoading && isAuthenticated && userStatus === "pending_approval") {
+      setStep("pending");
     }
   }, [isLoading, isAuthenticated, userStatus, router]);
 
@@ -227,11 +232,27 @@ export default function VerifyPage() {
 
   // Pending approval screen
   if (step === "pending") {
+    const handleChangeBroker = async () => {
+      if (accountType !== "agent") return;
+      
+      // Reset broker request
+      await fetch("/api/agent/reset-broker", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agentId: userId }),
+      });
+
+      // Go back to agent verification
+      setStep("agent-verification");
+    };
+
     return (
       <main className="flex min-h-screen bg-[#0247ae]">
         <AnimatedBackground />
         <div className="relative z-10 flex w-full items-center justify-center p-6">
-          <PendingApprovalScreen />
+          <PendingApprovalScreen 
+            onChangeBroker={accountType === "agent" ? handleChangeBroker : undefined}
+          />
         </div>
       </main>
     );

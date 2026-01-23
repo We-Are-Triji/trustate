@@ -1,9 +1,14 @@
 "use client";
 
-import { Clock } from "lucide-react";
+import { Clock, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-export function PendingApprovalScreen() {
+interface PendingApprovalScreenProps {
+  onChangeBroker?: () => void;
+}
+
+export function PendingApprovalScreen({ onChangeBroker }: PendingApprovalScreenProps) {
   return (
     <Card className="w-full max-w-md border-0 bg-white shadow-xl rounded-3xl">
       <CardHeader className="pb-4 text-center">
@@ -32,6 +37,17 @@ export function PendingApprovalScreen() {
             If not confirmed, you will need to register again.
           </p>
         </div>
+
+        {onChangeBroker && (
+          <Button
+            variant="outline"
+            onClick={onChangeBroker}
+            className="w-full border-[#0247ae] text-[#0247ae] hover:bg-[#0247ae]/5"
+          >
+            <RefreshCw size={16} className="mr-2" />
+            Change Broker
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

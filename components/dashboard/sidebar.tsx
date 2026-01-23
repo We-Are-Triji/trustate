@@ -60,9 +60,14 @@ export function DashboardSidebar() {
   const { theme, toggleTheme } = useTheme();
 
   const handleSignOut = async () => {
-    document.cookie = "accountType=; path=/; max-age=0";
-    await signOut();
-    router.push("/login");
+    setIsLoggingOut(true);
+    try {
+      document.cookie = "accountType=; path=/; max-age=0";
+      await signOut();
+      router.push("/login");
+    } catch (error) {
+      setIsLoggingOut(false);
+    }
   };
 
   const fullName = [firstName, lastName].filter(Boolean).join(" ") || "User";
@@ -247,6 +252,12 @@ export function DashboardSidebar() {
               <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
             </div>
           )}
+          disabled={isLoggingOut}
+          className={`mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${collapsed ? "justify-center" : ""}`}
+          title={collapsed ? "Sign Out" : undefined}
+        >
+          <LogOut size={20} className={isLoggingOut ? "animate-pulse" : ""} />
+          {!collapsed && (isLoggingOut ? "Signing out..." : "Sign Out")}
         </button>
       </div>
     </aside>
