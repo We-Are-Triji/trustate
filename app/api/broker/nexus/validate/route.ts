@@ -83,19 +83,20 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (cognitoError: any) {
-      console.error("Cognito error:", cognitoError);
+      console.error("Cognito full error:", JSON.stringify(cognitoError, null, 2));
 
-      let errorMessage = "Failed to fetch broker information";
+      let errorMessage = `Failed to fetch broker information: ${cognitoError.code || "Unknown"} - ${cognitoError.message || JSON.stringify(cognitoError)}`;
+
       if (cognitoError.code === "AccessDeniedException" || cognitoError.code === "NotAuthorizedException") {
         errorMessage = "Server Error: Missing permissions to fetch broker details. Please check AWS IAM policies.";
-      } else if (cognitoError.code === "UnrecognizedClientException" || cognitoError.code === "MissingCredentials") {
-        errorMessage = "Server Error: Missing AWS Credentials in environment.";
+      } else if (cognitoError.code === "UnrecognizedClientException" || cognitoError.code === "MissingCredentials" || cognitoError.code === "CredentialsError") {
+        errorMessage = "Server Error: Missing AWS Credentials. Please check APP_AWS_ACCESS_KEY_ID in env vars.";
       } else if (cognitoError.code === "UserNotFoundException") {
-        errorMessage = "Broker account not found.";
+        errorMessage = "Broker account not found in Cognito.";
       }
 
       return NextResponse.json(
-        { error: errorMessage },
+        { error: errorMessage, details: cognitoError },
         { status: 500 }
       );
     }
