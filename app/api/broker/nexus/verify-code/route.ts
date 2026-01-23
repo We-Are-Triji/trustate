@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { TOTP } from "otplib";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch TOTP secret
+    const supabase = getSupabaseAdmin();
     const { data: nexusData, error: nexusError } = await supabase
       .from("broker_nexus")
       .select("broker_id, totp_secret")

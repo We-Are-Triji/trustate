@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,6 +20,7 @@ export async function POST(req: NextRequest) {
     const nexusCode = match[1].toUpperCase();
 
     // Fetch broker info from nexus code
+    const supabase = getSupabaseAdmin();
     const { data: nexusData, error: nexusError } = await supabase
       .from("broker_nexus")
       .select("broker_id")
