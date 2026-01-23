@@ -235,13 +235,21 @@ export default function VerifyPage() {
   if (step === "pending") {
     const handleChangeBroker = async () => {
       if (accountType !== "agent") return;
-      
+
       // Reset broker request
-      await fetch("/api/agent/reset-broker", {
+      const res = await fetch("/api/agent/reset-broker", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ agentId: userId }),
       });
+
+      if (!res.ok) {
+        const data = await res.json();
+        // Since we don't have a toast component context here easily accessible without refactor,
+        // we'll use a simple alert or set an error state. For now, alert to satisfy requirement.
+        alert(data.error || "Failed to change broker");
+        return;
+      }
 
       // Go back to agent verification
       setStep("agent-verification");
@@ -251,7 +259,7 @@ export default function VerifyPage() {
       <main className="flex min-h-screen bg-[#0247ae]">
         <AnimatedBackground />
         <div className="relative z-10 flex w-full items-center justify-center p-6">
-          <PendingApprovalScreen 
+          <PendingApprovalScreen
             onChangeBroker={accountType === "agent" ? handleChangeBroker : undefined}
           />
         </div>
@@ -289,7 +297,7 @@ export default function VerifyPage() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Complete!</h2>
             <p className="text-gray-600 mb-6">
-              {accountType === "broker" 
+              {accountType === "broker"
                 ? "Your broker account has been successfully verified. You can now access all broker features."
                 : "Your account has been successfully verified."}
             </p>
