@@ -139,7 +139,7 @@ export function BrokerConnectionForm({ onSubmit, onBack }: BrokerConnectionFormP
                                         setNexusLink(e.target.value);
                                         setError("");
                                     }}
-                                    placeholder="https://trustate.triji.me/nexus/XXXXXXXX"
+                                    placeholder="https://trustate.triji.me/nexus/..."
                                     className="h-10 w-full pl-10 pr-4 rounded-lg border-2 border-gray-200 bg-white focus:outline-none focus:border-[#0247ae] focus:ring-2 focus:ring-[#0247ae]/10"
                                 />
                             </div>
@@ -153,7 +153,7 @@ export function BrokerConnectionForm({ onSubmit, onBack }: BrokerConnectionFormP
 
                         <div className="rounded-lg bg-[#0247ae]/5 p-3 border border-[#0247ae]/10">
                             <p className="font-semibold text-[#0247ae] mb-1 text-xs">Expected Format</p>
-                            <p className="text-xs text-gray-600 font-mono">https://trustate.triji.me/nexus/XXXXXXXX</p>
+                            <p className="text-xs text-gray-600 font-mono">https://trustate.triji.me/nexus/...</p>
                         </div>
 
                         <Button

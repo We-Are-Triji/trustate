@@ -7,18 +7,21 @@ export async function POST(req: NextRequest) {
     const { nexusLink } = await req.json();
 
     // Validate format: https://trustate.triji.me/nexus/{nexus_code} or https://trustate.com/nexus/{nexus_code}
-    // Updated to accept both trustate.com and trustate.triji.me
-    const nexusPattern = /^https?:\/\/(?:www\.)?(?:trustate\.com|trustate\.triji\.me)\/nexus\/([A-Z0-9]{8})$/i;
+    // Updated to accept both trustate.com and trustate.triji.me, and variable length codes (mixed case)
+    const nexusPattern = /^https?:\/\/(?:www\.)?(?:trustate\.com|trustate\.triji\.me)\/nexus\/([A-Za-z0-9_-]+)$/i;
     const match = nexusLink.match(nexusPattern);
 
     if (!match) {
       return NextResponse.json(
-        { error: "Invalid nexus link format. Expected: https://trustate.triji.me/nexus/XXXXXXXX" },
+        { error: "Invalid nexus link format. Expected: https://trustate.triji.me/nexus/CODE..." },
         { status: 400 }
       );
     }
 
-    const nexusCode = match[1].toUpperCase();
+    // Use the code exactly as extracted (preserve case if needed, though previously we uppercased it)
+    // If the generation logic uses mixed case, we should strictly NOT force uppercase unless we know for sure.
+    // Given the user gave 'MhWJm6XujccW', we should preserve case.
+    const nexusCode = match[1];
 
     // Fetch broker info from nexus code
     const supabase = getSupabaseAdmin();
