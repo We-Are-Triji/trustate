@@ -6,13 +6,14 @@ export async function POST(req: NextRequest) {
   try {
     const { nexusLink } = await req.json();
 
-    // Validate format: https://trustate.com/nexus/{nexus_code}
-    const nexusPattern = /^https?:\/\/(?:www\.)?trustate\.com\/nexus\/([A-Z0-9]{8})$/i;
+    // Validate format: https://trustate.triji.me/nexus/{nexus_code} or https://trustate.com/nexus/{nexus_code}
+    // Updated to accept both trustate.com and trustate.triji.me
+    const nexusPattern = /^https?:\/\/(?:www\.)?(?:trustate\.com|trustate\.triji\.me)\/nexus\/([A-Z0-9]{8})$/i;
     const match = nexusLink.match(nexusPattern);
 
     if (!match) {
       return NextResponse.json(
-        { error: "Invalid nexus link format. Expected: https://trustate.com/nexus/XXXXXXXX" },
+        { error: "Invalid nexus link format. Expected: https://trustate.triji.me/nexus/XXXXXXXX" },
         { status: 400 }
       );
     }
