@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -58,6 +59,7 @@ export function DashboardSidebar() {
   const { firstName, lastName, accountType } = useAuth();
   const { collapsed, setCollapsed } = useSidebar();
   const { theme, toggleTheme } = useTheme();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleSignOut = async () => {
     setIsLoggingOut(true);
@@ -232,18 +234,20 @@ export function DashboardSidebar() {
         {/* Logout Button */}
         <button
           onClick={handleSignOut}
+          disabled={isLoggingOut}
           className={`
             flex items-center gap-3 h-12 rounded-xl 
             text-gray-500 dark:text-gray-400 
             hover:bg-red-50 dark:hover:bg-red-900/20 
             hover:text-red-600 dark:hover:text-red-400 
             transition-all duration-300 group relative w-full hover:scale-[1.02]
+            disabled:opacity-50 disabled:cursor-not-allowed
             ${collapsed ? "justify-center" : "px-4"}
           `}
           title={collapsed ? "Sign Out" : undefined}
         >
-          <LogOut size={20} strokeWidth={2} className="shrink-0" />
-          {!collapsed && <span className="text-sm font-medium">Sign Out</span>}
+          <LogOut size={20} strokeWidth={2} className={`shrink-0 ${isLoggingOut ? "animate-pulse" : ""}`} />
+          {!collapsed && <span className="text-sm font-medium">{isLoggingOut ? "Signing out..." : "Sign Out"}</span>}
           
           {/* Tooltip (only when collapsed) */}
           {collapsed && (
@@ -252,12 +256,6 @@ export function DashboardSidebar() {
               <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-900 dark:border-r-gray-700" />
             </div>
           )}
-          disabled={isLoggingOut}
-          className={`mt-2 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${collapsed ? "justify-center" : ""}`}
-          title={collapsed ? "Sign Out" : undefined}
-        >
-          <LogOut size={20} className={isLoggingOut ? "animate-pulse" : ""} />
-          {!collapsed && (isLoggingOut ? "Signing out..." : "Sign Out")}
         </button>
       </div>
     </aside>

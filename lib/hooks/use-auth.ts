@@ -12,6 +12,7 @@ interface AuthState {
   email: string | null;
   firstName: string | null;
   lastName: string | null;
+  userId: string | null;
 }
 
 export function useAuth() {
@@ -23,11 +24,12 @@ export function useAuth() {
     email: null,
     firstName: null,
     lastName: null,
+    userId: null,
   });
 
   const checkAuth = useCallback(async () => {
     try {
-      await getCurrentUser();
+      const user = await getCurrentUser();
       const attributes = await fetchUserAttributes();
       
       setState({
@@ -38,6 +40,7 @@ export function useAuth() {
         email: attributes.email || null,
         firstName: attributes.given_name || null,
         lastName: attributes.family_name || null,
+        userId: user.userId || null,
       });
     } catch {
       setState({
@@ -48,6 +51,7 @@ export function useAuth() {
         email: null,
         firstName: null,
         lastName: null,
+        userId: null,
       });
     }
   }, []);

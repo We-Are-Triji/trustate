@@ -58,7 +58,7 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
     const fakeBlob = new Blob(['fake-doc'], { type: 'image/png' });
     
     const fakeData: FirmLegitimacyData = {
-      firmType: "Sole Proprietorship",
+      firmType: "sole-proprietorship",
       registrationNumber: `REG-${timestamp}`,
       registrationDocument: new File([fakeBlob], `reg-${timestamp}.png`, { type: 'image/png' }),
       businessPermit: new File([fakeBlob], `permit-${timestamp}.png`, { type: 'image/png' }),
@@ -69,7 +69,7 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
     };
     
     setData(fakeData);
-    setSelectedType("Sole Proprietorship");
+    setSelectedType("sole-proprietorship");
     
     setTimeout(() => {
       onComplete(fakeData);

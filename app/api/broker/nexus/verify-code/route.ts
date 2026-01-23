@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { authenticator } from "otplib";
+import { TOTP } from "otplib";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,10 +33,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify TOTP
-    const isValid = authenticator.verify({
-      token: totpCode,
-      secret: nexusData.totp_secret,
-    });
+    const totp = new TOTP({ secret: nexusData.totp_secret });
+    const isValid = totp.verify(totpCode);
 
     if (!isValid) {
       return NextResponse.json(
