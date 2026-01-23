@@ -46,6 +46,15 @@ export async function POST(req: NextRequest) {
     const secretAccessKey = process.env.APP_AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
     const region = process.env.APP_AWS_REGION || process.env.AWS_REGION || "ap-southeast-1";
 
+    if (!accessKeyId || !secretAccessKey) {
+      console.error("Missing AWS Credentials", { hasAccessKey: !!accessKeyId, hasSecretKey: !!secretAccessKey });
+      return NextResponse.json(
+        { error: `Server Configuration Error: Missing ${!accessKeyId ? "Access Key" : ""} ${!secretAccessKey ? "Secret Key" : ""}. Please check APP_AWS_... environment variables.` },
+        { status: 500 }
+      );
+    }
+
+
     const cognito = new AWS.CognitoIdentityServiceProvider({
       region,
       credentials: new AWS.Credentials({
