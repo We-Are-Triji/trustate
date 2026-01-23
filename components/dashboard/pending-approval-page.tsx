@@ -33,8 +33,8 @@ export function PendingApprovalPage({ accountType }: PendingApprovalPageProps) {
         return;
       }
 
-      // Redirect to verify page to re-enter details
-      router.push("/verify?step=connect-broker");
+      // Redirect to dedicated broker connection page
+      router.push("/connect-broker");
     } catch (error) {
       console.error("Reset error:", error);
       alert("An unexpected error occurred");

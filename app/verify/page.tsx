@@ -8,7 +8,7 @@ import { RegistrationStepper } from "@/components/auth/registration/registration
 import { IdVerificationForm } from "@/components/auth/registration/id-verification-form";
 import { FaceVerificationContent } from "@/components/auth/registration/face-verification-content";
 import { AgentVerificationForm } from "@/components/auth/registration/agent-verification-form";
-import { BrokerConnectionForm } from "@/components/auth/registration/broker-connection-form";
+import { AgentVerificationForm } from "@/components/auth/registration/agent-verification-form";
 import { BrokerCredentialsForm } from "@/components/auth/registration/broker-credentials-form";
 import { BrokerTypeContent } from "@/components/auth/registration/broker-type-content";
 import { FirmLegitimacyContent } from "@/components/auth/registration/firm-legitimacy-content";
@@ -84,7 +84,7 @@ export default function VerifyPage() {
       return [
         ...baseSteps,
         { label: "PRC", completed: completedSteps.has("prc-details"), current: step === "agent-verification" && !completedSteps.has("prc-details") },
-        { label: "Broker", completed: completedSteps.has("agent-verification"), current: step === "agent-verification" && completedSteps.has("prc-details") },
+        // Broker step moved to dedicated page
       ];
     }
 
@@ -133,21 +133,11 @@ export default function VerifyPage() {
   const handleAgentPrcSubmit = (prcData: PrcData) => {
     console.log("Agent PRC data:", prcData);
     markStepComplete("prc-details");
-    // Ensure prc-details is marked in completedSteps for logic checks
-    setStep("broker-connection");
+    // Redirect to separate broker connection page
+    router.push("/connect-broker");
   };
 
-  // Agent Broker Connection
-  const handleBrokerConnectSubmit = async (nexusLink: string) => {
-    console.log("Broker Link:", nexusLink);
-    markStepComplete("broker-connection");
-    try {
-      await updateUserAttributes({ userAttributes: { "custom:status": "pending_approval" } });
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
-    setStep("pending");
-  };
+  // Agent Broker Connection - REMOVED (Moved to dedicated page)
 
   // Broker Credentials
   const handleBrokerCredentialsSubmit = (licenseData: BrokerLicenseData, bondData: SuretyBondData) => {
@@ -366,13 +356,6 @@ export default function VerifyPage() {
                 onSubmit={handleAgentPrcSubmit}
                 onBack={handleBackToFace}
                 onDevBypass={handleAgentDevBypass}
-              />
-            )}
-
-            {step === "broker-connection" && (
-              <BrokerConnectionForm
-                onSubmit={handleBrokerConnectSubmit}
-                onBack={handleBackToPrc}
               />
             )}
 
