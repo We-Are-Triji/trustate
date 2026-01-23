@@ -40,8 +40,18 @@ export async function POST(req: NextRequest) {
 
     // Fetch broker details from Cognito
     const AWS = require("aws-sdk");
+
+    // Amplify doesn't allow AWS_ prefix for custom env vars, so we check for alternates
+    const accessKeyId = process.env.APP_AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.APP_AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
+    const region = process.env.APP_AWS_REGION || process.env.AWS_REGION || "ap-southeast-1";
+
     const cognito = new AWS.CognitoIdentityServiceProvider({
-      region: process.env.AWS_REGION || "ap-southeast-1",
+      region,
+      credentials: new AWS.Credentials({
+        accessKeyId,
+        secretAccessKey,
+      }),
     });
 
     const userPoolId = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID;
@@ -72,10 +82,20 @@ export async function POST(req: NextRequest) {
           picture: attributes.picture || null,
         },
       });
-    } catch (cognitoError) {
+    } catch (cognitoError: any) {
       console.error("Cognito error:", cognitoError);
+
+      let errorMessage = "Failed to fetch broker information";
+      if (cognitoError.code === "AccessDeniedException" || cognitoError.code === "NotAuthorizedException") {
+        errorMessage = "Server Error: Missing permissions to fetch broker details. Please check AWS IAM policies.";
+      } else if (cognitoError.code === "UnrecognizedClientException" || cognitoError.code === "MissingCredentials") {
+        errorMessage = "Server Error: Missing AWS Credentials in environment.";
+      } else if (cognitoError.code === "UserNotFoundException") {
+        errorMessage = "Broker account not found.";
+      }
+
       return NextResponse.json(
-        { error: "Failed to fetch broker information" },
+        { error: errorMessage },
         { status: 500 }
       );
     }
