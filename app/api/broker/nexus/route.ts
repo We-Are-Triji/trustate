@@ -28,10 +28,10 @@ export async function GET(req: NextRequest) {
         }
 
         return NextResponse.json(data);
-    } catch (error) {
+    } catch (error: any) {
         console.error("Fetch nexus error:", error);
         return NextResponse.json(
-            { error: "Internal server error" },
+            { error: error?.message || "Internal server error" },
             { status: 500 }
         );
     }

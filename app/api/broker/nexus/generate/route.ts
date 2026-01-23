@@ -40,10 +40,10 @@ export async function POST(req: NextRequest) {
         }
 
         return NextResponse.json({ nexus_code: nexusCode, totp_secret: totpSecret });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Generate nexus error:", error);
         return NextResponse.json(
-            { error: "Internal server error" },
+            { error: error?.message || "Internal server error" },
             { status: 500 }
         );
     }
