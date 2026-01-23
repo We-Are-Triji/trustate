@@ -57,10 +57,7 @@ export async function POST(req: NextRequest) {
 
     const cognito = new AWS.CognitoIdentityServiceProvider({
       region,
-      credentials: new AWS.Credentials({
-        accessKeyId,
-        secretAccessKey,
-      }),
+      credentials: new AWS.Credentials(accessKeyId, secretAccessKey),
     });
 
     const userPoolId = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID;
