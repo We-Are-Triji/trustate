@@ -8,7 +8,6 @@ import { RegistrationStepper } from "@/components/auth/registration/registration
 import { IdVerificationForm } from "@/components/auth/registration/id-verification-form";
 import { FaceVerificationContent } from "@/components/auth/registration/face-verification-content";
 import { AgentVerificationForm } from "@/components/auth/registration/agent-verification-form";
-import { AgentVerificationForm } from "@/components/auth/registration/agent-verification-form";
 import { BrokerCredentialsForm } from "@/components/auth/registration/broker-credentials-form";
 import { BrokerTypeContent } from "@/components/auth/registration/broker-type-content";
 import { FirmLegitimacyContent } from "@/components/auth/registration/firm-legitimacy-content";
