@@ -81,7 +81,8 @@ export default function VerifyPage() {
     if (accountType === "agent") {
       return [
         ...baseSteps,
-        { label: "PRC & Nexus", completed: completedSteps.has("agent-verification"), current: step === "agent-verification" },
+        { label: "PRC", completed: completedSteps.has("prc-details"), current: step === "agent-verification" && !completedSteps.has("prc-details") },
+        { label: "Broker", completed: completedSteps.has("agent-verification"), current: step === "agent-verification" && completedSteps.has("prc-details") },
       ];
     }
 
@@ -346,6 +347,7 @@ export default function VerifyPage() {
                 onSubmit={handleAgentSubmit}
                 onBack={handleBackToFace}
                 onDevBypass={handleAgentDevBypass}
+                onPrcComplete={() => markStepComplete("prc-details")}
               />
             )}
 

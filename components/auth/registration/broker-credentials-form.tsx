@@ -48,6 +48,35 @@ export function BrokerCredentialsForm({ onSubmit, onBack, onDevBypass }: BrokerC
     if (canSubmit) onSubmit(license, bond);
   };
 
+  const handleDevBypass = () => {
+    const timestamp = Date.now();
+    const fakeBlob = new Blob(['fake-doc'], { type: 'image/png' });
+    
+    const fakeLicense: BrokerLicenseData = {
+      prcBrokerNumber: `BRK-${timestamp}`,
+      corNumber: `COR-${timestamp}`,
+      prcFrontImage: new File([fakeBlob], `prc-front-${timestamp}.png`, { type: 'image/png' }),
+      prcBackImage: new File([fakeBlob], `prc-back-${timestamp}.png`, { type: 'image/png' }),
+    };
+    
+    const futureDate = new Date();
+    futureDate.setFullYear(futureDate.getFullYear() + 1);
+    
+    const fakeBond: SuretyBondData = {
+      bondPolicyNumber: `BOND-${timestamp}`,
+      bondExpiryDate: futureDate.toISOString().split('T')[0],
+      providerName: `Provider-${timestamp}`,
+      bondImage: new File([fakeBlob], `bond-${timestamp}.png`, { type: 'image/png' }),
+    };
+    
+    setLicense(fakeLicense);
+    setBond(fakeBond);
+    
+    setTimeout(() => {
+      onSubmit(fakeLicense, fakeBond);
+    }, 100);
+  };
+
   const inputClass = (hasError?: boolean) => 
     `h-9 w-full rounded-lg border-2 bg-white px-4 text-gray-700 placeholder:text-gray-400 transition-all duration-200 focus:outline-none ${
       hasError 
@@ -217,10 +246,10 @@ export function BrokerCredentialsForm({ onSubmit, onBack, onDevBypass }: BrokerC
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={onDevBypass}
+                onClick={handleDevBypass}
                 className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 h-9"
               >
-                [DEV] Skip
+                [DEV] Fill & Skip
               </Button>
             )}
             <Button

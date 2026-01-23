@@ -32,6 +32,19 @@ export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerifica
     }
   };
 
+  const handleDevBypass = () => {
+    const timestamp = Date.now();
+    setIdType("Philippine Passport");
+    
+    const fakeBlob = new Blob(['fake-id-image'], { type: 'image/png' });
+    const fakeId = new File([fakeBlob], `id-${timestamp}.png`, { type: 'image/png' });
+    setIdImage(fakeId);
+    
+    setTimeout(() => {
+      onSubmit({ idType: "Philippine Passport", idImage: fakeId });
+    }, 100);
+  };
+
   const handleClose = () => {
     if (idType || idImage) {
       setShowExitConfirm(true);
@@ -137,10 +150,10 @@ export function IdVerificationForm({ onSubmit, onBack, onDevBypass }: IdVerifica
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={onDevBypass}
+                onClick={handleDevBypass}
                 className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 h-9"
               >
-                [DEV] Skip
+                [DEV] Fill & Skip
               </Button>
             )}
             <Button

@@ -21,13 +21,14 @@ interface AgentVerificationFormProps {
   onSubmit: (prcData: PrcData, nexusLink: string) => void;
   onBack: () => void;
   onDevBypass?: () => void;
+  onPrcComplete?: () => void;
 }
 
-type Step = "form" | "broker-preview" | "totp-verification";
+type Step = "prc-form" | "nexus-validation" | "broker-preview" | "totp-verification";
 
-export function AgentVerificationForm({ onSubmit, onBack, onDevBypass }: AgentVerificationFormProps) {
+export function AgentVerificationForm({ onSubmit, onBack, onDevBypass, onPrcComplete }: AgentVerificationFormProps) {
   const { userId } = useAuth();
-  const [step, setStep] = useState<Step>("form");
+  const [step, setStep] = useState<Step>("prc-form");
   const [prcNumber, setPrcNumber] = useState("");
   const [prcFrontImage, setPrcFrontImage] = useState<File | null>(null);
   const [prcBackImage, setPrcBackImage] = useState<File | null>(null);
@@ -39,10 +40,37 @@ export function AgentVerificationForm({ onSubmit, onBack, onDevBypass }: AgentVe
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
 
-  const canSubmit = prcNumber.trim() && prcFrontImage && prcBackImage && nexusLink.trim();
+  const canSubmitPrc = prcNumber.trim() && prcFrontImage && prcBackImage;
+
+  const handlePrcContinue = () => {
+    if (canSubmitPrc) {
+      onPrcComplete?.();
+      setStep("nexus-validation");
+    }
+  };
+
+  const handleDevBypassPrc = () => {
+    // Generate unique fake data
+    const timestamp = Date.now();
+    setPrcNumber(`PRC-${timestamp}`);
+    
+    // Create fake image files
+    const fakeBlob = new Blob(['fake-image-data'], { type: 'image/png' });
+    const fakeFront = new File([fakeBlob], `prc-front-${timestamp}.png`, { type: 'image/png' });
+    const fakeBack = new File([fakeBlob], `prc-back-${timestamp}.png`, { type: 'image/png' });
+    
+    setPrcFrontImage(fakeFront);
+    setPrcBackImage(fakeBack);
+    
+    // Auto-continue after a brief moment
+    setTimeout(() => {
+      onPrcComplete?.();
+      setStep("nexus-validation");
+    }, 100);
+  };
 
   const handleValidateNexus = async () => {
-    if (!canSubmit) return;
+    if (!nexusLink.trim()) return;
 
     setIsValidating(true);
     setError("");
@@ -73,6 +101,14 @@ export function AgentVerificationForm({ onSubmit, onBack, onDevBypass }: AgentVe
 
   const handleConfirmBroker = () => {
     setStep("totp-verification");
+  };
+
+  const handleChangeBroker = () => {
+    setStep("nexus-validation");
+    setBrokerInfo(null);
+    setNexusCode("");
+    setNexusLink("");
+    setError("");
   };
 
   const handleVerifyCode = async () => {
@@ -137,6 +173,157 @@ export function AgentVerificationForm({ onSubmit, onBack, onDevBypass }: AgentVe
     </div>
   );
 
+  // PRC Form Step
+  if (step === "prc-form") {
+    return (
+      <>
+        <CardHeader className="pb-1 pt-5 animate-[fadeInUp_0.5s_ease-out]">
+          <div className="text-center">
+            <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
+              Agent Verification
+            </CardTitle>
+            <p className="text-gray-500 text-sm">PRC Accreditation Details</p>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col px-6 pb-4">
+          <div className="max-w-md mx-auto w-full space-y-4 flex-1 flex flex-col justify-center">
+            <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+              <Award className="h-4 w-4 text-[#0247ae]" />
+              <h3 className="font-semibold text-[#0247ae] text-sm">PRC Accreditation</h3>
+            </div>
+            
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-600">PRC Accreditation Number *</label>
+              <input
+                value={prcNumber}
+                onChange={(e) => setPrcNumber(e.target.value)}
+                placeholder="Enter your PRC number"
+                className={inputClass}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {renderUpload("PRC Card (Front) *", prcFrontImage, setPrcFrontImage)}
+              {renderUpload("PRC Card (Back) *", prcBackImage, setPrcBackImage)}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-4 mt-3 border-t border-gray-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onBack}
+              className="h-9 px-4 text-gray-600 hover:text-[#0247ae] hover:border-[#0247ae]"
+            >
+              <ArrowLeft size={16} className="mr-1" />
+              Previous
+            </Button>
+            <div className="flex gap-2">
+              {isDev && onDevBypass && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDevBypassPrc}
+                  className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 h-9"
+                >
+                  [DEV] Fill & Skip
+                </Button>
+              )}
+              <Button
+                onClick={handlePrcContinue}
+                disabled={!canSubmitPrc}
+                className="bg-[#0247ae] hover:bg-[#023a8a] px-6 h-9"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </>
+    );
+  }
+
+  // Nexus Validation Step
+  if (step === "nexus-validation") {
+    return (
+      <>
+        <CardHeader className="pb-1 pt-5 animate-[fadeInUp_0.5s_ease-out]">
+          <div className="text-center">
+            <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
+              Connect to Broker
+            </CardTitle>
+            <p className="text-gray-500 text-sm">Enter your broker's nexus link</p>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col items-center justify-center px-6 pb-4">
+          <div className="bg-white border-2 border-gray-200 rounded-xl p-6 max-w-md w-full space-y-4">
+            <div className="text-center space-y-2">
+              <div className="h-12 w-12 rounded-full bg-[#0247ae]/10 flex items-center justify-center mx-auto">
+                <Users size={24} className="text-[#0247ae]" />
+              </div>
+              <p className="text-sm text-gray-600">
+                Request the nexus link from your supervising broker
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-600">Broker Nexus Link *</label>
+              <div className="relative">
+                <LinkIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  value={nexusLink}
+                  onChange={(e) => {
+                    setNexusLink(e.target.value);
+                    setError("");
+                  }}
+                  placeholder="https://trustate.com/nexus/XXXXXXXX"
+                  className="h-10 w-full pl-10 pr-4 rounded-lg border-2 border-gray-200 bg-white focus:outline-none focus:border-[#0247ae] focus:ring-2 focus:ring-[#0247ae]/10"
+                />
+              </div>
+              {error && (
+                <div className="flex items-center gap-2 text-red-600 text-sm">
+                  <AlertCircle size={16} />
+                  <span>{error}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-lg bg-[#0247ae]/5 p-3 border border-[#0247ae]/10">
+              <p className="font-semibold text-[#0247ae] mb-1 text-xs">Expected Format</p>
+              <p className="text-xs text-gray-600 font-mono">https://trustate.com/nexus/XXXXXXXX</p>
+            </div>
+
+            <Button
+              onClick={handleValidateNexus}
+              disabled={!nexusLink.trim() || isValidating}
+              className="w-full bg-[#0247ae] hover:bg-[#023a8a] h-10"
+            >
+              {isValidating ? (
+                <>
+                  <Loader2 size={16} className="animate-spin mr-2" />
+                  Validating...
+                </>
+              ) : (
+                "Validate Link"
+              )}
+            </Button>
+          </div>
+
+          <Button
+            variant="ghost"
+            onClick={() => setStep("prc-form")}
+            className="mt-4 text-gray-600"
+          >
+            <ArrowLeft size={16} className="mr-1" />
+            Back to PRC Details
+          </Button>
+        </CardContent>
+      </>
+    );
+  }
+
   // Broker Preview Step
   if (step === "broker-preview" && brokerInfo) {
     return (
@@ -172,11 +359,7 @@ export function AgentVerificationForm({ onSubmit, onBack, onDevBypass }: AgentVe
           <div className="flex gap-3 mt-6">
             <Button
               variant="outline"
-              onClick={() => {
-                setStep("form");
-                setBrokerInfo(null);
-                setNexusCode("");
-              }}
+              onClick={handleChangeBroker}
               className="h-9 px-6"
             >
               Change Broker
@@ -267,122 +450,5 @@ export function AgentVerificationForm({ onSubmit, onBack, onDevBypass }: AgentVe
     );
   }
 
-  return (
-    <>
-      <CardHeader className="pb-1 pt-5 animate-[fadeInUp_0.5s_ease-out]">
-        <div className="text-center">
-          <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
-            Agent Verification
-          </CardTitle>
-          <p className="text-gray-500 text-sm">PRC Accreditation and Broker Connection</p>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col px-6 pb-4">
-        <div className="grid grid-cols-2 gap-x-8 flex-1">
-          {/* Left Column - PRC Accreditation */}
-          <div className="space-y-3 animate-[fadeInUp_0.5s_ease-out_0.1s_both]">
-            <div className="flex items-center gap-2 pb-1 border-b border-gray-100">
-              <Award className="h-4 w-4 text-[#0247ae]" />
-              <h3 className="font-semibold text-[#0247ae] text-sm">PRC Accreditation</h3>
-            </div>
-            
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-600">PRC Accreditation Number *</label>
-              <input
-                value={prcNumber}
-                onChange={(e) => setPrcNumber(e.target.value)}
-                placeholder="Enter your PRC number"
-                className={inputClass}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {renderUpload("PRC Card (Front) *", prcFrontImage, setPrcFrontImage)}
-              {renderUpload("PRC Card (Back) *", prcBackImage, setPrcBackImage)}
-            </div>
-          </div>
-
-          {/* Right Column - Broker Connection */}
-          <div className="space-y-3 animate-[fadeInUp_0.5s_ease-out_0.2s_both]">
-            <div className="flex items-center gap-2 pb-1 border-b border-gray-100">
-              <Users className="h-4 w-4 text-[#0247ae]" />
-              <h3 className="font-semibold text-[#0247ae] text-sm">Broker Connection</h3>
-            </div>
-            
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-600">Broker Nexus Link *</label>
-              <div className="relative">
-                <LinkIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <input
-                  value={nexusLink}
-                  onChange={(e) => {
-                    setNexusLink(e.target.value);
-                    setError("");
-                  }}
-                  placeholder="https://trustate.com/nexus/XXXXXXXX"
-                  className={`${inputClass} pl-10`}
-                />
-              </div>
-              {error && (
-                <div className="flex items-center gap-1 text-red-600 text-xs mt-1">
-                  <AlertCircle size={12} />
-                  <span>{error}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-lg bg-[#0247ae]/5 p-3 border border-[#0247ae]/10">
-              <p className="font-semibold text-[#0247ae] mb-0.5 text-xs">Link Format</p>
-              <p className="text-xs text-gray-600 leading-relaxed font-mono">https://trustate.com/nexus/XXXXXXXX</p>
-            </div>
-
-            <div className="rounded-lg bg-[#ffce08]/10 p-3 border border-[#ffce08]/20">
-              <p className="font-semibold text-[#0247ae] mb-0.5 text-xs">What happens next?</p>
-              <p className="text-xs text-gray-600 leading-relaxed">You'll confirm the broker and enter a verification code they provide.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between pt-4 mt-3 border-t border-gray-100 animate-[fadeInUp_0.5s_ease-out_0.3s_both]">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onBack}
-            className="h-9 px-4 text-gray-600 hover:text-[#0247ae] hover:border-[#0247ae]"
-          >
-            <ArrowLeft size={16} className="mr-1" />
-            Previous
-          </Button>
-          <div className="flex gap-2">
-            {isDev && onDevBypass && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={onDevBypass}
-                className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 h-9"
-              >
-                [DEV] Skip
-              </Button>
-            )}
-            <Button
-              onClick={handleValidateNexus}
-              disabled={!canSubmit || isValidating}
-              className="bg-[#0247ae] hover:bg-[#023a8a] active:bg-[#022d6e] px-6 h-9 text-sm font-semibold shadow-lg shadow-[#0247ae]/25 hover:shadow-xl hover:shadow-[#0247ae]/30 transition-all duration-200 disabled:opacity-50 disabled:shadow-none"
-            >
-              {isValidating ? (
-                <>
-                  <Loader2 size={16} className="animate-spin mr-2" />
-                  Validating...
-                </>
-              ) : (
-                "Continue"
-              )}
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </>
-  );
+  return null;
 }

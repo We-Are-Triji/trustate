@@ -53,6 +53,29 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
     if (canSubmit) onComplete(data);
   };
 
+  const handleDevBypass = () => {
+    const timestamp = Date.now();
+    const fakeBlob = new Blob(['fake-doc'], { type: 'image/png' });
+    
+    const fakeData: FirmLegitimacyData = {
+      firmType: "Sole Proprietorship",
+      registrationNumber: `REG-${timestamp}`,
+      registrationDocument: new File([fakeBlob], `reg-${timestamp}.png`, { type: 'image/png' }),
+      businessPermit: new File([fakeBlob], `permit-${timestamp}.png`, { type: 'image/png' }),
+      birForm2303: new File([fakeBlob], `bir-${timestamp}.png`, { type: 'image/png' }),
+      dhsudNumber: `DHSUD-${timestamp}`,
+      dhsudRegistration: new File([fakeBlob], `dhsud-${timestamp}.png`, { type: 'image/png' }),
+      corporateBondImage: new File([fakeBlob], `bond-${timestamp}.png`, { type: 'image/png' }),
+    };
+    
+    setData(fakeData);
+    setSelectedType("Sole Proprietorship");
+    
+    setTimeout(() => {
+      onComplete(fakeData);
+    }, 100);
+  };
+
   const inputClass = "h-11 w-full rounded-lg border-2 border-gray-200 bg-white px-4 text-gray-700 placeholder:text-gray-400 transition-all duration-200 focus:outline-none focus:border-[#0247ae] focus:ring-2 focus:ring-[#0247ae]/10";
 
   const renderUpload = (label: string, file: File | null, field: keyof FirmLegitimacyData) => (
@@ -251,10 +274,10 @@ export function FirmLegitimacyContent({ onComplete, onBack, onDevBypass }: FirmL
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={onDevBypass}
+                    onClick={handleDevBypass}
                     className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 h-9"
                   >
-                    [DEV] Skip
+                    [DEV] Fill & Skip
                   </Button>
                 )}
                 <Button

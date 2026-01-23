@@ -37,6 +37,17 @@ export function FaceVerificationContent({ onComplete, onBack, onDevBypass }: Fac
     };
   }, [stopAllStreams]);
 
+  const handleDevBypass = () => {
+    const timestamp = Date.now();
+    const fakeBlob = new Blob(['fake-face-image'], { type: 'image/png' });
+    const fakeFace = new File([fakeBlob], `face-${timestamp}.png`, { type: 'image/png' });
+    setFaceImage(fakeFace);
+    
+    setTimeout(() => {
+      onComplete(fakeFace);
+    }, 100);
+  };
+
   const handleCapture = (file: File) => {
     stopAllStreams();
     setFaceImage(file);
@@ -176,10 +187,10 @@ export function FaceVerificationContent({ onComplete, onBack, onDevBypass }: Fac
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={onDevBypass}
+                onClick={handleDevBypass}
                 className="border-dashed border-orange-400 text-orange-600 hover:bg-orange-50 h-9"
               >
-                [DEV] Skip
+                [DEV] Fill & Skip
               </Button>
             )}
             <Button
