@@ -48,8 +48,9 @@ export async function POST(req: NextRequest) {
 
     if (!accessKeyId || !secretAccessKey) {
       console.error("Missing AWS Credentials", { hasAccessKey: !!accessKeyId, hasSecretKey: !!secretAccessKey });
+      const availableKeys = Object.keys(process.env).filter(key => key.startsWith("APP_") || key.startsWith("AWS_") || key.startsWith("NEXT_"));
       return NextResponse.json(
-        { error: `Server Configuration Error: Missing ${!accessKeyId ? "Access Key" : ""} ${!secretAccessKey ? "Secret Key" : ""}. Please check APP_AWS_... environment variables.` },
+        { error: `Server Configuration Error: Missing ${!accessKeyId ? "Access Key" : ""} ${!secretAccessKey ? "Secret Key" : ""}. Available Keys: ${availableKeys.join(", ")}` },
         { status: 500 }
       );
     }
