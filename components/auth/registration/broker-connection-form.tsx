@@ -312,78 +312,41 @@ export function BrokerConnectionForm({ onSubmit, onBack }: BrokerConnectionFormP
                 </CardContent>
             </>
         );
-        // Success Step
-        if (step === "success" && brokerInfo) {
-            return (
-                <>
-                    <CardHeader className="pb-1 pt-5 animate-[fadeInUp_0.5s_ease-out]">
-                        <div className="text-center">
-                            <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
-                                Request Sent!
-                            </CardTitle>
-                            <p className="text-gray-500 text-sm">Waiting for broker approval</p>
+    }
+
+    // Success Step
+    if (step === "success" && brokerInfo) {
+        return (
+            <>
+                <CardHeader className="pb-1 pt-5 animate-[fadeInUp_0.5s_ease-out]">
+                    <div className="text-center">
+                        <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
+                            Request Sent!
+                        </CardTitle>
+                        <p className="text-gray-500 text-sm">Waiting for broker approval</p>
+                    </div>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col items-center justify-center px-6 pb-4">
+                    <div className="bg-white rounded-xl p-6 max-w-md w-full text-center space-y-4">
+                        <div className="mx-auto h-20 w-20 rounded-full bg-emerald-100 flex items-center justify-center animate-[bounce_0.5s_ease-out]">
+                            <Award size={40} className="text-emerald-600" />
                         </div>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col items-center justify-center px-6 pb-4">
-                        <div className="bg-white rounded-xl p-6 max-w-md w-full text-center space-y-4">
-                            <div className="mx-auto h-20 w-20 rounded-full bg-emerald-100 flex items-center justify-center animate-[bounce_0.5s_ease-out]">
-                                <Award size={40} className="text-emerald-600" />
-                                // Success Step
-                                if (step === "success" && brokerInfo) {
-        return (
-                                <>
-                                    <CardHeader className="pb-1 pt-5 animate-[fadeInUp_0.5s_ease-out]">
-                                        <div className="text-center">
-                                            <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
-                                                Request Sent!
-                                            </CardTitle>
-                                            <p className="text-gray-500 text-sm">Waiting for broker approval</p>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-6 pb-4">
-                                        <div className="bg-white rounded-xl p-6 max-w-md w-full text-center space-y-4">
-                                            <div className="mx-auto h-20 w-20 rounded-full bg-emerald-100 flex items-center justify-center animate-[bounce_0.5s_ease-out]">
-                                                <Award size={40} className="text-emerald-600" />
-                                            </div>
 
-                                            <div className="space-y-1">
-                                                <p className="font-semibold text-gray-900">Successfully Connected to</p>
+                        <div className="space-y-1">
+                            <p className="font-semibold text-gray-900">Successfully Connected to</p>
+                            <p className="text-lg text-[#0247ae] font-bold">
+                                {brokerInfo.firstName} {brokerInfo.lastName}
+                            </p>
+                        </div>
+
+                        <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                            Redirecting to dashboard...
+                        </div>
+                    </div>
+                </CardContent>
+            </>
+        );
     }
 
-                                                // Success Step
-                                                if (step === "success" && brokerInfo) {
-        return (
-                                                <>
-                                                    <CardHeader className="pb-1 pt-5 animate-[fadeInUp_0.5s_ease-out]">
-                                                        <div className="text-center">
-                                                            <CardTitle className="text-2xl font-bold text-[#0247ae] font-[family-name:var(--font-arsenal-sc)]">
-                                                                Request Sent!
-                                                            </CardTitle>
-                                                            <p className="text-gray-500 text-sm">Waiting for broker approval</p>
-                                                        </div>
-                                                    </CardHeader>
-                                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-6 pb-4">
-                                                        <div className="bg-white rounded-xl p-6 max-w-md w-full text-center space-y-4">
-                                                            <div className="mx-auto h-20 w-20 rounded-full bg-emerald-100 flex items-center justify-center animate-[bounce_0.5s_ease-out]">
-                                                                <Award size={40} className="text-emerald-600" />
-                                                            </div>
-
-                                                            <div className="space-y-1">
-                                                                <p className="font-semibold text-gray-900">Successfully Connected to</p>
-                                                                <p className="text-lg text-[#0247ae] font-bold">
-                                                                    {brokerInfo.firstName} {brokerInfo.lastName}
-                                                                </p>
-                                                            </div>
-
-                                                            <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
-                                                                Redirecting to dashboard...
-                                                            </div>
-                                                        </div>
-                                                    </CardContent>
-                                                </>
-                                                );
-    }
-
-                                                return null;
+    return null;
 }
-                                                ```
