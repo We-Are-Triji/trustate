@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const { data: nexusData, error: nexusError } = await supabase
       .from("broker_nexus")
       .select("broker_id, totp_secret")
-      .eq("nexus_code", nexusCode.toUpperCase())
+      .eq("nexus_code", nexusCode)
       .single();
 
     if (nexusError || !nexusData) {
