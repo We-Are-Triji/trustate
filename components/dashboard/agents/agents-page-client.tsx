@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { generateTOTPCode, getTOTPTimeRemaining } from "@/lib/totp";
 import { getCurrentUser } from "@/lib/cognito";
 import { cn } from "@/lib/utils";
+import { AgentDetailsModal } from "@/components/dashboard/agents/agent-details-modal";
 
 export default function AgentsPageClient() {
     const { isLoading } = useAuth();
@@ -19,6 +20,10 @@ export default function AgentsPageClient() {
     const [copied, setCopied] = useState(false);
     const [requests, setRequests] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<"agents" | "settings">("agents");
+
+    // Modal State
+    const [selectedAgent, setSelectedAgent] = useState<any>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         initUser();
@@ -145,6 +150,13 @@ export default function AgentsPageClient() {
 
     const activeAgents = useMemo(() => requests.filter(r => r.status === "accepted"), [requests]);
     const pendingRequests = useMemo(() => requests.filter(r => r.status === "pending"), [requests]);
+
+    const handleAgentClick = (agentReq: any) => {
+        if (agentReq.status === "accepted") {
+            setSelectedAgent(agentReq.agent);
+            setIsModalOpen(true);
+        }
+    };
 
     if (isLoading || loading) {
         return (
@@ -287,12 +299,16 @@ export default function AgentsPageClient() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {activeAgents.map((req) => (
-                                    <div key={req.id} className="flex items-center p-4 bg-white rounded-xl border hover:border-[#0247ae]/30 transition-colors shadow-sm">
-                                        <div className="h-12 w-12 rounded-full bg-[#0247ae]/5 text-[#0247ae] flex items-center justify-center font-bold text-lg mr-4">
+                                    <div
+                                        key={req.id}
+                                        onClick={() => handleAgentClick(req)}
+                                        className="flex items-center p-4 bg-white rounded-xl border hover:border-[#0247ae] hover:shadow-md transition-all cursor-pointer group"
+                                    >
+                                        <div className="h-12 w-12 rounded-full bg-[#0247ae]/5 text-[#0247ae] flex items-center justify-center font-bold text-lg mr-4 group-hover:bg-[#0247ae]/10 transition-colors">
                                             {req.agent?.firstName?.[0] || "?"}
                                         </div>
                                         <div>
-                                            <p className="font-semibold text-gray-900">
+                                            <p className="font-semibold text-gray-900 group-hover:text-[#0247ae] transition-colors">
                                                 {req.agent?.firstName} {req.agent?.lastName}
                                             </p>
                                             <p className="text-sm text-gray-500">{req.agent?.email || "No email available"}</p>
@@ -372,6 +388,12 @@ export default function AgentsPageClient() {
                     </div>
                 </div>
             )}
+
+            <AgentDetailsModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                agent={selectedAgent}
+            />
         </div>
     );
 }

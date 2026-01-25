@@ -72,12 +72,31 @@ export async function GET(req: NextRequest) {
                             agent: {
                                 firstName: attributes["custom:firstName"] || "",
                                 lastName: attributes["custom:lastName"] || "",
-                                email: attributes.email || ""
+                                email: attributes.email || "",
+                                phoneNumber: attributes.phone_number || "",
+                                licenseNumber: attributes["custom:licenseNumber"] || "",
+                                brokerage: attributes["custom:brokerage"] || "",
+                                bio: attributes["custom:bio"] || "",
+                                location: attributes["custom:location"] || "",
+                                status: attributes["custom:status"] || ""
                             }
                         };
                     } catch (err) {
                         console.error(`Failed to fetch agent ${req.agent_id}`, err);
-                        return { ...req, agent: { firstName: "Unknown", lastName: "Agent", email: "N/A" } };
+                        return {
+                            ...req,
+                            agent: {
+                                firstName: "Unknown",
+                                lastName: "Agent",
+                                email: "N/A",
+                                phoneNumber: "",
+                                licenseNumber: "",
+                                brokerage: "",
+                                bio: "",
+                                location: "",
+                                status: "unknown"
+                            }
+                        };
                     }
                 }));
 
