@@ -7,7 +7,9 @@ import { TransactionLayout, TransactionMenu } from "@/components/transaction/tra
 import { TransactionLifecycle } from "@/components/transaction/transaction-lifecycle";
 import { OverviewTab } from "@/components/transaction/overview-tab";
 import { ConversationTab } from "@/components/transaction/conversation-tab";
-// import { ToolsPanel } from "@/components/transaction/tools-panel"; // Removed
+import { DocumentVault } from "@/components/transaction/document-vault";
+import { EscrowForm } from "@/components/transaction/escrow-form";
+import { SmartAssistant } from "@/components/transaction/smart-assistant";
 import type { Transaction } from "@/lib/types/transaction";
 
 export default function TransactionPage() {
@@ -40,11 +42,11 @@ export default function TransactionPage() {
       case "messages":
         return <ConversationTab transactionId={transactionId} />;
       case "documents":
-        return <div className="p-8 text-center text-gray-500">Document Vault - Drop files here</div>;
+        return <DocumentVault transactionId={transactionId} />;
       case "escrow":
-        return <div className="p-8 text-center text-gray-500">Escrow & Payments Form</div>;
+        return <EscrowForm transactionId={transactionId} />;
       case "assistant":
-        return <div className="p-8 text-center text-gray-500">Smart Assistant Analysis</div>;
+        return <SmartAssistant transactionId={transactionId} />;
       default:
         return <OverviewTab transaction={null} />;
     }
