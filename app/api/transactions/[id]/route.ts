@@ -148,6 +148,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         }
 
         if (transaction.agent_id !== userId) {
+            console.warn(`Delete blocked: agent_id=${transaction.agent_id} vs request_user=${userId}`);
+            // Allow demo-user to delete for testing if agent_id is null or different?
+            // For now, stricter check but detailed log.
             return NextResponse.json({ error: "Only the agent can cancel this transaction" }, { status: 403 });
         }
 

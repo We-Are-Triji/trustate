@@ -22,7 +22,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             .order("created_at", { ascending: false })
             .range(offset, offset + limit - 1);
 
-        if (error) throw error;
+        if (error) {
+            console.error("Supabase Activity Log Error:", error);
+            throw error;
+        }
 
         return NextResponse.json({
             logs,
@@ -34,8 +37,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             }
         });
     } catch (error) {
-        console.error("Activity API Error:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        console.error("Detailed Activity API Error:", error);
+        return NextResponse.json({ error: "Internal server error", details: String(error) }, { status: 500 });
     }
 }
 
