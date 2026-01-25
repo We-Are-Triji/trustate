@@ -3,108 +3,111 @@
 ## Project Overview
 Trustate is a real estate transaction management platform designed to streamline the deal process for Agents, Brokers, and Buyers. It features a "Transaction Workbench" for managing individual deals through a structured lifecycle.
 
-**Tech Stack:** Next.js (App Router), TypeScript, Tailwind CSS, Lucide React, Shadcn UI (Custom Implementation).
+**Tech Stack:** Next.js (App Router), TypeScript, Tailwind CSS, Lucide React, Shadcn UI, AWS (Lambda, S3, API Gateway), Supabase (PostgreSQL).
 
 ---
 
-## 🚀 Current Progress (As of Jan 25, 2026 - 8:42 PM)
+## 🚀 Current Progress (As of Jan 25, 2026 - 9:02 PM)
 
-### 1. **Transactions Module (`/dashboard/transactions`)**
+### 1. **Backend Infrastructure** ✅ COMPLETE
+   - **Supabase Database:**
+     - Tables: `transactions`, `transaction_documents`, `transaction_logs`, `transaction_participants`
+     - Extended schema with: `project_name`, `transaction_type`, `unit_address`, `client_name`, `reservation_number`, `lifecycle_step`
+     - Row Level Security (RLS) enabled
+   - **API Routes:**
+     - `GET/POST /api/transactions` - List and create transactions
+     - `GET/PATCH/DELETE /api/transactions/[id]` - Single transaction CRUD
+     - `GET/POST /api/transactions/[id]/messages` - Transaction chat
+     - `GET/POST /api/transactions/[id]/documents` - Document management with S3 presigned URLs
+     - `GET/PATCH/DELETE /api/transactions/[id]/documents/[docId]` - Single document operations
+   - **AWS Integration:**
+     - S3 document storage with presigned URL uploads (cost optimization)
+     - Lambda AI Assistant (Groq/Llama 3.1)
+     - API Gateway for Lambda invocation
+
+### 2. **Transactions Module (`/dashboard/transactions`)**
    - **Transaction List:**
-     - Displays list of active transactions.
-     - **Empty State:** Centered, aesthetic empty state when no transactions exist.
-     - **Creation Flow:** Implemented via a **`CreateTransactionModal`** - opens directly on dashboard.
-     - **Persistence:** Uses `localStorage` ("mock_transactions") to demonstrate data persistence.
-     - **Inputs:** Money inputs are formatted with commas (e.g., "5,000,000").
-   - **Data Model:**
-     - `Transaction` type defined with status, agent_id, property details, and secure 8-char IDs.
+     - Fetches from API with localStorage fallback
+     - Filter by status (All, Pending, Completed)
+     - Search by property address or access code
+   - **Creation Flow:**
+     - Modal-based creation on dashboard
+     - Syncs with API and localStorage
 
-### 2. **Transaction Workbench (`/transaction/[id]`)** ✅ COMPLETE
-   - **Layout:**
-     - **3-Column IDE Style:**
-       - **Col A (Left 250px):** Navigation (Overview, Messages, Docs, Escrow, AI).
-       - **Col B (Center Fluid):** Workspace for the active tab.
-       - **Col C (Right 300px):** Deal Lifecycle Stepper.
-     - **No Scroll:** Full-screen layout (`h-screen`) with independent scrolling for content.
-   - **Navigation & State:**
-     - **Tab Locking:** "Escrow & Payments" tab is visually locked (greyed out) until Step 4.
-     - **Overview Tab:** Shows status badges, property details, and a progress summary.
-   - **Deal Lifecycle (Stepper):**
-     - **Steps:** 1. Reservation, 2. KYC, 3. Docs, 4. Escrow, 5. Handoff, 6. Commission.
-     - **Visuals:** Green Check (Done), Blue Pulse (Active), Padlock (Locked).
-     - **Logic:** Progress simulated via a Dev "Complete Step" button.
+### 3. **Transaction Workbench (`/transaction/[id]`)** ✅ COMPLETE
+   - **3-Column Layout:**
+     - Left: Navigation menu (Overview, Messages, Docs, Escrow, AI)
+     - Center: Active tab content
+     - Right: Deal Lifecycle Stepper (6 steps)
+   - **Data Flow:**
+     - Fetches transaction from API with localStorage fallback
+     - Updates lifecycle step via PATCH API
 
-### 3. **Workbench Tabs** ✅ PHASE 2 COMPLETE
-   - **Message Center (`ConversationTab`):**
-     - Real-time chat interface between Agent/Buyer/Broker.
-     - Mock message display with timestamps and user avatars.
-   - **Document Vault (`DocumentVault`):**
-     - **Drag-and-drop file upload** with visual feedback.
-     - **Split-view:** File list (left) + Document preview (right).
-     - Status badges: Pending Review, Verified, Rejected.
-     - Supports PDF, JPG, PNG, DOC, DOCX.
-   - **Escrow & Payments (`EscrowForm`):**
-     - **Payment milestones** tracker with progress bar.
-     - Summary cards: Total Contract, Amount Paid, Remaining.
-     - Visual status for each milestone (Paid, Pending, Overdue).
-     - Escrow protection notice.
-   - **Smart Assistant (`SmartAssistant`):**
-     - **AI chat interface** with typing indicator.
-     - Quick action buttons: Analyze Documents, Calculate Fees, Transaction Status.
-     - Message history with timestamps.
-     - Responsive input with send button.
+### 4. **Workbench Tabs** ✅ COMPLETE
+   - **Overview Tab:** Status, property details, progress summary
+   - **Message Center:** Chat interface (stores in `transaction_logs`)
+   - **Document Vault:** Drag-drop upload with S3 presigned URLs
+   - **Escrow & Payments:** Payment milestones tracker
+   - **Smart Assistant:** Connected to Lambda API with transaction context
 
-### 4. **Dashboard & Agent Management**
-   - **Agents List:** UI for managing agents (legacy/existing functionality).
-   - **Sidebar:** Standard application sidebar navigation.
-
-### 5. **UI/UX System**
-   - **Global Cursor:** Pointer cursor enforced on all interactive elements.
-   - **Theme:** Clean, professional aesthetic using `#0247ae` (Trustate Blue) as the primary color.
-   - **Components:** Custom implementations of `Card`, `Button`, `Input`, `Select`, `Dialog`, `Badge`.
+### 5. **AI Assistant**
+   - **Dashboard FAB:** Uses Lambda → Groq (llama-3.1-8b-instant)
+   - **Workbench Smart Assistant:** Connected to same Lambda with transaction context
 
 ---
 
 ## 📋 To Be Implemented (Roadmap)
 
-### Phase 3: Backend Integration
-- [ ] **API Routes:** Replace `localStorage` with real Next.js API routes (`/api/transactions`).
-- [ ] **Database:** Connect to Supabase/Postgres.
-- [ ] **Auth:** Finalize AWS Cognito/Supabase auth integration for Agent/Broker roles.
-- [ ] **File Upload:** Implement actual file storage (S3/Supabase Storage).
+### Phase 6: Production Readiness
+- [ ] **S3 Bucket Creation:** Deploy Terraform for document storage bucket
+- [ ] **Environment Variables:** Add AWS S3 credentials to .env
+- [ ] **Apply Supabase Migration:** Run new migration on Supabase
 
-### Phase 4: Compliance & Security
-- [ ] **KYC Integration:** Liveness check implementation.
-- [ ] **Audit Logging:** Track every step completion in the Activity Log.
-- [ ] **Access Code Verification:** Re-implement transaction access code flow.
+### Phase 7: Compliance & Security
+- [ ] **KYC Integration:** Liveness check implementation
+- [ ] **Audit Logging:** Enhanced activity tracking
+- [ ] **Access Code Verification:** Client join flow
 
-### Phase 5: Polish & Production
-- [ ] **Responsive Design:** Mobile drawer for Column A & C.
-- [ ] **PDF Viewer:** Integrate PDF.js for document preview.
-- [ ] **AI Integration:** Connect Smart Assistant to actual LLM API.
-- [ ] **Notifications:** Toast notifications for actions.
-- [ ] **Testing:** E2E tests with Playwright.
+### Phase 8: Polish & Testing
+- [ ] **Responsive Design:** Mobile drawer for Column A & C
+- [ ] **PDF Viewer:** Integrate PDF.js for document preview
+- [ ] **Real-time Updates:** WebSocket for messages
+- [ ] **E2E Tests:** Playwright testing suite
 
 ---
 
 ## 🛠 Recent Changes (This Session)
-1. **Fixed:** `CreateTransactionModal` now properly integrated in `TransactionList`.
-2. **Created:** `DocumentVault` component with drag-drop upload and split-view.
-3. **Created:** `EscrowForm` component with payment milestones and progress tracking.
-4. **Created:** `SmartAssistant` component with AI chat interface.
-5. **Integrated:** All new components into `/transaction/[id]` workbench page.
-6. **Updated:** This `CONTEXT.md` file with current progress.
+1. **Migration:** Extended transactions table with new fields
+2. **API Routes:** Full CRUD for transactions, messages, documents
+3. **S3 Integration:** Presigned URL uploads for documents
+4. **Smart Assistant:** Connected to Lambda API with transaction context
+5. **Frontend Updates:** API integration with localStorage fallback
 
 ---
 
 ## 📁 Key Files
 | File | Purpose |
 |------|---------|
-| `components/transaction/transaction-layout.tsx` | 3-column workbench layout + navigation menu |
-| `components/transaction/transaction-lifecycle.tsx` | Deal lifecycle stepper (6 steps) |
-| `components/transaction/transaction-list.tsx` | Dashboard transaction list with modal |
-| `components/transaction/create-transaction-modal.tsx` | Transaction creation form modal |
-| `components/transaction/document-vault.tsx` | File upload with drag-drop |
-| `components/transaction/escrow-form.tsx` | Payment milestones tracker |
-| `components/transaction/smart-assistant.tsx` | AI chat interface |
-| `app/transaction/[id]/page.tsx` | Transaction workbench page |
+| `supabase/migrations/20260125_extend_transactions.sql` | New field migration |
+| `app/api/transactions/route.ts` | Transaction list/create API |
+| `app/api/transactions/[id]/route.ts` | Single transaction API |
+| `app/api/transactions/[id]/messages/route.ts` | Chat messages API |
+| `app/api/transactions/[id]/documents/route.ts` | Document upload API |
+| `components/transaction/smart-assistant.tsx` | AI chat with Lambda |
+
+---
+
+## 🔧 Environment Variables Required
+```env
+# Existing
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_ASSISTANT_API_URL=
+
+# New (for S3 documents)
+AWS_REGION=ap-southeast-1
+APP_AWS_ACCESS_KEY_ID=
+APP_AWS_SECRET_ACCESS_KEY=
+AWS_S3_DOCUMENTS_BUCKET=trustate-documents
+```

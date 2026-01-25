@@ -19,15 +19,36 @@ export default function TransactionList() {
     const [statusFilter, setStatusFilter] = useState<TransactionStatus | "all">("all");
 
     const fetchTransactions = async () => {
+        setIsLoading(true);
         try {
+            // Try API first
+            const response = await fetch("/api/transactions", {
+                headers: {
+                    "x-user-id": userId || "demo-user",
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setTransactions(data.transactions || []);
+            } else {
+                // Fallback to localStorage
+                const stored = localStorage.getItem("mock_transactions");
+                if (stored) {
+                    setTransactions(JSON.parse(stored));
+                } else {
+                    setTransactions([]);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch transactions from API:", error);
+            // Fallback to localStorage
             const stored = localStorage.getItem("mock_transactions");
             if (stored) {
                 setTransactions(JSON.parse(stored));
             } else {
                 setTransactions([]);
             }
-        } catch (error) {
-            console.error("Failed to fetch transactions", error);
         } finally {
             setIsLoading(false);
         }

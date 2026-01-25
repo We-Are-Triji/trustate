@@ -43,26 +43,70 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
         e.preventDefault();
         setLoading(true);
 
-        const newTransaction: Transaction = {
-            id: nanoid(8),
-            status: "documents_pending",
-            agent_id: userId || "agent-1",
-            property_address: `${projectName} - ${address}`,
-            property_type: (propType as any) || "condo",
-            transaction_value: parseInt(price.replace(/,/g, "")) || 0,
-            access_code: nanoid(6).toUpperCase(),
-            access_code_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+        const payload = {
+            project_name: projectName,
+            transaction_type: transType || "preselling",
+            unit_address: address,
+            property_type: propType || "condo",
+            transaction_value: parseInt(price.replace(/,/g, "")) || null,
+            client_name: clientName,
+            reservation_number: reservationNo || null,
         };
 
-        // Save to localStorage
-        const stored = localStorage.getItem("mock_transactions");
-        const transactions = stored ? JSON.parse(stored) : [];
-        localStorage.setItem("mock_transactions", JSON.stringify([newTransaction, ...transactions]));
+        try {
+            // Try API first
+            const response = await fetch("/api/transactions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-user-id": userId || "demo-user",
+                },
+                body: JSON.stringify(payload),
+            });
 
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+            if (response.ok) {
+                const data = await response.json();
+                // Also save to localStorage for offline/demo access
+                const stored = localStorage.getItem("mock_transactions");
+                const transactions = stored ? JSON.parse(stored) : [];
+                localStorage.setItem("mock_transactions", JSON.stringify([data.transaction, ...transactions]));
+            } else {
+                // Fallback to localStorage only
+                const fallbackTransaction: Transaction = {
+                    id: nanoid(8),
+                    status: "documents_pending",
+                    agent_id: userId || "agent-1",
+                    property_address: `${projectName} - ${address}`,
+                    property_type: (propType as any) || "condo",
+                    transaction_value: parseInt(price.replace(/,/g, "")) || 0,
+                    access_code: nanoid(6).toUpperCase(),
+                    access_code_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                };
+                const stored = localStorage.getItem("mock_transactions");
+                const transactions = stored ? JSON.parse(stored) : [];
+                localStorage.setItem("mock_transactions", JSON.stringify([fallbackTransaction, ...transactions]));
+            }
+        } catch (error) {
+            console.error("Failed to create transaction via API:", error);
+            // Fallback to localStorage
+            const fallbackTransaction: Transaction = {
+                id: nanoid(8),
+                status: "documents_pending",
+                agent_id: userId || "agent-1",
+                property_address: `${projectName} - ${address}`,
+                property_type: (propType as any) || "condo",
+                transaction_value: parseInt(price.replace(/,/g, "")) || 0,
+                access_code: nanoid(6).toUpperCase(),
+                access_code_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            };
+            const stored = localStorage.getItem("mock_transactions");
+            const transactions = stored ? JSON.parse(stored) : [];
+            localStorage.setItem("mock_transactions", JSON.stringify([fallbackTransaction, ...transactions]));
+        }
 
         setLoading(false);
         setOpen(false);
