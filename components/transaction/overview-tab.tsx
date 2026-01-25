@@ -1,14 +1,20 @@
 "use client";
 
-import { MapPin, DollarSign, Calendar, Users } from "lucide-react";
+import { MapPin, DollarSign, Calendar, Users, Home, Briefcase, Building2, Hash } from "lucide-react";
 import type { Transaction } from "@/lib/types/transaction";
 import { ClientInviteSection } from "./client-invite-section";
 
-interface ExtendedTransaction extends Transaction {
+// Use Omit to avoid conflicts if we are redefining types for this specific view (or mock extensions)
+interface ExtendedTransaction extends Omit<Transaction, "property_type" | "transaction_type"> {
   client_status?: "none" | "pending" | "approved" | "rejected";
   client_invite_code?: string;
   client_invite_expires_at?: string;
   client_name?: string;
+  // Redefine as string (or optional string) for UI purposes if the base type is stricter
+  transaction_type?: string;
+  property_type?: string;
+  developer_name?: string;
+  reservation_number?: string;
 }
 
 interface OverviewTabProps {

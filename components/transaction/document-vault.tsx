@@ -50,6 +50,22 @@ export function DocumentVault({ transactionId }: DocumentVaultProps) {
         }
     };
 
+    const logDocumentView = async (docName: string) => {
+        try {
+            await fetch(`/api/transactions/${transactionId}/activity`, {
+                method: "POST",
+                body: JSON.stringify({
+                    action_type: "view",
+                    description: `Viewed document: ${docName}`,
+                    actor_id: "demo-user", // TODO: Auth
+                    actor_type: "agent"
+                }),
+            });
+        } catch (e) {
+            console.error("Failed to log view", e);
+        }
+    };
+
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         setIsDragging(true);
@@ -236,7 +252,10 @@ export function DocumentVault({ transactionId }: DocumentVaultProps) {
                                 return (
                                     <div
                                         key={doc.id}
-                                        onClick={() => setSelectedDoc(doc)}
+                                        onClick={() => {
+                                            setSelectedDoc(doc);
+                                            logDocumentView(doc.file_name);
+                                        }}
                                         className={`p-4 rounded-xl border transition-all cursor-pointer group ${selectedDoc?.id === doc.id
                                             ? "border-[#0247ae] bg-blue-50/50"
                                             : "border-gray-200 hover:border-gray-300 bg-white"
