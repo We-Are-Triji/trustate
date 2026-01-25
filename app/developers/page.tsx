@@ -48,7 +48,7 @@ export default function DevelopersPage() {
       <LandingHeader />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-24 pb-12">
+      <section className="relative overflow-hidden pt-20 md:pt-24 pb-8 md:pb-12">
         {/* Gradient Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0247ae]/5 via-transparent to-[#ffce08]/5" />
         
@@ -58,18 +58,18 @@ export default function DevelopersPage() {
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur-sm px-6 py-3 border-2 border-[#0247ae]/10 shadow-lg">
-              <span className="text-sm font-extrabold text-[#0247ae] tracking-wide uppercase">
+            <div className="mb-4 md:mb-6 inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur-sm px-4 md:px-6 py-2 md:py-3 border-2 border-[#0247ae]/10 shadow-lg">
+              <span className="text-xs md:text-sm font-extrabold text-[#0247ae] tracking-wide uppercase">
                 Trusted Partners
               </span>
             </div>
-            <h1 className="mb-6 text-5xl font-[family-name:var(--font-arsenal-sc)] font-bold text-gray-900 sm:text-6xl lg:text-7xl leading-tight">
+            <h1 className="mb-4 md:mb-6 text-3xl md:text-5xl lg:text-7xl font-[family-name:var(--font-arsenal-sc)] font-bold text-gray-900 leading-tight">
               Our Developer
               <span className="block bg-gradient-to-r from-[#0247ae] to-[#0560d4] bg-clip-text text-transparent">
                 Partners
               </span>
             </h1>
-            <p className="mx-auto max-w-3xl text-lg text-gray-600 leading-relaxed">
+            <p className="mx-auto max-w-3xl text-sm md:text-lg text-gray-600 leading-relaxed px-4">
               Discover the Philippines&apos; most trusted real estate developers committed to delivering quality properties and exceptional service.
             </p>
           </div>
