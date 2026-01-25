@@ -49,6 +49,14 @@ export async function GET(req: NextRequest) {
                 const secretAccessKey = process.env.APP_AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
                 const region = process.env.APP_AWS_REGION || process.env.AWS_REGION || "ap-southeast-1";
 
+                if (!accessKeyId || !secretAccessKey) {
+                    console.warn("Missing AWS Admin Credentials in env. Cannot fetch agent details.");
+                    return NextResponse.json({
+                        requests,
+                        warning: "Agent details incomplete (Missing Server Credentials)"
+                    });
+                }
+
                 const cognito = new AWS.CognitoIdentityServiceProvider({
                     region,
                     credentials: new AWS.Credentials(accessKeyId, secretAccessKey),
