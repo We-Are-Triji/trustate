@@ -22,6 +22,14 @@ const arsenalSC = Arsenal_SC({
 export const metadata: Metadata = {
   title: "TruState - Login",
   description: "TruState - The Transaction Integrity Layer",
+  icons: {
+    icon: [
+      { url: "/trustate-logo.png" },
+      { url: "/trustate-logo.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/trustate-logo.png",
+    apple: "/trustate-logo.png",
+  },
 };
 
 export default function RootLayout({
