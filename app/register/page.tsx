@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { RegistrationContainer } from "@/components/auth/registration/registration-container";
 import { RegistrationStepper } from "@/components/auth/registration/registration-stepper";
 import { BasicInfoForm } from "@/components/auth/registration/basic-info-form";
@@ -242,6 +243,24 @@ export default function RegisterPage() {
   return (
     <main className="flex min-h-screen bg-[#0247ae]">
       <AnimatedBackground />
+      
+      {/* Back Button - Top Left */}
+      <Link 
+        href="/"
+        className="absolute left-8 top-8 z-20 inline-flex items-center gap-2 px-3 py-2 transition-all duration-300 group"
+      >
+        <svg 
+          className="h-5 w-5 text-white/60 group-hover:text-white group-hover:-translate-x-0.5 transition-all duration-300" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+          strokeWidth={2.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        <span className="text-sm font-semibold text-white/60 group-hover:text-white transition-colors duration-300">Back</span>
+      </Link>
+      
       <div className="relative z-10 flex w-full items-center justify-center p-6 py-12">
         <div className="w-full max-w-5xl animate-[fadeInScale_0.6s_ease-out_0.2s_both]">
           <RegistrationStepper steps={getSteps()} />
