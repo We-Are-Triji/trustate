@@ -109,11 +109,11 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="max-w-5xl w-full p-8">
-                <DialogHeader className="mb-6">
-                    <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-2xl bg-[#0247ae]/10 flex items-center justify-center text-[#0247ae]">
-                            <Building2 size={24} />
+            <DialogContent className="max-w-6xl w-full p-8 md:p-10 overflow-hidden">
+                <DialogHeader className="mb-8">
+                    <div className="flex items-center gap-5">
+                        <div className="h-14 w-14 rounded-2xl bg-[#0247ae]/10 flex items-center justify-center text-[#0247ae] shadow-sm">
+                            <Building2 size={28} />
                         </div>
                         <div>
                             <DialogTitle className="text-2xl font-bold text-gray-900">Create New Transaction</DialogTitle>
@@ -125,15 +125,17 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                 </DialogHeader>
 
                 <form onSubmit={onSubmit} className="space-y-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
                         {/* Left Column: Project Context */}
                         <div className="space-y-6">
-                            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">
-                                Project Information
-                            </h3>
+                            <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                    Project Information
+                                </h3>
+                            </div>
 
-                            <div className="space-y-4">
-                                <div className="space-y-2">
+                            <div className="space-y-5">
+                                <div className="space-y-2.5">
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                         <HardHat size={16} className="text-[#0247ae]" />
                                         Developer <span className="text-red-500">*</span>
@@ -144,7 +146,7 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                                     />
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="space-y-2.5">
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                         <Building2 size={16} className="text-[#0247ae]" />
                                         Project Name <span className="text-red-500">*</span>
@@ -154,17 +156,17 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                                         placeholder="e.g. Mandani Bay"
                                         value={projectName}
                                         onChange={(e) => setProjectName(e.target.value)}
-                                        className="h-11"
+                                        className="h-11 shadow-sm focus-visible:ring-[#0247ae]"
                                     />
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="space-y-2.5">
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                         <Tag size={16} className="text-[#0247ae]" />
                                         Transaction Type
                                     </label>
                                     <Select value={transType} onValueChange={setTransType}>
-                                        <SelectTrigger className="h-11">
+                                        <SelectTrigger className="h-11 shadow-sm focus:ring-[#0247ae]">
                                             <SelectValue placeholder="Select type" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -179,12 +181,14 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
 
                         {/* Right Column: Unit & Financials */}
                         <div className="space-y-6">
-                            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2">
-                                Property & Financials
-                            </h3>
+                            <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                    Property & Financials
+                                </h3>
+                            </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2 col-span-2">
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-2.5 col-span-2">
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                         <MapPin size={16} className="text-[#0247ae]" />
                                         Unit Address <span className="text-red-500">*</span>
@@ -194,17 +198,17 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                                         placeholder="e.g. Tower 2, Unit 15-B"
                                         value={address}
                                         onChange={(e) => setAddress(e.target.value)}
-                                        className="h-11"
+                                        className="h-11 shadow-sm focus-visible:ring-[#0247ae]"
                                     />
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="space-y-2.5">
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                         <Home size={16} className="text-[#0247ae]" />
                                         Property Type
                                     </label>
                                     <Select value={propType} onValueChange={setPropType}>
-                                        <SelectTrigger className="h-11">
+                                        <SelectTrigger className="h-11 shadow-sm focus:ring-[#0247ae]">
                                             <SelectValue placeholder="Select type" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -216,24 +220,24 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                                     </Select>
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="space-y-2.5">
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                         <DollarSign size={16} className="text-[#0247ae]" />
                                         Total Price
                                     </label>
                                     <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₱</span>
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">₱</span>
                                         <Input
                                             type="text"
                                             placeholder="0"
-                                            className="pl-7 h-11"
+                                            className="pl-7 h-11 shadow-sm focus-visible:ring-[#0247ae]"
                                             value={price}
                                             onChange={handlePriceChange}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-2 col-span-2">
+                                <div className="space-y-2.5 col-span-2">
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                                         <FileText size={16} className="text-[#0247ae]" />
                                         Reservation Number
@@ -242,7 +246,7 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                                         placeholder="e.g. OR-12345 (Optional)"
                                         value={reservationNo}
                                         onChange={(e) => setReservationNo(e.target.value)}
-                                        className="h-11"
+                                        className="h-11 shadow-sm focus-visible:ring-[#0247ae]"
                                     />
                                 </div>
                             </div>
