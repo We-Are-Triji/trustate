@@ -41,8 +41,8 @@ export function TransactionLifecycle({ currentStep, completedSteps, clientStatus
 
                 {/* Client Status Check - Moved from Overview */}
                 <div className={`p-3 rounded-xl border flex items-center gap-3 transition-colors ${isClientJoined
-                        ? "bg-green-50 border-green-200"
-                        : "bg-white border-dashed border-gray-300"
+                    ? "bg-green-50 border-green-200"
+                    : "bg-white border-dashed border-gray-300"
                     }`}>
                     <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${isClientJoined ? "bg-green-500 text-white" : "bg-gray-100 text-gray-400"
                         }`}>
@@ -67,7 +67,9 @@ export function TransactionLifecycle({ currentStep, completedSteps, clientStatus
                     <div className="space-y-8 relative z-10">
                         {LIFECYCLE_STEPS.map((step) => {
                             const isCompleted = completedSteps.includes(step.id);
-                            const isActive = currentStep === step.id;
+                            // Only show active if client is verified
+                            const isActive = isClientJoined && currentStep === step.id;
+                            // Lock if not completed and not active (which covers no client case)
                             const isLocked = !isCompleted && !isActive;
 
                             return (

@@ -196,14 +196,7 @@ export default function TransactionPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Demo Control */}
-            <button
-              onClick={handleStepComplete}
-              disabled={currentStep >= 6}
-              className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-gray-600 transition-colors disabled:opacity-50"
-            >
-              [Dev] Complete Step {currentStep}
-            </button>
+            {/* Tools Area */}
           </div>
         </header>
 
