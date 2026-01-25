@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, Loader2, Building2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@/lib/hooks/use-debounce"; // Assuming this exists or I'll implement simple debounce
 
 // Simple debounce hook if not available
 function useDebounceValue<T>(value: T, delay: number): T {
