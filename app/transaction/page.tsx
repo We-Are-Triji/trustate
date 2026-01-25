@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Building2, MapPin, DollarSign, Loader2 } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, DollarSign, Loader2, Tag, Home, User, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,22 +50,55 @@ export default function CreateTransactionPage() {
 
                     <form onSubmit={onSubmit}>
                         <CardContent className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                    <MapPin size={16} className="text-[#0247ae]" />
-                                    Property Address
-                                </label>
-                                <Input
-                                    required
-                                    placeholder="Unit 123, Building A, Example Residences"
-                                    className="bg-gray-50 dark:bg-gray-800"
-                                />
-                            </div>
-
+                            {/* Row 1: The Context */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                         <Building2 size={16} className="text-[#0247ae]" />
+                                        Project Name
+                                    </label>
+                                    <Input
+                                        required
+                                        placeholder="e.g. Mandani Bay"
+                                        className="bg-gray-50 dark:bg-gray-800"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <Tag size={16} className="text-[#0247ae]" />
+                                        Transaction Type
+                                    </label>
+                                    <Select>
+                                        <SelectTrigger className="bg-gray-50 dark:bg-gray-800">
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="preselling">Pre-Selling</SelectItem>
+                                            <SelectItem value="resale">Resale</SelectItem>
+                                            <SelectItem value="rental">Rental</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            {/* Row 2: The Unit Details */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <MapPin size={16} className="text-[#0247ae]" />
+                                        Unit / Property Address
+                                    </label>
+                                    <Input
+                                        required
+                                        placeholder="e.g. Tower 2, Unit 15-B"
+                                        className="bg-gray-50 dark:bg-gray-800"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <Home size={16} className="text-[#0247ae]" />
                                         Property Type
                                     </label>
                                     <Select>
@@ -80,11 +113,14 @@ export default function CreateTransactionPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
+                            </div>
 
+                            {/* Row 3: The Money & People */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                         <DollarSign size={16} className="text-[#0247ae]" />
-                                        Transaction Value
+                                        Total Contract Price
                                     </label>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₱</span>
@@ -95,6 +131,30 @@ export default function CreateTransactionPage() {
                                         />
                                     </div>
                                 </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                        <User size={16} className="text-[#0247ae]" />
+                                        Client Name
+                                    </label>
+                                    <Input
+                                        required
+                                        placeholder="e.g. Juan Cruz"
+                                        className="bg-gray-50 dark:bg-gray-800"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Row 4: The Status */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                    <FileText size={16} className="text-[#0247ae]" />
+                                    Reservation Number <span className="text-gray-400 font-normal">(Optional)</span>
+                                </label>
+                                <Input
+                                    placeholder="e.g. OR-12345"
+                                    className="bg-gray-50 dark:bg-gray-800"
+                                />
                             </div>
                         </CardContent>
 
