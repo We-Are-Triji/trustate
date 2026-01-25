@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
             .from("agent_broker_requests")
             .select("*")
             .eq("broker_id", brokerId)
-            .eq("status", "pending"); // Only pending for now, or all if preferred
+        // .eq("status", "pending") // Fetch all statuses to categorize in frontend
 
         if (error) {
             console.error("Error fetching requests:", error);
