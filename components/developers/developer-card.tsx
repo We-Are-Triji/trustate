@@ -48,11 +48,11 @@ export function DeveloperCard({ developer, onClick }: DeveloperCardProps) {
 
   return (
     <div
-      className="group cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 flex flex-col"
+      className="group cursor-pointer overflow-hidden rounded-xl md:rounded-2xl border border-gray-200 bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:border-blue-300 hover:-translate-y-1 flex flex-col"
       onClick={() => onClick(developer)}
     >
       {/* Header with photo */}
-      <div className="relative h-44 overflow-hidden bg-gray-100">
+      <div className="relative h-32 md:h-44 overflow-hidden bg-gray-100">
         <img 
           src={getDeveloperPhoto(developer.id)} 
           alt={developer.name}
@@ -61,46 +61,46 @@ export function DeveloperCard({ developer, onClick }: DeveloperCardProps) {
         <div className={`absolute inset-0 bg-gradient-to-br ${config.overlay}`} />
         
         {/* Tier Badge */}
-        <div className="absolute top-3 right-3">
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${config.badge} backdrop-blur-sm font-bold text-xs uppercase tracking-wide shadow-lg`}>
-            <Star className="h-3 w-3 fill-current" />
+        <div className="absolute top-2 md:top-3 right-2 md:right-3">
+          <div className={`flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-full ${config.badge} backdrop-blur-sm font-bold text-[10px] md:text-xs uppercase tracking-wide shadow-lg`}>
+            <Star className="h-2.5 md:h-3 w-2.5 md:w-3 fill-current" />
             {developer.partnerTier}
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-5 flex flex-col flex-1">
+      <div className="p-3 md:p-5 flex flex-col flex-1">
         {/* Company Name */}
-        <h3 className="mb-2 text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+        <h3 className="mb-1.5 md:mb-2 text-base md:text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
           {developer.name}
         </h3>
 
         {/* Location */}
-        <div className="flex items-center gap-2 mb-3 text-gray-600">
-          <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
-          <span className="text-xs font-medium">{developer.city}</span>
+        <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3 text-gray-600">
+          <MapPin className="h-3 md:h-3.5 w-3 md:w-3.5 flex-shrink-0" />
+          <span className="text-[10px] md:text-xs font-medium">{developer.city}</span>
         </div>
 
         {/* Description */}
-        <p className="mb-4 line-clamp-2 text-sm text-gray-600 leading-relaxed flex-1">
+        <p className="mb-3 md:mb-4 line-clamp-2 text-xs md:text-sm text-gray-600 leading-relaxed flex-1">
           {developer.description}
         </p>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="rounded-lg bg-blue-50 border border-blue-100 p-2.5 text-center">
-            <p className="text-lg font-bold text-blue-600">{developer.projectsCompleted}</p>
-            <p className="text-[10px] font-semibold text-gray-600 uppercase">Projects</p>
+        <div className="grid grid-cols-2 gap-1.5 md:gap-2 mb-3 md:mb-4">
+          <div className="rounded-lg bg-blue-50 border border-blue-100 p-2 md:p-2.5 text-center">
+            <p className="text-base md:text-lg font-bold text-blue-600">{developer.projectsCompleted}</p>
+            <p className="text-[9px] md:text-[10px] font-semibold text-gray-600 uppercase">Projects</p>
           </div>
-          <div className="rounded-lg bg-emerald-50 border border-emerald-100 p-2.5 text-center">
-            <p className="text-lg font-bold text-emerald-600">{developer.yearsInBusiness}+</p>
-            <p className="text-[10px] font-semibold text-gray-600 uppercase">Years</p>
+          <div className="rounded-lg bg-emerald-50 border border-emerald-100 p-2 md:p-2.5 text-center">
+            <p className="text-base md:text-lg font-bold text-emerald-600">{developer.yearsInBusiness}+</p>
+            <p className="text-[9px] md:text-[10px] font-semibold text-gray-600 uppercase">Years</p>
           </div>
         </div>
 
         {/* View Details Button */}
-        <button className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 py-2.5 text-center font-semibold text-sm text-white transition-all duration-300 hover:shadow-md hover:from-blue-700 hover:to-blue-800">
+        <button className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 py-2 md:py-2.5 text-center font-semibold text-xs md:text-sm text-white transition-all duration-300 hover:shadow-md hover:from-blue-700 hover:to-blue-800">
           View Details
         </button>
       </div>
