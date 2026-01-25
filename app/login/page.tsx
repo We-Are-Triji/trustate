@@ -2,6 +2,7 @@
 
 import { LoginForm } from "@/components/auth/login/login-form";
 import Image from "next/image";
+import Link from "next/link";
 import trustateLogo from "@/app/assets/trustate.png";
 
 export default function LoginPage() {
@@ -92,14 +93,16 @@ export default function LoginPage() {
 
         {/* Logo at top - Static */}
         <div className="absolute left-8 top-8 z-10">
-          <Image
-            src={trustateLogo}
-            alt="TruState"
-            width={150}
-            height={50}
-            priority
-            className="brightness-0 invert"
-          />
+          <Link href="/" className="block">
+            <Image
+              src={trustateLogo}
+              alt="TruState"
+              width={150}
+              height={50}
+              priority
+              className="brightness-0 invert hover:opacity-80 transition-opacity duration-300"
+            />
+          </Link>
         </div>
 
         {/* Text - bottom left - Static */}
@@ -126,6 +129,23 @@ export default function LoginPage() {
 
       {/* Right Panel - Static Container */}
       <div className="relative flex w-full items-center justify-center overflow-hidden bg-white p-8 lg:flex-1 lg:-ml-[40px] rounded-tl-[40px] rounded-bl-[40px] z-10">
+        
+        {/* Back Button - Top Left */}
+        <Link 
+          href="/"
+          className="absolute left-8 top-8 z-20 inline-flex items-center gap-2 px-3 py-2 transition-all duration-300 group"
+        >
+          <svg 
+            className="h-5 w-5 text-gray-400 group-hover:text-[#0247ae] group-hover:-translate-x-0.5 transition-all duration-300" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="text-sm font-semibold text-gray-500 group-hover:text-[#0247ae] transition-colors duration-300">Back</span>
+        </Link>
         
         {/* House and Dotted Trail - Static Background */}
         <svg 
