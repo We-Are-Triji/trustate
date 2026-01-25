@@ -46,11 +46,6 @@ export function OverviewTab({ transaction, onTransactionUpdate }: OverviewTabPro
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="p-6 border-b border-gray-100">
-        <h1 className="text-2xl font-bold text-gray-900">Transaction Overview</h1>
-        <p className="text-sm text-gray-500 mt-1">Track your transaction progress</p>
-      </div>
-
       <div className="p-6 space-y-6">
         {/* Client Invite Section */}
         {transaction.client_status !== "approved" && (
@@ -64,14 +59,22 @@ export function OverviewTab({ transaction, onTransactionUpdate }: OverviewTabPro
             onReject={onTransactionUpdate}
           />
         )}
+
         {/* Status Badge */}
-        <div>
+        <div className="flex items-center justify-between">
           <span
             className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusColors[transaction.status] || "bg-gray-100 text-gray-700"
               }`}
           >
             {transaction.status.replace(/_/g, " ").toUpperCase()}
           </span>
+
+          {transaction.client_status === "none" && (
+            <span className="flex items-center gap-2 text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              <Users size={14} />
+              Waiting for Client to Join
+            </span>
+          )}
         </div>
 
         {/* Property Details */}
@@ -106,32 +109,6 @@ export function OverviewTab({ transaction, onTransactionUpdate }: OverviewTabPro
                 {new Date(transaction.created_at).toLocaleDateString()}
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Progress Timeline */}
-        <div className="bg-gray-50 rounded-2xl p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Progress</h3>
-          <div className="space-y-3">
-            {[
-              { label: "Transaction Initiated", completed: true },
-              { label: "Client Joined", completed: transaction.client_status === "approved" || transaction.status !== "initiated" },
-              { label: "Documents Submitted", completed: ["documents_review", "payment_pending", "payment_held", "developer_handoff", "completed"].includes(transaction.status) },
-              { label: "Payment Processed", completed: ["payment_held", "developer_handoff", "completed"].includes(transaction.status) },
-              { label: "Completed", completed: transaction.status === "completed" },
-            ].map((step, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <div
-                  className={`h-8 w-8 rounded-full flex items-center justify-center ${step.completed ? "bg-[#0247ae] text-white" : "bg-gray-200 text-gray-400"
-                    }`}
-                >
-                  {step.completed ? "✓" : index + 1}
-                </div>
-                <span className={step.completed ? "text-gray-900 font-medium" : "text-gray-500"}>
-                  {step.label}
-                </span>
-              </div>
-            ))}
           </div>
         </div>
       </div>

@@ -22,20 +22,41 @@ export const LIFECYCLE_STEPS: LifecycleStep[] = [
 interface TransactionLifecycleProps {
     currentStep: number;
     completedSteps: number[];
+    clientStatus?: "none" | "pending" | "approved" | "rejected";
     onStepClick?: (stepId: number) => void;
 }
 
-export function TransactionLifecycle({ currentStep, completedSteps, onStepClick }: TransactionLifecycleProps) {
+export function TransactionLifecycle({ currentStep, completedSteps, clientStatus = "none", onStepClick }: TransactionLifecycleProps) {
+    const isClientJoined = clientStatus === "approved";
+
     return (
         <div className="flex flex-col h-full">
             <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-gray-900">Deal Lifecycle</h3>
                     <Badge variant="outline" className="bg-white text-xs font-normal">
                         Phase 1: Initiation
                     </Badge>
                 </div>
-                <p className="text-xs text-gray-500">Complete tasks to unlock next steps.</p>
+
+                {/* Client Status Check - Moved from Overview */}
+                <div className={`p-3 rounded-xl border flex items-center gap-3 transition-colors ${isClientJoined
+                        ? "bg-green-50 border-green-200"
+                        : "bg-white border-dashed border-gray-300"
+                    }`}>
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${isClientJoined ? "bg-green-500 text-white" : "bg-gray-100 text-gray-400"
+                        }`}>
+                        {isClientJoined ? <Check size={14} strokeWidth={3} /> : <Circle size={14} />}
+                    </div>
+                    <div>
+                        <p className={`text-sm font-medium ${isClientJoined ? "text-gray-900" : "text-gray-500"}`}>
+                            {isClientJoined ? "Client Verified" : "Waiting for Client"}
+                        </p>
+                        <p className="text-[10px] text-gray-400">
+                            {isClientJoined ? "Access granted" : "Invite needed to proceed"}
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">

@@ -147,6 +147,13 @@ export default function TransactionPage() {
             }}
           />
         );
+      case "settings":
+        return (
+          <TransactionSettings
+            transactionId={transactionId}
+            transactionName={transaction?.project_name || transaction?.property_address}
+          />
+        );
       default:
         return <OverviewTab transaction={transaction} />;
     }
@@ -166,6 +173,7 @@ export default function TransactionPage() {
         <TransactionLifecycle
           currentStep={currentStep}
           completedSteps={completedSteps}
+          clientStatus={transaction?.client_status}
           onStepClick={(step) => {
             // Allow viewing completed steps
             if (completedSteps.includes(step) || step === currentStep) {
@@ -196,12 +204,6 @@ export default function TransactionPage() {
             >
               [Dev] Complete Step {currentStep}
             </button>
-
-            {/* Settings */}
-            <TransactionSettings
-              transactionId={transactionId}
-              transactionName={transaction?.project_name || transaction?.property_address}
-            />
           </div>
         </header>
 

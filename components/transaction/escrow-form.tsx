@@ -55,11 +55,6 @@ export function EscrowForm({ transactionId }: EscrowFormProps) {
 
     return (
         <div className="h-full overflow-y-auto">
-            <div className="p-6 border-b border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900">Escrow & Payments</h2>
-                <p className="text-sm text-gray-500">Track payment milestones and escrow status</p>
-            </div>
-
             <div className="p-6 space-y-6">
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -135,8 +130,8 @@ export function EscrowForm({ transactionId }: EscrowFormProps) {
                             <div
                                 key={milestone.id}
                                 className={`flex items-center gap-4 p-4 rounded-xl border ${milestone.status === "paid"
-                                        ? "bg-green-50/50 border-green-200"
-                                        : "bg-white border-gray-200"
+                                    ? "bg-green-50/50 border-green-200"
+                                    : "bg-white border-gray-200"
                                     }`}
                             >
                                 <div className="flex items-center justify-center">

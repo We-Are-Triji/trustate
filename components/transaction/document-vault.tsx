@@ -179,11 +179,7 @@ export function DocumentVault({ transactionId }: DocumentVaultProps) {
         <div className="h-full flex">
             {/* Document List */}
             <div className={`${selectedDoc ? "w-1/2 border-r border-gray-100" : "w-full"} flex flex-col`}>
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                    <div>
-                        <h2 className="text-lg font-bold text-gray-900">Document Vault</h2>
-                        <p className="text-sm text-gray-500">{documents.length} documents</p>
-                    </div>
+                <div className="p-6 border-b border-gray-100 flex items-center justify-end">
                     <label>
                         <input
                             type="file"
