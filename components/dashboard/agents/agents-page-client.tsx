@@ -54,7 +54,7 @@ export default function AgentsPageClient() {
 
     const fetchNexus = async () => {
         try {
-            const res = await fetch(`/api/broker/nexus?brokerId=${userId}`);
+            const res = await fetch(`/api/broker/nexus-info?brokerId=${userId}`);
             if (res.ok) {
                 const data = await res.json();
                 setNexusCode(data.nexus_code);
