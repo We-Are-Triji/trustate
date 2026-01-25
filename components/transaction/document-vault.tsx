@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Upload, FileText, Image, File, X, Eye, Download, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PdfPreview } from "./pdf-preview";
 
 interface Document {
     id: string;
@@ -241,8 +242,8 @@ export function DocumentVault({ transactionId }: DocumentVaultProps) {
                                         key={doc.id}
                                         onClick={() => setSelectedDoc(doc)}
                                         className={`p-4 rounded-xl border transition-all cursor-pointer group ${selectedDoc?.id === doc.id
-                                                ? "border-[#0247ae] bg-blue-50/50"
-                                                : "border-gray-200 hover:border-gray-300 bg-white"
+                                            ? "border-[#0247ae] bg-blue-50/50"
+                                            : "border-gray-200 hover:border-gray-300 bg-white"
                                             }`}
                                     >
                                         <div className="flex items-center gap-4">
@@ -283,7 +284,7 @@ export function DocumentVault({ transactionId }: DocumentVaultProps) {
             {/* Document Preview */}
             {selectedDoc && (
                 <div className="w-1/2 flex flex-col bg-gray-50">
-                    <div className="p-6 border-b border-gray-100 bg-white flex items-center justify-between">
+                    <div className="p-4 border-b border-gray-100 bg-white flex items-center justify-between">
                         <div className="min-w-0">
                             <h3 className="font-semibold text-gray-900 truncate">{selectedDoc.file_name}</h3>
                             <p className="text-sm text-gray-500 capitalize">{selectedDoc.document_type}</p>
@@ -300,14 +301,26 @@ export function DocumentVault({ transactionId }: DocumentVaultProps) {
                             </Button>
                         </div>
                     </div>
-                    <div className="flex-1 flex items-center justify-center p-8">
-                        <div className="text-center">
-                            <div className="h-20 w-20 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                                <Eye size={32} className="text-gray-400" />
+                    <div className="flex-1 overflow-hidden">
+                        {selectedDoc.file_name.toLowerCase().endsWith(".pdf") ? (
+                            <PdfPreview url={selectedDoc.file_url} fileName={selectedDoc.file_name} />
+                        ) : selectedDoc.file_name.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                            <div className="h-full flex items-center justify-center p-4 bg-gray-100">
+                                <img
+                                    src={selectedDoc.file_url}
+                                    alt={selectedDoc.file_name}
+                                    className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+                                />
                             </div>
-                            <p className="text-gray-500 text-sm">Document preview will be available here</p>
-                            <p className="text-gray-400 text-xs mt-1">(PDF viewer integration coming soon)</p>
-                        </div>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center p-8 text-center">
+                                <div className="h-20 w-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+                                    <Eye size={32} className="text-gray-400" />
+                                </div>
+                                <p className="text-gray-500 text-sm">Preview not available for this file type</p>
+                                <p className="text-gray-400 text-xs mt-1">Click download to view the file</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
