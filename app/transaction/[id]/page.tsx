@@ -104,12 +104,11 @@ export default function TransactionPage() {
   const isClientApproved = transaction?.client_status === "approved";
   // User requested tabs to remain LOCKED until approved (reverting previous unlock)
   const canViewTabs = isAgent || isClientApproved;
-  const isEscrowLocked = currentStep < 4;
 
-  // Lock all tabs only if not allowed to view
+  // Lock all tabs only if not allowed to view (Escrow now unlocked from Step 1)
   const lockedTabs = !canViewTabs
     ? ["messages", "documents", "escrow", "assistant"]
-    : (isEscrowLocked ? ["escrow"] : []);
+    : [];
 
   const handleStepComplete = async () => {
     if (currentStep < 6) {
@@ -166,7 +165,7 @@ export default function TransactionPage() {
 
     switch (activeTab) {
       case "overview":
-        return <OverviewTab transaction={transaction} onTransactionUpdate={fetchTransaction} isAgent={isAgent} />;
+        return <OverviewTab transaction={transaction} onTransactionUpdate={fetchTransaction} isAgent={isAgent} currentStep={currentStep} onNavigate={setActiveTab} />;
       case "messages":
         return <ConversationTab transactionId={transactionId} />;
       case "documents":
@@ -214,6 +213,7 @@ export default function TransactionPage() {
       }
       rightTools={
         <TransactionLifecycle
+          transactionId={transactionId}
           currentStep={currentStep}
           completedSteps={completedSteps}
           clientStatus={transaction?.client_status}

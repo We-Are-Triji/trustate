@@ -288,11 +288,6 @@ export function TransactionLifecycle({ transactionId, currentStep, completedStep
                                                 </p>
                                             </>
                                         )}
-                                        {isActive && !isEditing && (
-                                            <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-600 animate-pulse">
-                                                In Progress
-                                            </div>
-                                        )}
                                     </div>
 
                                     {/* Delete Button */}

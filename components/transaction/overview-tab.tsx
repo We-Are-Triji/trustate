@@ -21,9 +21,21 @@ interface OverviewTabProps {
   transaction: ExtendedTransaction | null;
   onTransactionUpdate?: () => void;
   isAgent?: boolean;
+  currentStep?: number;
+  onNavigate?: (tab: string) => void;
 }
 
-export function OverviewTab({ transaction, onTransactionUpdate, isAgent = false }: OverviewTabProps) {
+// Map step to action info
+const STEP_ACTIONS: Record<number, { title: string; description: string; tab: string; buttonText: string }> = {
+  1: { title: "Fund Your Reservation", description: "Deposit your reservation fee via the Escrow tab to secure your unit.", tab: "escrow", buttonText: "Go to Escrow" },
+  2: { title: "Complete Identity Verification", description: "Upload your valid ID and complete the liveness check.", tab: "documents", buttonText: "Upload Documents" },
+  3: { title: "Review & Sign Documents", description: "Review the Reservation Agreement and Buyer Information Sheet, then sign them digitally.", tab: "documents", buttonText: "View Documents" },
+  4: { title: "Fund Down Payment", description: "Deposit your down payment via escrow to proceed with the transaction.", tab: "escrow", buttonText: "Go to Escrow" },
+  5: { title: "Await Developer Handoff", description: "Your agent is coordinating with the developer. No action required from you.", tab: "overview", buttonText: "View Status" },
+  6: { title: "Transaction Complete", description: "Congratulations! Your transaction has been completed successfully.", tab: "overview", buttonText: "View Summary" },
+};
+
+export function OverviewTab({ transaction, onTransactionUpdate, isAgent = false, currentStep = 1, onNavigate }: OverviewTabProps) {
   if (!transaction) {
     return (
       <div className="h-full bg-white p-6">
@@ -65,22 +77,30 @@ export function OverviewTab({ transaction, onTransactionUpdate, isAgent = false 
             </div>
           ) : (
             // ACTION CENTER - Prominent Card (Visible when approved)
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[#0247ae] text-xs font-bold uppercase tracking-wider rounded-full mb-4">
-                  <span className="w-2 h-2 rounded-full bg-[#0247ae] animate-pulse"></span>
-                  Current Task
+            (() => {
+              const action = STEP_ACTIONS[currentStep] || STEP_ACTIONS[1];
+              return (
+                <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="relative z-10">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[#0247ae] text-xs font-bold uppercase tracking-wider rounded-full mb-4">
+                      <span className="w-2 h-2 rounded-full bg-[#0247ae]"></span>
+                      Step {currentStep} of 6
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-3">{action.title}</h2>
+                    <p className="text-gray-600 mb-8 max-w-lg leading-relaxed">
+                      {action.description}
+                    </p>
+                    <button
+                      onClick={() => onNavigate?.(action.tab)}
+                      className="px-8 py-4 bg-[#0247ae] text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#023a8a] hover:shadow-xl hover:-translate-y-1 transition-all"
+                    >
+                      {action.buttonText}
+                    </button>
+                  </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-3">Upload Proof of Payment</h2>
-                <p className="text-gray-600 mb-8 max-w-lg leading-relaxed">
-                  To secure your reservation for <strong>{transaction.property_address}</strong>, please upload your reservation fee receipt to the Document Vault.
-                </p>
-                <button className="px-8 py-4 bg-[#0247ae] text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#023a8a] hover:shadow-xl hover:-translate-y-1 transition-all">
-                  Go to Action
-                </button>
-              </div>
-            </div>
+              );
+            })()
           )}
 
           {/* Simple Property Info */}
