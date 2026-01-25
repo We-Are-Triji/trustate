@@ -101,9 +101,8 @@ export default function TransactionPage() {
   // Derived State
   const isAgent = userId === transaction?.agent_id;
   const isClientApproved = transaction?.client_status === "approved";
-  const isClientPending = transaction?.client_status === "pending";
-  // User requested tabs to be unlocked after joining (even if pending)
-  const canViewTabs = isAgent || isClientApproved || isClientPending;
+  // User requested tabs to remain LOCKED until approved (reverting previous unlock)
+  const canViewTabs = isAgent || isClientApproved;
   const isEscrowLocked = currentStep < 4;
 
   // Lock all tabs only if not allowed to view
@@ -199,6 +198,7 @@ export default function TransactionPage() {
           transactionId={transactionId}
           projectName={transaction?.project_name || transaction?.property_address}
           lockedTabs={lockedTabs}
+          userRole={isAgent ? "agent" : "client"}
         />
       }
       rightTools={
@@ -206,6 +206,7 @@ export default function TransactionPage() {
           currentStep={currentStep}
           completedSteps={completedSteps}
           clientStatus={transaction?.client_status}
+          readOnly={!isAgent}
           onStepClick={(step) => {
             // Allow viewing completed steps
             if (completedSteps.includes(step) || step === currentStep) {

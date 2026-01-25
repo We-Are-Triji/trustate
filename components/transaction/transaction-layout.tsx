@@ -143,13 +143,23 @@ interface TransactionMenuProps {
   projectName?: string;
   lockedTabs?: string[];
   onClose?: () => void;
+  userRole?: "agent" | "client";
 }
 
-export function TransactionMenu({ activeTab, onTabChange, transactionId, projectName, lockedTabs = [], onClose }: TransactionMenuProps) {
+export function TransactionMenu({ activeTab, onTabChange, transactionId, projectName, lockedTabs = [], onClose, userRole = "agent" }: TransactionMenuProps) {
   const handleTabChange = (tabId: string) => {
     onTabChange(tabId);
     onClose?.(); // Close mobile drawer
   };
+
+  const visibleItems = menuItems.filter(item => {
+    if (userRole === "client") {
+      // Clients see a restricted set of tabs
+      // Hiding: Activity, Settings
+      return ["overview", "messages", "documents", "escrow", "assistant"].includes(item.id);
+    }
+    return true; // Agents see everything
+  });
 
   return (
     <div className="flex flex-col h-full">
@@ -159,7 +169,7 @@ export function TransactionMenu({ activeTab, onTabChange, transactionId, project
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
-          {menuItems.map((item) => {
+          {visibleItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             const isLocked = lockedTabs.includes(item.id);

@@ -24,9 +24,10 @@ interface TransactionLifecycleProps {
     completedSteps: number[];
     clientStatus?: "none" | "pending" | "approved" | "rejected";
     onStepClick?: (stepId: number) => void;
+    readOnly?: boolean;
 }
 
-export function TransactionLifecycle({ currentStep, completedSteps, clientStatus = "none", onStepClick }: TransactionLifecycleProps) {
+export function TransactionLifecycle({ currentStep, completedSteps, clientStatus = "none", onStepClick, readOnly = false }: TransactionLifecycleProps) {
     const isClientJoined = clientStatus === "approved";
 
     return (
@@ -71,12 +72,13 @@ export function TransactionLifecycle({ currentStep, completedSteps, clientStatus
                             const isActive = isClientJoined && currentStep === step.id;
                             // Lock if not completed and not active (which covers no client case)
                             const isLocked = !isCompleted && !isActive;
+                            const isClickable = !isLocked && !readOnly;
 
                             return (
                                 <div
                                     key={step.id}
-                                    className={`flex gap-4 group ${isLocked ? "opacity-60 grayscale" : ""}`}
-                                    onClick={() => !isLocked && onStepClick?.(step.id)}
+                                    className={`flex gap-4 group ${isLocked ? "opacity-60 grayscale" : ""} ${isClickable ? "cursor-pointer hover:bg-gray-50/50 rounded-lg -m-2 p-2 transition-colors" : ""}`}
+                                    onClick={() => isClickable && onStepClick?.(step.id)}
                                 >
                                     {/* Icon Indicator */}
                                     <div className={`

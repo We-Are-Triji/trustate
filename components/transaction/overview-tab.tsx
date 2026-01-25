@@ -39,6 +39,74 @@ export function OverviewTab({ transaction, onTransactionUpdate, isAgent = false 
     );
   }
 
+  if (!isAgent) {
+    // Client View: Simplified Experience
+    return (
+      <div className="h-full overflow-y-auto bg-gray-50/30">
+        <div className="p-6 max-w-5xl mx-auto space-y-8">
+          {/* Welcome Header */}
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+            <p className="text-gray-500 mt-1">Here is your transaction status for <span className="font-medium text-gray-900">{transaction.property_address}</span></p>
+          </div>
+
+          {!isAgent && transaction.client_status === "pending" ? (
+            // Pending Approval Banner (Replaces Action Center)
+            <div className="bg-orange-50 rounded-3xl p-8 border border-orange-100 relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-100 text-orange-700 text-xs font-bold uppercase tracking-wider rounded-full mb-4">
+                  Pending Approval
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Waiting for Agent Approval</h2>
+                <p className="text-gray-600 max-w-lg">
+                  You have requested to join this transaction. While you wait, you can inspect the property details below.
+                </p>
+              </div>
+            </div>
+          ) : (
+            // ACTION CENTER - Prominent Card (Visible when approved)
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[#0247ae] text-xs font-bold uppercase tracking-wider rounded-full mb-4">
+                  <span className="w-2 h-2 rounded-full bg-[#0247ae] animate-pulse"></span>
+                  Current Task
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-3">Upload Proof of Payment</h2>
+                <p className="text-gray-600 mb-8 max-w-lg leading-relaxed">
+                  To secure your reservation for <strong>{transaction.property_address}</strong>, please upload your reservation fee receipt to the Document Vault.
+                </p>
+                <button className="px-8 py-4 bg-[#0247ae] text-white font-bold rounded-xl shadow-lg shadow-blue-900/20 hover:bg-[#023a8a] hover:shadow-xl hover:-translate-y-1 transition-all">
+                  Go to Action
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Simple Property Info */}
+          <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <h3 className="font-semibold text-gray-900 mb-4">Property Summary</h3>
+            <div className="flex items-center gap-4">
+              <div className="h-16 w-16 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">
+                <Home size={28} />
+              </div>
+              <div>
+                <p className="font-bold text-lg text-gray-900">{transaction.property_address}</p>
+                <div className="flex items-center gap-4 mt-1">
+                  <p className="text-sm text-gray-500">
+                    {transaction.transaction_value ? `₱${transaction.transaction_value.toLocaleString()}` : "Price TBD"}
+                  </p>
+                  <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                  <p className="text-sm text-gray-500 capitalize">{transaction.property_type?.replace("_", " ") || "Property"}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const statusColors: Record<string, string> = {
     initiated: "bg-blue-100 text-blue-700",
     client_joined: "bg-green-100 text-green-700",
