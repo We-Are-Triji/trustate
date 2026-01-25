@@ -2,40 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, Filter, ArrowUpRight, Building2, Calendar, DollarSign } from "lucide-react";
+import { Plus, Search, ArrowUpRight, Building2, Calendar, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "../ui/badge";
 import { useAuth } from "@/lib/hooks/use-auth";
 import type { Transaction, TransactionStatus } from "@/lib/types/transaction";
+import { CreateTransactionModal } from "./create-transaction-modal";
 
 export default function TransactionList() {
     const { userId } = useAuth();
     const router = useRouter();
-    // TODO: Use secure 8-char alphanumeric IDs (e.g. nanoid(8)) for new transactions
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<TransactionStatus | "all">("all");
 
-    useEffect(() => {
-        // TODO: Replace with actual API call
-        const fetchTransactions = async () => {
-            try {
-                // Fetch actual transactions here
-                // const res = await fetch('/api/transactions');
-                // const data = await res.json();
-                // setTransactions(data);
-
-                // No mock data - start with empty list
+    const fetchTransactions = async () => {
+        try {
+            const stored = localStorage.getItem("mock_transactions");
+            if (stored) {
+                setTransactions(JSON.parse(stored));
+            } else {
                 setTransactions([]);
-            } catch (error) {
-                console.error("Failed to fetch transactions", error);
-            } finally {
-                setIsLoading(false);
             }
-        };
+        } catch (error) {
+            console.error("Failed to fetch transactions", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         if (userId) {
             fetchTransactions();
         }
@@ -77,13 +75,15 @@ export default function TransactionList() {
                     <p className="text-gray-500 dark:text-gray-400 mb-8">
                         Get started by creating your first real estate transaction.
                     </p>
-                    <Button
-                        className="bg-[#0247ae] hover:bg-[#0560d4] text-white"
-                        onClick={() => router.push("/transaction")}
-                    >
-                        <Plus size={18} className="mr-2" />
-                        Create Transaction
-                    </Button>
+                    <CreateTransactionModal
+                        onTransactionCreated={fetchTransactions}
+                        trigger={
+                            <Button className="bg-[#0247ae] hover:bg-[#0560d4] text-white">
+                                <Plus size={18} className="mr-2" />
+                                Create Transaction
+                            </Button>
+                        }
+                    />
                 </div>
             ) : (
                 <>
@@ -124,13 +124,15 @@ export default function TransactionList() {
                                 </Button>
                             </div>
 
-                            <Button
-                                className="bg-[#0247ae] hover:bg-[#0560d4] text-white shrink-0"
-                                onClick={() => router.push("/transaction")}
-                            >
-                                <Plus size={18} className="mr-2" />
-                                New Transaction
-                            </Button>
+                            <CreateTransactionModal
+                                onTransactionCreated={fetchTransactions}
+                                trigger={
+                                    <Button className="bg-[#0247ae] hover:bg-[#0560d4] text-white shrink-0">
+                                        <Plus size={18} className="mr-2" />
+                                        New Transaction
+                                    </Button>
+                                }
+                            />
                         </div>
                     </div>
 
