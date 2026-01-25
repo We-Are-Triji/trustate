@@ -24,13 +24,34 @@ interface AgentListSectionProps {
 export function AgentListSection({ agents }: AgentListSectionProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   
   // Guard against undefined/empty agents prop
   const safeAgents = agents || [];
   const displayAgents = safeAgents.slice(0, 6);
-  const itemsPerView = 3;
+  
+  // Responsive items per view
+  const getItemsPerView = () => {
+    if (isMobile) return 1;
+    if (isTablet) return 2;
+    return 3;
+  };
+  
+  const itemsPerView = getItemsPerView();
   const maxIndex = Math.max(0, displayAgents.length - itemsPerView);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -165,16 +186,22 @@ export function AgentListSection({ agents }: AgentListSectionProps) {
         </div>
 
         {/* Agent cards carousel */}
-        <div className="relative -mx-8 sm:-mx-12 lg:-mx-16">
-          <div className="overflow-hidden px-12 sm:px-16 lg:px-20 py-8">
+        <div className="relative -mx-4 sm:-mx-8 lg:-mx-12 xl:-mx-16">
+          <div className="overflow-hidden px-4 sm:px-8 lg:px-12 xl:px-20 py-8">
             <div 
-              className="flex gap-6 transition-transform duration-700 ease-out"
-              style={{ transform: `translateX(calc(-${activeIndex} * (33.333% + 8px)))` }}
+              className="flex gap-4 sm:gap-6 transition-transform duration-700 ease-out"
+              style={{ 
+                transform: isMobile 
+                  ? `translateX(calc(-${activeIndex} * (100% + 16px)))` 
+                  : isTablet
+                  ? `translateX(calc(-${activeIndex} * (50% + 12px)))`
+                  : `translateX(calc(-${activeIndex} * (33.333% + 8px)))`
+              }}
             >
             {displayAgents.map((agent, index) => (
               <Card
                 key={agent.id || index}
-                className={`w-[calc(33.333%-16px)] flex-shrink-0 overflow-hidden rounded-3xl border-0 bg-white/90 backdrop-blur-xl shadow-xl transition-all duration-700 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.25)] hover:-translate-y-4 group p-0 gap-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}
+                className={`w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] flex-shrink-0 overflow-hidden rounded-3xl border-0 bg-white/90 backdrop-blur-xl shadow-xl transition-all duration-700 hover:shadow-[0_30px_70px_-15px_rgba(0,0,0,0.25)] hover:-translate-y-4 group p-0 gap-0 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}
                 style={{ transitionDelay: `${200 + index * 100}ms` }}
               >
                 <CardContent className="p-0 relative">
