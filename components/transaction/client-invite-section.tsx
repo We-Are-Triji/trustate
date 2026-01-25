@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { UserPlus, Copy, RefreshCw, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
@@ -27,6 +28,11 @@ export function ClientInviteSection({
 }: ClientInviteSectionProps) {
     const [timeLeft, setTimeLeft] = useState<string>("");
     const [isProcessing, setIsProcessing] = useState(false);
+    const [origin, setOrigin] = useState("");
+
+    useEffect(() => {
+        setOrigin(window.location.origin);
+    }, []);
 
     useEffect(() => {
         const updateTimeLeft = () => {
@@ -122,55 +128,62 @@ export function ClientInviteSection({
     }
 
     // Invite State
-    const inviteLink = `${window.location.origin}/transaction/join`;
+    const inviteLink = origin ? `${origin}/transaction/join?ref=${transactionId}` : "Loading...";
 
     return (
         <div className="bg-gradient-to-r from-[#0247ae]/5 to-[#0247ae]/10 border border-[#0247ae]/10 rounded-2xl p-6 mb-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#0247ae]">
-                        <UserPlus size={24} />
-                    </div>
-                    <div>
-                        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                            Invite Client
-                            <Badge variant="outline" className="bg-white/50 text-[#0247ae] border-[#0247ae]/20 text-[10px] h-5">
-                                Expires in {timeLeft}
-                            </Badge>
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1 max-w-sm">
-                            Share the access code with your client. They need it to join securely.
-                        </p>
+            <div className="flex items-start gap-4 mb-6">
+                <div className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#0247ae]">
+                    <UserPlus size={24} />
+                </div>
+                <div>
+                    <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                        Invite Client
+                        <Badge variant="outline" className="bg-white/50 text-[#0247ae] border-[#0247ae]/20 text-[10px] h-5">
+                            Expires in {timeLeft}
+                        </Badge>
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                        Share these details with your client to join securely.
+                    </p>
+                </div>
+            </div>
+
+            <div className="space-y-5">
+                {/* Invite Link Row */}
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Invite Link</label>
+                    <div className="flex gap-3">
+                        <Input
+                            readOnly
+                            value={inviteLink}
+                            className="bg-white font-mono text-sm text-gray-600 h-11"
+                        />
+                        <Button
+                            variant="outline"
+                            className="bg-white border-gray-200 text-gray-700 hover:text-[#0247ae] hover:border-[#0247ae] shrink-0 h-11 px-4"
+                            onClick={() => copyToClipboard(inviteLink, "Invite Link")}
+                        >
+                            <Copy size={16} />
+                        </Button>
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                    {/* Access Code Box */}
-                    <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
-                        <div className="text-center">
-                            <p className="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Access Code</p>
-                            <p className="text-xl font-mono font-bold text-gray-900 tracking-widest">{accessCode}</p>
+                {/* Access Code Row */}
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Access Code</label>
+                    <div className="flex gap-3">
+                        <div className="flex-1 bg-white border border-gray-200 rounded-lg h-11 px-4 flex items-center shadow-sm">
+                            <span className="text-lg font-mono font-bold text-gray-900 tracking-[0.2em]">{accessCode}</span>
                         </div>
-                        <div className="h-8 w-px bg-gray-100 mx-1" />
                         <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-[#0247ae]"
-                            onClick={() => copyToClipboard(accessCode, "Code")}
+                            className="bg-[#0247ae] hover:bg-[#0560d4] text-white shrink-0 h-11 px-6"
+                            onClick={() => copyToClipboard(accessCode, "Access Code")}
                         >
-                            <Copy size={14} />
+                            <Copy size={16} className="mr-2" />
+                            Copy Code
                         </Button>
                     </div>
-
-                    {/* Invite Link Button */}
-                    <Button
-                        variant="outline"
-                        className="bg-white border-gray-200 text-gray-700 hover:text-[#0247ae] hover:border-[#0247ae]"
-                        onClick={() => copyToClipboard(inviteLink, "Invite Link")}
-                    >
-                        <Copy size={16} className="mr-2" />
-                        Copy Invite Link
-                    </Button>
                 </div>
             </div>
         </div>
