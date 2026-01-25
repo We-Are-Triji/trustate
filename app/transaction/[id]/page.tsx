@@ -169,6 +169,7 @@ export default function TransactionPage() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           transactionId={transactionId}
+          projectName={transaction?.project_name || transaction?.property_address}
           lockedTabs={lockedTabs}
         />
       }
