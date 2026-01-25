@@ -137,6 +137,10 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+
+  button, [role="button"], a, input[type="submit"], input[type="reset"] {
+    cursor: pointer;
+  }
   
   /* Performance optimizations */
   .will-change-transform {
