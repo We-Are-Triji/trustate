@@ -32,13 +32,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: "Transaction not found" }, { status: 404 });
         }
 
-        // Check if user is a participant
-        const isParticipant = transaction.transaction_participants?.some(
-            (p: { user_id: string }) => p.user_id === userId
-        );
+        // Check if user is a participant or the owner (agent)
+        const isParticipant =
+            transaction.agent_id === userId ||
+            transaction.transaction_participants?.some(
+                (p: { user_id: string }) => p.user_id === userId
+            );
 
         if (!isParticipant) {
-            return NextResponse.json({ error: "Access denied" }, { status: 403 });
+            // Check if user is a supervising Broker
+            const { data: brokerConnection } = await supabase
+                .from("agent_broker_requests")
+                .select("id")
+                .eq("broker_id", userId)
+                .eq("agent_id", transaction.agent_id)
+                .eq("status", "accepted")
+                .single();
+
+            if (!brokerConnection) {
+                return NextResponse.json({ error: "Access denied" }, { status: 403 });
+            }
         }
 
         return NextResponse.json({ transaction });

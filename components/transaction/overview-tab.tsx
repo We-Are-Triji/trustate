@@ -20,9 +20,10 @@ interface ExtendedTransaction extends Omit<Transaction, "property_type" | "trans
 interface OverviewTabProps {
   transaction: ExtendedTransaction | null;
   onTransactionUpdate?: () => void;
+  isAgent?: boolean;
 }
 
-export function OverviewTab({ transaction, onTransactionUpdate }: OverviewTabProps) {
+export function OverviewTab({ transaction, onTransactionUpdate, isAgent = false }: OverviewTabProps) {
   if (!transaction) {
     return (
       <div className="h-full bg-white p-6">
@@ -63,6 +64,7 @@ export function OverviewTab({ transaction, onTransactionUpdate }: OverviewTabPro
             pendingClientName={transaction.client_name}
             onApprove={onTransactionUpdate}
             onReject={onTransactionUpdate}
+            isAgent={isAgent}
           />
         )}
 

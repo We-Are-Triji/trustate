@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/hooks/use-auth";
 import { TransactionLayout, TransactionMenu } from "@/components/transaction/transaction-layout";
 import { TransactionLifecycle } from "@/components/transaction/transaction-lifecycle";
 import { OverviewTab } from "@/components/transaction/overview-tab";
@@ -27,21 +29,25 @@ export default function TransactionPage() {
   const params = useParams();
   const router = useRouter();
   const transactionId = params.id as string;
+  const { userId, isLoading: authLoading } = useAuth();
 
   // State
   const [transaction, setTransaction] = useState<ExtendedTransaction | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   // Fetch transaction data
   const fetchTransaction = useCallback(async () => {
+    if (!userId) return;
+
     try {
       // Try to fetch from API first
       const response = await fetch(`/api/transactions/${transactionId}`, {
         headers: {
-          "x-user-id": "demo-user", // TODO: Get from auth context
+          "x-user-id": userId,
         },
       });
 
@@ -55,6 +61,10 @@ export default function TransactionPage() {
           completed.push(i);
         }
         setCompletedSteps(completed);
+      } else if (response.status === 403) {
+        setError("Access Denied: You do not have permission to view this transaction.");
+        setIsLoading(false);
+        return;
       } else {
         // Fallback to localStorage for demo
         const stored = localStorage.getItem("mock_transactions");
@@ -62,6 +72,8 @@ export default function TransactionPage() {
           const transactions = JSON.parse(stored);
           const found = transactions.find((t: Transaction) => t.id === transactionId);
           if (found) {
+            // For strict protection, we should probably verify user ID against fallback too, 
+            // but localStorage is local.
             setTransaction(found);
           }
         }
@@ -80,19 +92,22 @@ export default function TransactionPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [transactionId, setTransaction, setCurrentStep, setCompletedSteps, setIsLoading]);
+  }, [transactionId, userId, setTransaction, setCurrentStep, setCompletedSteps, setIsLoading]);
 
   useEffect(() => {
     fetchTransaction();
   }, [fetchTransaction]);
 
   // Derived State
+  const isAgent = userId === transaction?.agent_id;
   const isClientApproved = transaction?.client_status === "approved";
+  const isClientPending = transaction?.client_status === "pending";
+  // User requested tabs to be unlocked after joining (even if pending)
+  const canViewTabs = isAgent || isClientApproved || isClientPending;
   const isEscrowLocked = currentStep < 4;
 
-  // Lock all tabs except Overview if client is not approved
-  // Otherwise, fallback to escrow locking logic
-  const lockedTabs = !isClientApproved
+  // Lock all tabs only if not allowed to view
+  const lockedTabs = !canViewTabs
     ? ["messages", "documents", "escrow", "assistant"]
     : (isEscrowLocked ? ["escrow"] : []);
 
@@ -119,7 +134,7 @@ export default function TransactionPage() {
   };
 
   const renderContent = () => {
-    if (isLoading) {
+    if (isLoading || authLoading) {
       return (
         <div className="flex items-center justify-center h-full">
           <Loader2 className="h-8 w-8 animate-spin text-[#0247ae]" />
@@ -127,9 +142,22 @@ export default function TransactionPage() {
       );
     }
 
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center p-8">
+          <div className="h-16 w-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4">
+            <ShieldAlert size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600 mb-6 max-w-md">{error}</p>
+          <Button onClick={() => router.push('/dashboard')} variant="outline">Back to Dashboard</Button>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case "overview":
-        return <OverviewTab transaction={transaction} onTransactionUpdate={fetchTransaction} />;
+        return <OverviewTab transaction={transaction} onTransactionUpdate={fetchTransaction} isAgent={isAgent} />;
       case "messages":
         return <ConversationTab transactionId={transactionId} />;
       case "documents":

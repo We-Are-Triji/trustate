@@ -15,6 +15,7 @@ interface ClientInviteSectionProps {
     pendingClientName?: string;
     onApprove?: () => void;
     onReject?: () => void;
+    isAgent?: boolean;
 }
 
 export function ClientInviteSection({
@@ -25,6 +26,7 @@ export function ClientInviteSection({
     pendingClientName,
     onApprove,
     onReject,
+    isAgent = false,
 }: ClientInviteSectionProps) {
     const [timeLeft, setTimeLeft] = useState<string>("");
     const [isProcessing, setIsProcessing] = useState(false);
@@ -91,6 +93,24 @@ export function ClientInviteSection({
 
     // Pending Approval State
     if (clientStatus === "pending") {
+        if (!isAgent) {
+            return (
+                <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-6">
+                    <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-[#0247ae]">
+                            <Clock size={24} />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gray-900">Waiting for Approval</h3>
+                            <p className="text-sm text-gray-600 mt-1">
+                                You have requested to join this transaction. Please wait for the agent to approve your access.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="bg-orange-50 border border-orange-100 rounded-2xl p-6 mb-6">
                 <div className="flex items-start justify-between">
@@ -125,6 +145,10 @@ export function ClientInviteSection({
                 </div>
             </div>
         );
+    }
+
+    if (!isAgent) {
+        return null;
     }
 
     // Invite State
