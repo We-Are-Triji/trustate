@@ -85,19 +85,18 @@ resource "aws_s3_bucket_lifecycle_configuration" "documents" {
     id     = "transition-to-ia"
     status = "Enabled"
 
-    # Move to Infrequent Access after 90 days
+    filter {}
+
     transition {
       days          = 90
       storage_class = "STANDARD_IA"
     }
 
-    # Move to Glacier after 1 year
     transition {
       days          = 365
       storage_class = "GLACIER"
     }
 
-    # Delete incomplete multipart uploads after 7 days
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -106,6 +105,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "documents" {
   rule {
     id     = "delete-old-versions"
     status = "Enabled"
+
+    filter {}
 
     noncurrent_version_expiration {
       noncurrent_days = 90
@@ -132,49 +133,6 @@ resource "aws_s3_bucket_cors_configuration" "documents" {
 }
 
 # =============================================================================
-# IAM USER FOR APPLICATION (Next.js API Routes)
-# =============================================================================
-
-resource "aws_iam_user" "app_user" {
-  name = "${var.project_name}-app-user-${var.environment}"
-
-  tags = {
-    Environment = var.environment
-    Project     = var.project_name
-  }
-}
-
-resource "aws_iam_access_key" "app_user" {
-  user = aws_iam_user.app_user.name
-}
-
-# S3 access policy for the application
-resource "aws_iam_user_policy" "app_s3_policy" {
-  name = "${var.project_name}-app-s3-policy"
-  user = aws_iam_user.app_user.name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowS3DocumentOperations"
-        Effect = "Allow"
-        Action = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          aws_s3_bucket.documents.arn,
-          "${aws_s3_bucket.documents.arn}/*"
-        ]
-      }
-    ]
-  })
-}
-
-# =============================================================================
 # OUTPUTS
 # =============================================================================
 
@@ -193,27 +151,7 @@ output "s3_bucket_region" {
   value       = var.aws_region
 }
 
-output "app_aws_access_key_id" {
-  description = "Access key ID for the application IAM user"
-  value       = aws_iam_access_key.app_user.id
-  sensitive   = true
-}
-
-output "app_aws_secret_access_key" {
-  description = "Secret access key for the application IAM user"
-  value       = aws_iam_access_key.app_user.secret
-  sensitive   = true
-}
-
-output "env_variables" {
-  description = "Environment variables to add to Amplify"
-  value       = <<-EOT
-    
-    # Add these to Amplify Environment Variables:
-    AWS_REGION=${var.aws_region}
-    AWS_S3_DOCUMENTS_BUCKET=${aws_s3_bucket.documents.id}
-    APP_AWS_ACCESS_KEY_ID=<run: terraform output -raw app_aws_access_key_id>
-    APP_AWS_SECRET_ACCESS_KEY=<run: terraform output -raw app_aws_secret_access_key>
-    
-  EOT
+output "env_variable" {
+  description = "Environment variable to add to Amplify"
+  value       = "AWS_S3_DOCUMENTS_BUCKET=${aws_s3_bucket.documents.id}"
 }
