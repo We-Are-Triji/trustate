@@ -22,8 +22,6 @@ const getNavItems = (accountType: AccountType | null, brokerType: "individual" |
     return [
       baseItems[0],
       { href: "/dashboard/transactions", label: "Transactions", icon: FileText },
-      { href: "/dashboard/properties", label: "Properties", icon: Building2 },
-      { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
       baseItems[1],
     ];
   }
