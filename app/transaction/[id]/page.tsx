@@ -17,6 +17,9 @@ interface ExtendedTransaction extends Transaction {
   project_name?: string;
   client_name?: string;
   lifecycle_step?: number;
+  client_status?: "none" | "pending" | "approved" | "rejected";
+  client_invite_code?: string;
+  client_invite_expires_at?: string;
 }
 
 export default function TransactionPage() {
@@ -32,40 +35,27 @@ export default function TransactionPage() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   // Fetch transaction data
-  useEffect(() => {
-    const fetchTransaction = async () => {
-      try {
-        // Try to fetch from API first
-        const response = await fetch(`/api/transactions/${transactionId}`, {
-          headers: {
-            "x-user-id": "demo-user", // TODO: Get from auth context
-          },
-        });
+  const fetchTransaction = useCallback(async () => {
+    try {
+      // Try to fetch from API first
+      const response = await fetch(`/api/transactions/${transactionId}`, {
+        headers: {
+          "x-user-id": "demo-user", // TODO: Get from auth context
+        },
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          setTransaction(data.transaction);
-          setCurrentStep(data.transaction.lifecycle_step || 1);
-          // Calculate completed steps based on lifecycle_step
-          const completed = [];
-          for (let i = 1; i < (data.transaction.lifecycle_step || 1); i++) {
-            completed.push(i);
-          }
-          setCompletedSteps(completed);
-        } else {
-          // Fallback to localStorage for demo
-          const stored = localStorage.getItem("mock_transactions");
-          if (stored) {
-            const transactions = JSON.parse(stored);
-            const found = transactions.find((t: Transaction) => t.id === transactionId);
-            if (found) {
-              setTransaction(found);
-            }
-          }
+      if (response.ok) {
+        const data = await response.json();
+        setTransaction(data.transaction);
+        setCurrentStep(data.transaction.lifecycle_step || 1);
+        // Calculate completed steps based on lifecycle_step
+        const completed = [];
+        for (let i = 1; i < (data.transaction.lifecycle_step || 1); i++) {
+          completed.push(i);
         }
-      } catch (error) {
-        console.error("Failed to fetch transaction:", error);
-        // Fallback to localStorage
+        setCompletedSteps(completed);
+      } else {
+        // Fallback to localStorage for demo
         const stored = localStorage.getItem("mock_transactions");
         if (stored) {
           const transactions = JSON.parse(stored);
@@ -74,17 +64,36 @@ export default function TransactionPage() {
             setTransaction(found);
           }
         }
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch transaction:", error);
+      // Fallback to localStorage
+      const stored = localStorage.getItem("mock_transactions");
+      if (stored) {
+        const transactions = JSON.parse(stored);
+        const found = transactions.find((t: Transaction) => t.id === transactionId);
+        if (found) {
+          setTransaction(found);
+        }
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [transactionId, setTransaction, setCurrentStep, setCompletedSteps, setIsLoading]);
 
+  useEffect(() => {
     fetchTransaction();
-  }, [transactionId]);
+  }, [fetchTransaction]);
 
   // Derived State
+  const isClientApproved = transaction?.client_status === "approved";
   const isEscrowLocked = currentStep < 4;
-  const lockedTabs = isEscrowLocked ? ["escrow"] : [];
+
+  // Lock all tabs except Overview if client is not approved
+  // Otherwise, fallback to escrow locking logic
+  const lockedTabs = !isClientApproved
+    ? ["messages", "documents", "escrow", "assistant"]
+    : (isEscrowLocked ? ["escrow"] : []);
 
   const handleStepComplete = async () => {
     if (currentStep < 6) {
@@ -103,7 +112,7 @@ export default function TransactionPage() {
           body: JSON.stringify({ lifecycle_step: newStep }),
         });
       } catch (error) {
-        console.error("Failed to update lifecycle step:", error);
+        console.error("Failed to update step:", error);
       }
     }
   };
@@ -111,7 +120,7 @@ export default function TransactionPage() {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="h-full flex items-center justify-center">
+        <div className="flex items-center justify-center h-full">
           <Loader2 className="h-8 w-8 animate-spin text-[#0247ae]" />
         </div>
       );
@@ -119,7 +128,7 @@ export default function TransactionPage() {
 
     switch (activeTab) {
       case "overview":
-        return <OverviewTab transaction={transaction} />;
+        return <OverviewTab transaction={transaction} onTransactionUpdate={fetchTransaction} />;
       case "messages":
         return <ConversationTab transactionId={transactionId} />;
       case "documents":

@@ -51,13 +51,14 @@ export async function POST(request: NextRequest) {
         // Generate a client ID (in production, this would be from Cognito)
         const clientId = `client-${Date.now()}`;
 
-        // Update transaction with client info
+        // Update transaction with pending client info
         const { error: updateError } = await supabase
             .from("transactions")
             .update({
                 client_id: clientId,
                 client_name: client_name,
-                status: "client_joined",
+                client_status: "pending",
+                // status: "client_joined", // Don't update overall status yet until approved
             })
             .eq("id", transaction.id);
 
@@ -66,7 +67,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Failed to join transaction" }, { status: 500 });
         }
 
-        // Add client as participant
+        // Add client as participant with pending role or just client role?
+        // Let's stick to client role but the transaction field client_status determines access
         await supabase.from("transaction_participants").insert({
             transaction_id: transaction.id,
             user_id: clientId,
@@ -78,14 +80,14 @@ export async function POST(request: NextRequest) {
             transaction_id: transaction.id,
             actor_id: clientId,
             actor_role: "client",
-            action: "client_joined",
+            action: "client_joined_pending",
             details: { client_name, client_email },
         });
 
         return NextResponse.json({
             success: true,
             transaction_id: transaction.id,
-            message: "Successfully joined the transaction!",
+            message: "Request sent! Please wait for your agent to approve.",
         });
     } catch (error) {
         console.error("Join transaction error:", error);

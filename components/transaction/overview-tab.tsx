@@ -2,12 +2,21 @@
 
 import { MapPin, DollarSign, Calendar, Users } from "lucide-react";
 import type { Transaction } from "@/lib/types/transaction";
+import { ClientInviteSection } from "./client-invite-section";
 
-interface OverviewTabProps {
-  transaction: Transaction | null;
+interface ExtendedTransaction extends Transaction {
+  client_status?: "none" | "pending" | "approved" | "rejected";
+  client_invite_code?: string;
+  client_invite_expires_at?: string;
+  client_name?: string;
 }
 
-export function OverviewTab({ transaction }: OverviewTabProps) {
+interface OverviewTabProps {
+  transaction: ExtendedTransaction | null;
+  onTransactionUpdate?: () => void;
+}
+
+export function OverviewTab({ transaction, onTransactionUpdate }: OverviewTabProps) {
   if (!transaction) {
     return (
       <div className="h-full bg-white p-6">
@@ -43,6 +52,18 @@ export function OverviewTab({ transaction }: OverviewTabProps) {
       </div>
 
       <div className="p-6 space-y-6">
+        {/* Client Invite Section */}
+        {transaction.client_status !== "approved" && (
+          <ClientInviteSection
+            transactionId={transaction.id}
+            accessCode={transaction.client_invite_code || transaction.access_code || "N/A"}
+            expiresAt={transaction.client_invite_expires_at || transaction.access_code_expires_at || new Date().toISOString()}
+            clientStatus={transaction.client_status || "none"}
+            pendingClientName={transaction.client_name}
+            onApprove={onTransactionUpdate}
+            onReject={onTransactionUpdate}
+          />
+        )}
         {/* Status Badge */}
         <div>
           <span
@@ -94,7 +115,7 @@ export function OverviewTab({ transaction }: OverviewTabProps) {
           <div className="space-y-3">
             {[
               { label: "Transaction Initiated", completed: true },
-              { label: "Client Joined", completed: transaction.status !== "initiated" },
+              { label: "Client Joined", completed: transaction.client_status === "approved" || transaction.status !== "initiated" },
               { label: "Documents Submitted", completed: ["documents_review", "payment_pending", "payment_held", "developer_handoff", "completed"].includes(transaction.status) },
               { label: "Payment Processed", completed: ["payment_held", "developer_handoff", "completed"].includes(transaction.status) },
               { label: "Completed", completed: transaction.status === "completed" },
