@@ -12,7 +12,7 @@ import trustateLogo from "@/app/assets/trustate-logo.png";
 import { useSidebar } from "@/lib/contexts/sidebar-context";
 import { useTheme } from "@/lib/contexts/theme-context";
 
-const getNavItems = (accountType: AccountType | null) => {
+const getNavItems = (accountType: AccountType | null, brokerType: "individual" | "firm" | null) => {
   const baseItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/dashboard/settings", label: "Settings", icon: Settings },
@@ -40,14 +40,17 @@ const getNavItems = (accountType: AccountType | null) => {
   }
 
   if (accountType === "broker") {
-    return [
+    const items = [
       baseItems[0],
       { href: "/dashboard/agents", label: "Agents", icon: Users },
-      { href: "/dashboard/transactions", label: "Transactions", icon: FileText },
-      { href: "/dashboard/analytics", label: "Analytics", icon: TrendingUp },
-      { href: "/dashboard/firm", label: "Firm", icon: Briefcase },
-      baseItems[1],
     ];
+
+    if (brokerType === "firm") {
+      items.push({ href: "/dashboard/firm", label: "Firm", icon: Briefcase });
+    }
+
+    items.push(baseItems[1]);
+    return items;
   }
 
   return baseItems;
@@ -56,7 +59,7 @@ const getNavItems = (accountType: AccountType | null) => {
 export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { firstName, lastName, accountType } = useAuth();
+  const { firstName, lastName, accountType, brokerType } = useAuth();
   const { collapsed, setCollapsed } = useSidebar();
   const { theme, toggleTheme } = useTheme();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -74,10 +77,10 @@ export function DashboardSidebar() {
 
   const fullName = [firstName, lastName].filter(Boolean).join(" ") || "User";
   const initials = fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-  const navItems = getNavItems(accountType);
+  const navItems = getNavItems(accountType, brokerType);
 
   return (
-    <aside 
+    <aside
       className={`
         bg-white dark:bg-gray-800 
         border-r border-gray-200 dark:border-gray-700 
@@ -104,7 +107,7 @@ export function DashboardSidebar() {
             </h1>
           )}
         </div>
-        
+
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-all duration-300 hover:scale-110 shrink-0"
@@ -119,7 +122,7 @@ export function DashboardSidebar() {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
-            
+
             return (
               <li key={item.href}>
                 <Link
@@ -141,7 +144,7 @@ export function DashboardSidebar() {
                       {item.label}
                     </span>
                   )}
-                  
+
                   {/* Tooltip (only when collapsed) */}
                   {collapsed && (
                     <div className="absolute left-full ml-4 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
@@ -167,7 +170,7 @@ export function DashboardSidebar() {
               title={theme === "light" ? "Dark Mode" : "Light Mode"}
             >
               {theme === "light" ? <Moon size={20} strokeWidth={2} /> : <Sun size={20} strokeWidth={2} />}
-              
+
               {/* Tooltip */}
               <div className="absolute left-full ml-4 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
                 {theme === "light" ? "Dark Mode" : "Light Mode"}
@@ -179,7 +182,7 @@ export function DashboardSidebar() {
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {theme === "light" ? "Light" : "Dark"}
               </span>
-              
+
               <button
                 onClick={toggleTheme}
                 className={`
@@ -213,14 +216,14 @@ export function DashboardSidebar() {
           <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#0247ae] to-[#0560d4] flex items-center justify-center cursor-pointer hover:shadow-lg hover:shadow-[#0247ae]/25 transition-all duration-300 shrink-0 hover:scale-105">
             <span className="text-sm font-bold text-white">{initials}</span>
           </div>
-          
+
           {!collapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{fullName}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{accountType}</p>
             </div>
           )}
-          
+
           {/* Tooltip (only when collapsed) */}
           {collapsed && (
             <div className="absolute left-full ml-4 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">
@@ -230,7 +233,7 @@ export function DashboardSidebar() {
             </div>
           )}
         </div>
-        
+
         {/* Logout Button */}
         <button
           onClick={handleSignOut}
@@ -248,7 +251,7 @@ export function DashboardSidebar() {
         >
           <LogOut size={20} strokeWidth={2} className={`shrink-0 ${isLoggingOut ? "animate-pulse" : ""}`} />
           {!collapsed && <span className="text-sm font-medium">{isLoggingOut ? "Signing out..." : "Sign Out"}</span>}
-          
+
           {/* Tooltip (only when collapsed) */}
           {collapsed && (
             <div className="absolute left-full ml-4 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 pointer-events-none">

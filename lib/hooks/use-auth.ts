@@ -13,6 +13,7 @@ interface AuthState {
   firstName: string | null;
   lastName: string | null;
   userId: string | null;
+  brokerType: "individual" | "firm" | null;
 }
 
 export function useAuth() {
@@ -25,13 +26,14 @@ export function useAuth() {
     firstName: null,
     lastName: null,
     userId: null,
+    brokerType: null,
   });
 
   const checkAuth = useCallback(async () => {
     try {
       const user = await getCurrentUser();
       const attributes = await fetchUserAttributes();
-      
+
       setState({
         isLoading: false,
         isAuthenticated: true,
@@ -41,6 +43,7 @@ export function useAuth() {
         firstName: attributes.given_name || null,
         lastName: attributes.family_name || null,
         userId: user.userId || null,
+        brokerType: (attributes["custom:broker_type"] as "individual" | "firm") || null,
       });
     } catch {
       setState({
@@ -52,6 +55,7 @@ export function useAuth() {
         firstName: null,
         lastName: null,
         userId: null,
+        brokerType: null,
       });
     }
   }, []);
