@@ -20,7 +20,10 @@ const arsenalSC = Arsenal_SC({
 });
 
 export const metadata: Metadata = {
-  title: "TruState - Login",
+  title: {
+    template: "%s | Trustate",
+    default: "Trustate",
+  },
   description: "TruState - The Transaction Integrity Layer",
   icons: {
     icon: [
