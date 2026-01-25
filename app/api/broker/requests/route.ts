@@ -57,12 +57,23 @@ export async function GET(req: NextRequest) {
 
                 const detailedRequests = await Promise.all(requests.map(async (req: any) => {
                     try {
-                        const user = await cognito.adminGetUser({
+                        // We use listUsers with a filter because agent_id is likely the 'sub' (UUID),
+                        // and adminGetUser requires the exact 'Username', which might differ.
+                        const listUsersResponse = await cognito.listUsers({
                             UserPoolId: userPoolId,
-                            Username: req.agent_id
+                            Filter: `sub = "${req.agent_id}"`,
+                            Limit: 1
                         }).promise();
 
-                        const attributes = user.UserAttributes.reduce((acc: any, attr: any) => {
+                        const user = listUsersResponse.Users && listUsersResponse.Users.length > 0
+                            ? listUsersResponse.Users[0]
+                            : null;
+
+                        if (!user) {
+                            throw new Error("User not found in Cognito");
+                        }
+
+                        const attributes = user.Attributes.reduce((acc: any, attr: any) => {
                             acc[attr.Name] = attr.Value;
                             return acc;
                         }, {});
