@@ -109,7 +109,7 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="max-w-6xl w-full p-8 md:p-10 overflow-hidden">
+            <DialogContent className="max-w-[95vw] w-full md:max-w-7xl p-8 md:p-10 overflow-hidden">
                 <DialogHeader className="mb-8">
                     <div className="flex items-center gap-5">
                         <div className="h-14 w-14 rounded-2xl bg-[#0247ae]/10 flex items-center justify-center text-[#0247ae] shadow-sm">
@@ -125,7 +125,7 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                 </DialogHeader>
 
                 <form onSubmit={onSubmit} className="space-y-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24">
                         {/* Left Column: Project Context */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
