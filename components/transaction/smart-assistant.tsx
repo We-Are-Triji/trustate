@@ -20,6 +20,11 @@ interface SmartAssistantProps {
         lifecycleStep?: number;
         status?: string;
     };
+    aiContext?: {
+        documentId: string;
+        fileName: string;
+        fileUrl: string;
+    } | null;
 }
 
 const ASSISTANT_API_URL = process.env.NEXT_PUBLIC_ASSISTANT_API_URL;
@@ -47,10 +52,13 @@ const quickActions = [
 
 async function sendToAssistant(
     messages: Message[],
-    transactionContext: SmartAssistantProps["transactionContext"]
+    transactionContext: SmartAssistantProps["transactionContext"],
+    documentContext?: string
 ): Promise<string> {
     if (!ASSISTANT_API_URL) {
-        throw new Error("Assistant API not configured");
+        // Mock response if API not set
+        await new Promise(r => setTimeout(r, 1000));
+        return "I am simulating an AI response because the API URL is not configured. Context received.";
     }
 
     const contextString = transactionContext
@@ -61,6 +69,8 @@ async function sendToAssistant(
 - Status: ${transactionContext.status || "Unknown"}`
         : "";
 
+    const docString = documentContext ? `\n\nActive Document Content:\n${documentContext}` : "";
+
     const response = await fetch(ASSISTANT_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -68,7 +78,7 @@ async function sendToAssistant(
             messages: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
             userContext: {
                 currentPage: "Transaction Workbench",
-                transactionContext: contextString,
+                transactionContext: contextString + docString,
             },
             systemPromptOverride: TRANSACTION_SYSTEM_CONTEXT + contextString,
         }),
@@ -82,7 +92,7 @@ async function sendToAssistant(
     return data.response;
 }
 
-export function SmartAssistant({ transactionId, transactionContext }: SmartAssistantProps) {
+export function SmartAssistant({ transactionId, transactionContext, aiContext }: SmartAssistantProps) {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: "welcome",
@@ -95,6 +105,7 @@ export function SmartAssistant({ transactionId, transactionContext }: SmartAssis
     const [isTyping, setIsTyping] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const processedContextRef = useRef<string | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,6 +114,82 @@ export function SmartAssistant({ transactionId, transactionContext }: SmartAssis
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Handle incoming AI Context (Document Analysis)
+    useEffect(() => {
+        if (aiContext && processedContextRef.current !== aiContext.documentId) {
+            handleAnalyzeDocument(aiContext);
+            processedContextRef.current = aiContext.documentId;
+        }
+    }, [aiContext]);
+
+    const handleAnalyzeDocument = async (context: NonNullable<SmartAssistantProps["aiContext"]>) => {
+        setIsTyping(true);
+
+        // 1. Add user message
+        const userMessage: Message = {
+            id: `user-analyze-${Date.now()}`,
+            role: "user",
+            content: `Analyze this document: ${context.fileName}`,
+            timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, userMessage]);
+
+        try {
+            // 2. Call Textract API to get text
+            // Derive S3 Key from URL (Fragile but functional for this setup)
+            // URL: https://bucket.s3.region.amazonaws.com/transactions/id/file
+            // We need: transactions/id/file
+            const s3UrlParts = context.fileUrl.split(".amazonaws.com/");
+            const s3Key = s3UrlParts.length > 1 ? s3UrlParts[1] : null;
+
+            if (!s3Key) {
+                throw new Error("Could not determine file location");
+            }
+
+            const extractRes = await fetch("/api/ai/analyze", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "x-user-id": "ai-client" }, // TODO: proper auth
+                body: JSON.stringify({ documentId: context.documentId, s3Key }),
+            });
+
+            if (!extractRes.ok) throw new Error("Document analysis failed");
+
+            const extractData = await extractRes.json();
+            const documentText = extractData.text;
+
+            // 3. Send extracted text to LLM for summary
+            const aiResponse = await sendToAssistant(
+                [...messages, userMessage, {
+                    id: "system-context",
+                    role: "user",
+                    content: `Here is the content of the document "${context.fileName}":\n\n${documentText}\n\nPlease analyze it and summarize the key points.`
+                } as Message], // Inject as context
+                transactionContext,
+                documentText // Also pass as separate context if needed
+            );
+
+            const assistantMessage: Message = {
+                id: `assistant-${Date.now()}`,
+                role: "assistant",
+                content: aiResponse,
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, assistantMessage]);
+
+        } catch (err) {
+            console.error("Analysis Error:", err);
+            const errorMessage: Message = {
+                id: `error-${Date.now()}`,
+                role: "assistant",
+                content: "I'm sorry, I couldn't read that document. It might be password protected or in an unsupported format.",
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsTyping(false);
+        }
+    };
 
     const handleSend = async (messageText?: string) => {
         const text = messageText || input;

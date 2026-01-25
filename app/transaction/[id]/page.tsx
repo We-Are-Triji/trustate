@@ -38,6 +38,7 @@ export default function TransactionPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [aiContext, setAiContext] = useState<{ documentId: string; fileName: string; fileUrl: string } | null>(null);
 
   // Fetch transaction data
   const fetchTransaction = useCallback(async () => {
@@ -132,6 +133,15 @@ export default function TransactionPage() {
     }
   };
 
+  const handleAnalyzeDocument = (doc: any) => {
+    setAiContext({
+      documentId: doc.id,
+      fileName: doc.file_name,
+      fileUrl: doc.file_url
+    });
+    setActiveTab("assistant");
+  };
+
   const renderContent = () => {
     if (isLoading || authLoading) {
       return (
@@ -160,7 +170,7 @@ export default function TransactionPage() {
       case "messages":
         return <ConversationTab transactionId={transactionId} />;
       case "documents":
-        return <DocumentVault transactionId={transactionId} />;
+        return <DocumentVault transactionId={transactionId} onAnalyzeDocument={handleAnalyzeDocument} />;
       case "escrow":
         return <EscrowForm transactionId={transactionId} />;
       case "activity":
@@ -175,6 +185,7 @@ export default function TransactionPage() {
               lifecycleStep: currentStep,
               status: transaction?.status,
             }}
+            aiContext={aiContext}
           />
         );
       case "settings":
