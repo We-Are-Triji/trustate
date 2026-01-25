@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, ArrowUpRight, Building2, Calendar, DollarSign } from "lucide-react";
+import { Plus, Search, ArrowUpRight, Building2, Calendar, DollarSign, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "../ui/badge";
@@ -12,7 +12,7 @@ import { CreateTransactionModal } from "./create-transaction-modal";
 import { JoinTransactionModal } from "./join-transaction-modal";
 
 export default function TransactionList() {
-    const { userId, accountType } = useAuth();
+    const { userId, accountType, isLoading: authLoading } = useAuth();
     const router = useRouter();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -89,6 +89,14 @@ export default function TransactionList() {
     });
 
     const hasTransactions = transactions.length > 0;
+
+    if (authLoading) {
+        return (
+            <div className="p-8 flex justify-center items-center h-[calc(100vh-100px)]">
+                <Loader2 className="animate-spin text-gray-400" size={32} />
+            </div>
+        );
+    }
 
     return (
         <div className={`p-8 ${!hasTransactions ? "flex flex-col h-[calc(100vh-100px)] justify-center" : ""}`}>

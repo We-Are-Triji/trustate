@@ -12,36 +12,6 @@ export default function DashboardClient() {
     const fullName = [firstName, lastName].filter(Boolean).join(" ") || "User";
     const initials = fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
-    const getQuickActions = () => {
-        if (accountType === "client") {
-            return [
-                { title: "Browse Properties", desc: "Find your dream property", icon: Building2, href: "/properties", disabled: userStatus === "registered" },
-                { title: "My Transactions", desc: "View active transactions", icon: FileText, href: "/dashboard/transactions", disabled: userStatus === "registered" },
-                { title: "Messages", desc: "Chat with agents", icon: MessageSquare, href: "/dashboard/messages", disabled: userStatus === "registered" },
-            ];
-        }
-
-        if (accountType === "agent") {
-            return [
-                { title: "My Clients", desc: "Manage client relationships", icon: Users, href: "/dashboard/clients", disabled: userStatus === "registered" },
-                { title: "Transactions", desc: "Track ongoing deals", icon: FileText, href: "/dashboard/transactions", disabled: userStatus === "registered" },
-                { title: "Listings", desc: "Manage property listings", icon: Building2, href: "/dashboard/listings", disabled: userStatus === "registered" },
-            ];
-        }
-
-        if (accountType === "broker") {
-            return [
-                { title: "My Agents", desc: "Manage your agent network", icon: Users, href: "/dashboard/agents", disabled: userStatus === "registered" },
-                { title: "Analytics", desc: "View performance metrics", icon: TrendingUp, href: "/dashboard/analytics", disabled: userStatus === "registered" },
-                { title: "Firm Management", desc: "Manage firm operations", icon: Briefcase, href: "/dashboard/firm", disabled: userStatus === "registered" },
-            ];
-        }
-
-        return [];
-    };
-
-    const quickActions = getQuickActions();
-
     const currentHour = new Date().getHours();
     const greeting = currentHour < 12 ? "Good morning" : currentHour < 18 ? "Good afternoon" : "Good evening";
 
@@ -113,49 +83,7 @@ export default function DashboardClient() {
                     </div>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="mb-6">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {quickActions.map((action) => (
-                            <div
-                                key={action.title}
-                                className={`bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 transition-all duration-200 ${action.disabled
-                                        ? "opacity-60 cursor-not-allowed"
-                                        : "hover:shadow-lg hover:shadow-[#0247ae]/10 dark:hover:shadow-[#0560d4]/10 hover:-translate-y-1 hover:border-[#0247ae]/30 dark:hover:border-[#0560d4]/30 cursor-pointer"
-                                    }`}
-                                onClick={() => !action.disabled && router.push(action.href)}
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800 shrink-0 transition-all duration-200 ${!action.disabled && "group-hover:scale-110"
-                                        }`}>
-                                        <action.icon className="h-6 w-6 text-[#0247ae] dark:text-[#0560d4]" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="text-base font-bold text-gray-900 dark:text-white mb-1">
-                                            {action.title}
-                                        </h4>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                            {action.desc}
-                                        </p>
-                                        {!action.disabled && (
-                                            <div className="flex items-center text-[#0247ae] dark:text-[#0560d4] font-semibold text-sm gap-2">
-                                                <span>Open</span>
-                                                <ArrowRight className="h-4 w-4" />
-                                            </div>
-                                        )}
-                                        {action.disabled && (
-                                            <div className="flex items-center text-gray-400 dark:text-gray-500 text-sm gap-2">
-                                                <ShieldCheck className="h-4 w-4" />
-                                                <span className="font-medium">Verification Required</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+
 
 
             </div>
