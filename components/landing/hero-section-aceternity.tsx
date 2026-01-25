@@ -11,7 +11,7 @@ export function HeroSectionAceternity() {
     <div className="relative min-h-screen w-full bg-gradient-to-b from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center overflow-hidden">
       <BackgroundBeams />
       
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20">
         <div className="text-center">
           {/* Badge */}
           <motion.div
@@ -31,7 +31,7 @@ export function HeroSectionAceternity() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight px-2"
           >
             Find Your Dream
             <br />
@@ -45,7 +45,7 @@ export function HeroSectionAceternity() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-10 md:mb-12 max-w-3xl mx-auto px-4"
           >
             Connect with verified agents, brokers, and developers. Your journey to homeownership starts here.
           </motion.p>
@@ -55,25 +55,25 @@ export function HeroSectionAceternity() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4"
           >
             <Link href="/register">
               <MovingBorderButton
                 borderRadius="1.75rem"
-                className="bg-slate-900 text-white border-slate-800 px-8 py-4"
-                containerClassName="h-14"
+                className="bg-slate-900 text-white border-slate-800 px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto"
+                containerClassName="h-12 sm:h-14"
                 borderClassName="bg-[radial-gradient(var(--blue-500)_40%,transparent_60%)]"
               >
-                <span className="flex items-center gap-2 font-semibold">
+                <span className="flex items-center gap-2 font-semibold text-sm sm:text-base">
                   Get Started Free
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                 </span>
               </MovingBorderButton>
             </Link>
 
             <Link href="/developers">
-              <button className="h-14 px-8 py-4 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold hover:bg-white/20 transition-all duration-300 flex items-center gap-2">
-                <Home className="h-5 w-5" />
+              <button className="h-12 sm:h-14 px-6 sm:px-8 py-3 sm:py-4 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold hover:bg-white/20 transition-all duration-300 flex items-center gap-2 w-full sm:w-auto justify-center text-sm sm:text-base">
+                <Home className="h-4 w-4 sm:h-5 sm:w-5" />
                 Browse Properties
               </button>
             </Link>
@@ -84,7 +84,7 @@ export function HeroSectionAceternity() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20 max-w-4xl mx-auto"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12 sm:mt-16 md:mt-20 max-w-4xl mx-auto px-4"
           >
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
               <div className="flex items-center justify-center gap-2 mb-2">

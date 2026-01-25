@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   LandingHeader,
   HeroSection,
@@ -17,20 +17,31 @@ import {
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
   
-  // Optimized parallax effects - removed blur and reduced complexity
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -80]);
+  // Optimized parallax effects - disabled on mobile
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], isMobile ? [1, 1] : [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 0.3], isMobile ? [0, 0] : [0, -80]);
 
   useEffect(() => {
+    // Check if mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
     
     return () => {
+      window.removeEventListener('resize', checkMobile);
       document.documentElement.style.scrollBehavior = '';
     };
   }, []);
@@ -39,7 +50,7 @@ export default function Home() {
     <div ref={containerRef} className="relative">
       <LandingHeader />
       
-      {/* Hero Section with optimized parallax */}
+      {/* Hero Section with optimized parallax (disabled on mobile) */}
       <motion.div
         style={{ 
           opacity: heroOpacity,

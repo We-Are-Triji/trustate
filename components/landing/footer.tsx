@@ -167,25 +167,25 @@ export function LandingFooter({ partners, sections }: LandingFooterProps) {
                </div>
             </div>
             
-            <h3 className="mb-3 text-2xl font-bold text-white sm:text-4xl">
+            <h3 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-bold text-white">
               Stay Updated
             </h3>
-            <p className="mb-8 text-white/80 text-lg max-w-xl mx-auto">
+            <p className="mb-6 sm:mb-8 text-white/80 text-base sm:text-lg max-w-xl mx-auto px-4">
               Get updates on verified agents, platform features, and real estate industry insights
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row sm:justify-center max-w-lg mx-auto">
+            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 sm:justify-center max-w-lg mx-auto px-4">
               <div className="relative flex-1">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-white/50" />
                 <Input
                   type="email"
                   placeholder="Enter your email"
-                  className="h-14 rounded-full border-white/20 bg-white/10 backdrop-blur-md pl-12 pr-6 text-white placeholder:text-white/50 focus:bg-white/20 focus:border-white/40 transition-all duration-300 w-full"
+                  className="h-12 sm:h-14 rounded-full border-white/20 bg-white/10 backdrop-blur-md pl-11 sm:pl-12 pr-6 text-white placeholder:text-white/50 focus:bg-white/20 focus:border-white/40 transition-all duration-300 w-full text-sm sm:text-base"
                 />
               </div>
-              <Button className="h-14 rounded-full bg-gradient-to-r from-[#ffce08] to-[#f5c000] px-8 font-bold text-[#0247ae] hover:from-[#f5c000] hover:to-[#ffce08] shadow-xl shadow-[#ffce08]/30 transition-all duration-500 hover:shadow-2xl hover:shadow-[#ffce08]/50 hover:scale-105 group overflow-hidden relative">
+              <Button className="h-12 sm:h-14 rounded-full bg-gradient-to-r from-[#ffce08] to-[#f5c000] px-6 sm:px-8 font-bold text-[#0247ae] hover:from-[#f5c000] hover:to-[#ffce08] shadow-xl shadow-[#ffce08]/30 transition-all duration-500 hover:shadow-2xl hover:shadow-[#ffce08]/50 hover:scale-105 group overflow-hidden relative text-sm sm:text-base">
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                 <span className="relative">Subscribe</span>
-                <Send className="relative ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                <Send className="relative ml-2 h-3 w-3 sm:h-4 sm:w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
             </div>
           </div>
@@ -202,10 +202,10 @@ export function LandingFooter({ partners, sections }: LandingFooterProps) {
         <div className="absolute left-[5%] bottom-[20%] h-32 w-32 rounded-full bg-[#ffce08]/5 blur-3xl pointer-events-none" />
         
         <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="mb-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mb-14 grid gap-8 sm:gap-10 sm:grid-cols-2 lg:grid-cols-5">
             {/* Brand column */}
             <div className="lg:col-span-1">
-              <Link href="/" className="mb-6 inline-block group">
+              <Link href="/" className="mb-4 sm:mb-6 inline-block group">
                 <Image
                   src={trustateLogo}
                   alt="TruState"
@@ -214,10 +214,10 @@ export function LandingFooter({ partners, sections }: LandingFooterProps) {
                   className="brightness-0 invert transition-transform duration-300 group-hover:scale-105"
                 />
               </Link>
-              <p className="mb-6 text-sm text-gray-400 leading-relaxed">
+              <p className="mb-4 sm:mb-6 text-xs sm:text-sm text-gray-400 leading-relaxed">
                 Your trusted partner in Philippine real estate. The Transaction Integrity Layer connecting clients with verified, licensed agents and brokers.
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 {[
                   { icon: Facebook, label: 'Facebook' },
                   { icon: Twitter, label: 'Twitter' },
@@ -228,9 +228,9 @@ export function LandingFooter({ partners, sections }: LandingFooterProps) {
                     key={label}
                     href="#" 
                     aria-label={label}
-                    className="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 text-white transition-all duration-500 hover:bg-gradient-to-br hover:from-[#ffce08] hover:to-[#f5c000] hover:text-[#0247ae] hover:scale-110 hover:shadow-lg hover:shadow-[#ffce08]/20 group/social"
+                    className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/5 text-white transition-all duration-500 hover:bg-gradient-to-br hover:from-[#ffce08] hover:to-[#f5c000] hover:text-[#0247ae] hover:scale-110 hover:shadow-lg hover:shadow-[#ffce08]/20 group/social"
                   >
-                    <Icon className="h-5 w-5 transition-transform duration-300 group-hover/social:scale-110" />
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5 transition-transform duration-300 group-hover/social:scale-110" />
                   </a>
                 ))}
               </div>
@@ -239,15 +239,15 @@ export function LandingFooter({ partners, sections }: LandingFooterProps) {
             {/* Link columns */}
             {sections.map((section, sectionIndex) => (
               <div key={section.title}>
-                <h4 className="mb-5 font-bold text-white text-lg">
+                <h4 className="mb-4 sm:mb-5 font-bold text-white text-base sm:text-lg">
                   {section.title}
                 </h4>
-                <ul className="space-y-3">
+                <ul className="space-y-2 sm:space-y-3">
                   {section.links.map((link, linkIndex) => (
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="group/link flex items-center text-sm text-gray-400 transition-all duration-300 hover:text-[#ffce08] hover:translate-x-1"
+                        className="group/link flex items-center text-xs sm:text-sm text-gray-400 transition-all duration-300 hover:text-[#ffce08] hover:translate-x-1"
                       >
                         <ArrowRight className="h-3 w-3 mr-2 opacity-0 -translate-x-2 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all duration-300" />
                         {link.label}
@@ -260,32 +260,32 @@ export function LandingFooter({ partners, sections }: LandingFooterProps) {
           </div>
 
           {/* Contact info */}
-          <div className="mb-10 flex flex-wrap justify-center gap-8 border-t border-white/10 pt-10 text-sm text-gray-400">
+          <div className="mb-10 flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 border-t border-white/10 pt-10 text-xs sm:text-sm text-gray-400">
             {[
               { icon: Mail, text: 'support@trustate.ph' },
               { icon: Phone, text: '+63 (2) 8888-7777' },
               { icon: MapPin, text: 'Makati City, Philippines' },
             ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-2.5 group/contact cursor-pointer hover:text-white transition-colors duration-300">
-                <div className="p-2 rounded-full bg-[#ffce08]/10 group-hover/contact:bg-[#ffce08]/20 transition-colors duration-300">
-                  <Icon className="h-4 w-4 text-[#ffce08]" />
+              <div key={text} className="flex items-center gap-2 sm:gap-2.5 group/contact cursor-pointer hover:text-white transition-colors duration-300">
+                <div className="p-1.5 sm:p-2 rounded-full bg-[#ffce08]/10 group-hover/contact:bg-[#ffce08]/20 transition-colors duration-300">
+                  <Icon className="h-3 w-3 sm:h-4 sm:w-4 text-[#ffce08]" />
                 </div>
-                <span>{text}</span>
+                <span className="break-all">{text}</span>
               </div>
             ))}
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
-            <p className="text-sm text-gray-500">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 sm:pt-8 sm:flex-row">
+            <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
               &copy; {new Date().getFullYear()} Trustate. All rights reserved.
             </p>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
               {['Privacy', 'Terms', 'Cookies'].map((item) => (
                 <Link 
                   key={item}
                   href={`/${item.toLowerCase()}`} 
-                  className="text-sm text-gray-500 hover:text-[#ffce08] transition-all duration-300 hover:underline underline-offset-4"
+                  className="text-xs sm:text-sm text-gray-500 hover:text-[#ffce08] transition-all duration-300 hover:underline underline-offset-4"
                 >
                   {item}
                 </Link>

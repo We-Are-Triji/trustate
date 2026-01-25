@@ -135,11 +135,11 @@ export function HowItWorksSection() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="grid gap-16 lg:grid-cols-2 lg:gap-24 items-center">
+        <div className="grid gap-12 sm:gap-16 lg:grid-cols-2 lg:gap-24 items-center">
           
           {/* --- LEFT SIDE: Visuals --- */}
           <div className="relative order-2 lg:order-1">
-            <div className="relative mx-auto max-w-md aspect-square flex items-center justify-center">
+            <div className="relative mx-auto max-w-md aspect-square flex items-center justify-center px-4">
               
               {/* 1. Outer Ring (Expands AFTER House) */}
               <div 
@@ -155,36 +155,36 @@ export function HowItWorksSection() {
               
               {/* 3. CENTER HOUSE (The Trigger - Pops First) */}
               <div 
-                className={`relative z-10 h-36 w-36 rounded-full bg-gradient-to-br from-[#0247ae] to-[#0560d4] flex flex-col items-center justify-center shadow-2xl shadow-blue-900/30 opacity-0 ${isVisible ? 'animate-heavy-pop' : ''}`}
+                className={`relative z-10 h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 rounded-full bg-gradient-to-br from-[#0247ae] to-[#0560d4] flex flex-col items-center justify-center shadow-2xl shadow-blue-900/30 opacity-0 ${isVisible ? 'animate-heavy-pop' : ''}`}
                 style={{ animationDelay: '0s' }} // Instant
               >
                  {/* Inner Glow */}
                  <div className="absolute inset-0 rounded-full bg-white/10 animate-pulse" />
                  
-                 <Home className="h-10 w-10 text-white drop-shadow-md mb-1" />
+                 <Home className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 text-white drop-shadow-md mb-1" />
                  
                  <div className="text-center">
-                   <p className="text-[10px] font-bold text-blue-200 tracking-widest uppercase mb-0.5">THE</p>
-                   <p className="text-sm font-extrabold text-white leading-none">TRUSTATE</p>
-                   <p className="text-[9px] font-medium text-blue-100 mt-1 tracking-wider opacity-80">PROTOCOL</p>
+                   <p className="text-[9px] sm:text-[10px] font-bold text-blue-200 tracking-widest uppercase mb-0.5">THE</p>
+                   <p className="text-xs sm:text-sm font-extrabold text-white leading-none">TRUSTATE</p>
+                   <p className="text-[8px] sm:text-[9px] font-medium text-blue-100 mt-1 tracking-wider opacity-80">PROTOCOL</p>
                  </div>
               </div>
 
               {/* --- FLOATING CHATBOX 1 (Blue/Verified) --- */}
               <div 
-                className={`absolute -left-6 top-[15%] z-20 w-48 opacity-0 ${isVisible ? 'animate-fly-left' : ''}`}
+                className={`absolute -left-2 sm:-left-6 top-[15%] z-20 w-40 sm:w-48 opacity-0 ${isVisible ? 'animate-fly-left' : ''}`}
                 style={{ animationDelay: '0.6s' }}
               >
                 <div className="relative group cursor-pointer hover:scale-105 transition-transform duration-300 animate-[float-gentle_4s_ease-in-out_infinite]">
-                  <div className="absolute -bottom-2 right-6 w-4 h-4 bg-[#0560d4] rotate-45 transform origin-center"></div>
-                  <div className="relative rounded-2xl rounded-br-none bg-gradient-to-br from-[#0247ae] to-[#0560d4] p-4 shadow-xl shadow-blue-900/20 border border-white/10 backdrop-blur-md">
-                    <div className="relative flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
-                        <ShieldCheck className="h-5 w-5 text-white" />
+                  <div className="absolute -bottom-2 right-4 sm:right-6 w-3 h-3 sm:w-4 sm:h-4 bg-[#0560d4] rotate-45 transform origin-center"></div>
+                  <div className="relative rounded-2xl rounded-br-none bg-gradient-to-br from-[#0247ae] to-[#0560d4] p-3 sm:p-4 shadow-xl shadow-blue-900/20 border border-white/10 backdrop-blur-md">
+                    <div className="relative flex items-center gap-2 sm:gap-3">
+                      <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/20">
+                        <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase font-bold text-blue-200/80 tracking-wider">Discover</p>
-                        <p className="text-sm font-bold text-white">Browse Agents</p>
+                        <p className="text-[9px] sm:text-[10px] uppercase font-bold text-blue-200/80 tracking-wider">Discover</p>
+                        <p className="text-xs sm:text-sm font-bold text-white">Browse Agents</p>
                       </div>
                     </div>
                   </div>
@@ -193,19 +193,19 @@ export function HowItWorksSection() {
 
               {/* --- FLOATING CHATBOX 2 (Yellow/Premium) --- */}
               <div 
-                className={`absolute -right-4 bottom-[20%] z-20 w-48 opacity-0 ${isVisible ? 'animate-fly-right' : ''}`}
+                className={`absolute -right-2 sm:-right-4 bottom-[20%] z-20 w-40 sm:w-48 opacity-0 ${isVisible ? 'animate-fly-right' : ''}`}
                 style={{ animationDelay: '0.7s' }}
               >
                 <div className="relative group cursor-pointer hover:scale-105 transition-transform duration-300 animate-[float-gentle_5s_ease-in-out_infinite_1s]">
-                  <div className="absolute -top-1 left-6 w-4 h-4 bg-[#ffce08] rotate-45 transform origin-center"></div>
-                  <div className="relative rounded-2xl rounded-tl-none bg-gradient-to-br from-[#ffce08] to-[#f5c000] p-4 shadow-xl shadow-yellow-600/20 border border-white/20 backdrop-blur-md">
-                    <div className="relative flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/30">
-                        <Star className="h-5 w-5 text-[#0247ae] fill-[#0247ae]" />
+                  <div className="absolute -top-1 left-4 sm:left-6 w-3 h-3 sm:w-4 sm:h-4 bg-[#ffce08] rotate-45 transform origin-center"></div>
+                  <div className="relative rounded-2xl rounded-tl-none bg-gradient-to-br from-[#ffce08] to-[#f5c000] p-3 sm:p-4 shadow-xl shadow-yellow-600/20 border border-white/20 backdrop-blur-md">
+                    <div className="relative flex items-center gap-2 sm:gap-3">
+                      <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white/30">
+                        <Star className="h-4 w-4 sm:h-5 sm:w-5 text-[#0247ae] fill-[#0247ae]" />
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase font-bold text-[#0247ae]/70 tracking-wider">Verify</p>
-                        <p className="text-sm font-bold text-[#0247ae]">Review Profile</p>
+                        <p className="text-[9px] sm:text-[10px] uppercase font-bold text-[#0247ae]/70 tracking-wider">Verify</p>
+                        <p className="text-xs sm:text-sm font-bold text-[#0247ae]">Review Profile</p>
                       </div>
                     </div>
                   </div>
@@ -236,38 +236,38 @@ export function HowItWorksSection() {
               className={`opacity-0 ${isVisible ? 'animate-slide-up' : ''}`}
               style={{ animationDelay: '0.3s' }}
             >
-              <h2 className="mb-4 text-4xl font-bold text-gray-900 leading-tight">
+              <h2 className="mb-3 sm:mb-4 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
                 Connect with Confidence
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-base sm:text-lg text-gray-600">
                 in 4 Simple Steps
               </p>
             </div>
 
-            <div className="relative space-y-6 mt-12">
+            <div className="relative space-y-4 sm:space-y-6 mt-8 sm:mt-12">
               {/* Vertical Dashed Line */}
               <div 
-                className={`absolute left-[28px] top-4 bottom-4 w-0.5 border-l-2 border-dashed border-gray-200 z-0 transition-all duration-1000 ease-in-out ${isVisible ? 'h-[90%] opacity-100' : 'h-0 opacity-0'}`}
+                className={`absolute left-[20px] sm:left-[28px] top-4 bottom-4 w-0.5 border-l-2 border-dashed border-gray-200 z-0 transition-all duration-1000 ease-in-out ${isVisible ? 'h-[90%] opacity-100' : 'h-0 opacity-0'}`}
                 style={{ transitionDelay: '0.8s' }} 
               />
 
               {steps.map((step, index) => (
                 <div
                   key={step.title}
-                  className={`relative z-10 group flex gap-6 rounded-2xl p-4 transition-all duration-500 border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-lg hover:shadow-blue-900/5 opacity-0 ${isVisible ? 'animate-slide-up' : ''}`}
+                  className={`relative z-10 group flex gap-4 sm:gap-6 rounded-2xl p-3 sm:p-4 transition-all duration-500 border border-transparent hover:border-blue-100 hover:bg-white hover:shadow-lg hover:shadow-blue-900/5 opacity-0 ${isVisible ? 'animate-slide-up' : ''}`}
                   style={{ animationDelay: `${500 + (index * 150)}ms` }}
                 >
                   {/* Icon Container */}
-                  <div className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${step.gradient} shadow-lg text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-xl`}>
-                    <step.icon className="h-7 w-7" />
+                  <div className={`flex h-12 w-12 sm:h-14 sm:w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${step.gradient} shadow-lg text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-xl`}>
+                    <step.icon className="h-6 w-6 sm:h-7 sm:w-7" />
                   </div>
 
-                  <div className="flex-1 pt-1">
-                    <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900 group-hover:text-[#0247ae] transition-colors">
+                  <div className="flex-1 pt-0.5 sm:pt-1">
+                    <h3 className="flex items-center gap-2 text-base sm:text-lg font-bold text-gray-900 group-hover:text-[#0247ae] transition-colors">
                       {step.title}
-                      <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 text-[#0247ae]" />
+                      <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 text-[#0247ae]" />
                     </h3>
-                    <p className="mt-1 text-sm text-gray-600 leading-relaxed max-w-md">
+                    <p className="mt-1 text-xs sm:text-sm text-gray-600 leading-relaxed max-w-md">
                       {step.description}
                     </p>
                   </div>
