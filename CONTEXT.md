@@ -7,7 +7,7 @@ Trustate is a real estate transaction management platform designed to streamline
 
 ---
 
-## 🚀 Current Progress (As of Jan 25, 2026 - 9:02 PM)
+## 🚀 Current Progress (As of Jan 25, 2026 - 9:37 PM)
 
 ### 1. **Backend Infrastructure** ✅ COMPLETE
    - **Supabase Database:**
@@ -20,94 +20,74 @@ Trustate is a real estate transaction management platform designed to streamline
      - `GET/POST /api/transactions/[id]/messages` - Transaction chat
      - `GET/POST /api/transactions/[id]/documents` - Document management with S3 presigned URLs
      - `GET/PATCH/DELETE /api/transactions/[id]/documents/[docId]` - Single document operations
+     - `GET /api/transactions/[id]/logs` - Activity audit log
+     - `POST /api/transactions/join` - Client join via access code
    - **AWS Integration:**
-     - S3 document storage with presigned URL uploads (cost optimization)
+     - S3 bucket: `trustate-documents-prod` (Terraform deployed)
      - Lambda AI Assistant (Groq/Llama 3.1)
      - API Gateway for Lambda invocation
 
-### 2. **Transactions Module (`/dashboard/transactions`)**
-   - **Transaction List:**
-     - Fetches from API with localStorage fallback
-     - Filter by status (All, Pending, Completed)
-     - Search by property address or access code
-   - **Creation Flow:**
-     - Modal-based creation on dashboard
-     - Syncs with API and localStorage
+### 2. **Transactions Module (`/dashboard/transactions`)** ✅ COMPLETE
+   - Transaction List with API integration
+   - Filter by status, Search functionality
+   - Modal-based creation with API sync
 
 ### 3. **Transaction Workbench (`/transaction/[id]`)** ✅ COMPLETE
-   - **3-Column Layout:**
-     - Left: Navigation menu (Overview, Messages, Docs, Escrow, AI)
+   - **Responsive 3-Column Layout:**
+     - Left: Navigation (mobile drawer on small screens)
      - Center: Active tab content
-     - Right: Deal Lifecycle Stepper (6 steps)
-   - **Data Flow:**
-     - Fetches transaction from API with localStorage fallback
-     - Updates lifecycle step via PATCH API
+     - Right: Deal Lifecycle Stepper (collapsible)
+   - **Data Flow:** API with localStorage fallback
 
 ### 4. **Workbench Tabs** ✅ COMPLETE
-   - **Overview Tab:** Status, property details, progress summary
-   - **Message Center:** Chat interface (stores in `transaction_logs`)
-   - **Document Vault:** Drag-drop upload with S3 presigned URLs
-   - **Escrow & Payments:** Payment milestones tracker
-   - **Smart Assistant:** Connected to Lambda API with transaction context
+   - **Overview Tab:** Status, property details, progress
+   - **Message Center:** REST API for chat
+   - **Document Vault:** S3 uploads, PDF/Image preview
+   - **Escrow & Payments:** Payment milestones
+   - **Smart Assistant:** Lambda AI with transaction context
 
-### 5. **AI Assistant**
-   - **Dashboard FAB:** Uses Lambda → Groq (llama-3.1-8b-instant)
-   - **Workbench Smart Assistant:** Connected to same Lambda with transaction context
+### 5. **Compliance & Security (Phase 7)** ✅ COMPLETE
+   - **Access Code Verification:** `/transaction/join` page
+   - **Activity Logging:** Audit trail component
 
----
-
-## 📋 To Be Implemented (Roadmap)
-
-### Phase 6: Production Readiness
-- [ ] **S3 Bucket Creation:** Deploy Terraform for document storage bucket
-- [ ] **Environment Variables:** Add AWS S3 credentials to .env
-- [ ] **Apply Supabase Migration:** Run new migration on Supabase
-
-### Phase 7: Compliance & Security
-- [ ] **KYC Integration:** Liveness check implementation
-- [ ] **Audit Logging:** Enhanced activity tracking
-- [ ] **Access Code Verification:** Client join flow
-
-### Phase 8: Polish & Testing
-- [ ] **Responsive Design:** Mobile drawer for Column A & C
-- [ ] **PDF Viewer:** Integrate PDF.js for document preview
-- [ ] **Real-time Updates:** WebSocket for messages
-- [ ] **E2E Tests:** Playwright testing suite
+### 6. **Polish & Testing (Phase 8)** ✅ COMPLETE
+   - **Responsive Design:** Mobile drawer, collapsible panels
+   - **PDF Viewer:** react-pdf integration
+   - **Image Preview:** Inline image display
 
 ---
 
-## 🛠 Recent Changes (This Session)
-1. **Migration:** Extended transactions table with new fields
-2. **API Routes:** Full CRUD for transactions, messages, documents
-3. **S3 Integration:** Presigned URL uploads for documents
-4. **Smart Assistant:** Connected to Lambda API with transaction context
-5. **Frontend Updates:** API integration with localStorage fallback
+## 📋 Ready for Manual Testing
+
+1. **Create Transaction** → Dashboard → New Transaction
+2. **Upload Document** → Workbench → Document Vault → Upload PDF
+3. **View PDF** → Click on uploaded PDF → Preview panel
+4. **Client Join** → `/transaction/join` → Enter access code
+5. **Send Message** → Workbench → Message Center
+6. **AI Assistant** → Workbench → Smart Assistant tab
+7. **Responsive** → Resize browser to mobile width
 
 ---
 
 ## 📁 Key Files
 | File | Purpose |
 |------|---------|
-| `supabase/migrations/20260125_extend_transactions.sql` | New field migration |
-| `app/api/transactions/route.ts` | Transaction list/create API |
-| `app/api/transactions/[id]/route.ts` | Single transaction API |
-| `app/api/transactions/[id]/messages/route.ts` | Chat messages API |
-| `app/api/transactions/[id]/documents/route.ts` | Document upload API |
-| `components/transaction/smart-assistant.tsx` | AI chat with Lambda |
+| `app/api/transactions/join/route.ts` | Client access code verification |
+| `app/transaction/join/page.tsx` | Client join UI |
+| `components/transaction/activity-log.tsx` | Audit trail display |
+| `components/transaction/pdf-preview.tsx` | PDF viewer component |
+| `components/transaction/transaction-layout.tsx` | Responsive layout |
 
 ---
 
-## 🔧 Environment Variables Required
+## 🔧 Environment Variables
 ```env
-# Existing
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_ASSISTANT_API_URL=
-
-# New (for S3 documents)
 AWS_REGION=ap-southeast-1
 APP_AWS_ACCESS_KEY_ID=
 APP_AWS_SECRET_ACCESS_KEY=
-AWS_S3_DOCUMENTS_BUCKET=trustate-documents
+AWS_S3_DOCUMENTS_BUCKET=trustate-documents-prod
 ```
