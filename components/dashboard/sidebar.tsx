@@ -87,9 +87,9 @@ export function DashboardSidebar() {
         ${collapsed ? "w-24" : "w-64"}
       `}
     >
-      {/* Logo & Toggle */}
-      <div className={`p-5 flex ${collapsed ? "flex-col gap-4 justify-center" : "items-center justify-between"} border-b border-gray-100 dark:border-gray-700`}>
-        <div className={`flex items-center gap-2 min-w-0 ${!collapsed && "flex-1 mr-2"}`}>
+      {/* Logo */}
+      <div className={`p-5 flex ${collapsed ? "justify-center" : "items-center"} border-b border-gray-100 dark:border-gray-700 relative`}>
+        <div className="flex items-center gap-2 min-w-0">
           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#0247ae] to-[#0560d4] flex items-center justify-center shrink-0">
             <Image
               src={trustateLogo}
@@ -105,14 +105,15 @@ export function DashboardSidebar() {
             </h1>
           )}
         </div>
-
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-all duration-300 hover:scale-110 shrink-0"
-        >
-          {collapsed ? <ChevronRight size={18} strokeWidth={2} /> : <ChevronLeft size={18} strokeWidth={2} />}
-        </button>
       </div>
+
+      {/* Toggle Button - Overlapping Edge */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="absolute -right-3 top-1/2 -translate-y-1/2 p-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full text-gray-500 dark:text-gray-400 hover:text-[#0247ae] dark:hover:text-[#0560d4] hover:border-[#0247ae] dark:hover:border-[#0560d4] transition-all duration-300 shadow-sm z-50"
+      >
+        {collapsed ? <ChevronRight size={14} strokeWidth={2} /> : <ChevronLeft size={14} strokeWidth={2} />}
+      </button>
 
       {/* Navigation */}
       <nav className="flex-1 py-6 overflow-y-auto">
