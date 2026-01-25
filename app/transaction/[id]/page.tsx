@@ -190,9 +190,7 @@ export default function TransactionPage() {
             <h1 className="text-xl font-bold capitalize text-gray-900">
               {activeTab === "overview" ? "Transaction Overview" : activeTab.replace("-", " ")}
             </h1>
-            {transaction?.project_name && (
-              <p className="text-sm text-gray-500">{transaction.project_name}</p>
-            )}
+
           </div>
 
           <div className="flex items-center gap-2">
