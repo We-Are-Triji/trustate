@@ -81,33 +81,75 @@ export function OverviewTab({ transaction, onTransactionUpdate }: OverviewTabPro
         <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
           <h3 className="font-semibold text-gray-900">Property Details</h3>
 
-          <div className="flex items-start gap-3">
-            <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
-            <div>
-              <p className="text-sm text-gray-500">Address</p>
-              <p className="font-medium text-gray-900">{transaction.property_address}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3">
+              <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-sm text-gray-500">Address</p>
+                <p className="font-medium text-gray-900">{transaction.property_address}</p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-start gap-3">
-            <DollarSign className="h-5 w-5 text-gray-400 mt-0.5" />
-            <div>
-              <p className="text-sm text-gray-500">Transaction Value</p>
-              <p className="font-medium text-gray-900">
-                {transaction.transaction_value
-                  ? `₱${transaction.transaction_value.toLocaleString()}`
-                  : "Not specified"}
-              </p>
+            <div className="flex items-start gap-3">
+              <DollarSign className="h-5 w-5 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-sm text-gray-500">Transaction Value</p>
+                <p className="font-medium text-gray-900">
+                  {transaction.transaction_value
+                    ? `₱${transaction.transaction_value.toLocaleString()}`
+                    : "Not specified"}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-start gap-3">
-            <Calendar className="h-5 w-5 text-gray-400 mt-0.5" />
-            <div>
-              <p className="text-sm text-gray-500">Created</p>
-              <p className="font-medium text-gray-900">
-                {new Date(transaction.created_at).toLocaleDateString()}
-              </p>
+            <div className="flex items-start gap-3">
+              <Briefcase className="h-5 w-5 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-sm text-gray-500">Transaction Type</p>
+                <p className="font-medium text-gray-900 capitalize">
+                  {transaction.transaction_type?.replace("_", " ") || "Sale"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Home className="h-5 w-5 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-sm text-gray-500">Property Type</p>
+                <p className="font-medium text-gray-900 capitalize">
+                  {transaction.property_type?.replace("_", " ") || "Condominium"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Building2 className="h-5 w-5 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-sm text-gray-500">Developer</p>
+                <p className="font-medium text-gray-900">
+                  {transaction.developer_name || transaction.developer_id || "Not linked"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Hash className="h-5 w-5 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-sm text-gray-500">Reservation No.</p>
+                <p className="font-medium text-gray-900">
+                  {transaction.reservation_number || "PENDING-001"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Calendar className="h-5 w-5 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-sm text-gray-500">Created</p>
+                <p className="font-medium text-gray-900">
+                  {new Date(transaction.created_at).toLocaleDateString()}
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { Home, MessageSquare, FileText, Wallet, Bot, Lock, Menu, X, ChevronRight, ChevronLeft, Settings } from "lucide-react";
+import { Home, MessageSquare, FileText, Wallet, Bot, Lock, Menu, X, ChevronRight, ChevronLeft, Settings, Activity } from "lucide-react";
 
 interface TransactionLayoutProps {
   children: ReactNode;
@@ -131,6 +131,7 @@ const menuItems: MenuItem[] = [
   { id: "messages", label: "Message Center", icon: MessageSquare },
   { id: "documents", label: "Document Vault", icon: FileText },
   { id: "escrow", label: "Escrow & Payments", icon: Wallet },
+  { id: "activity", label: "Activity", icon: Activity },
   { id: "assistant", label: "Smart Assistant", icon: Bot },
   { id: "settings", label: "Settings", icon: Settings },
 ];

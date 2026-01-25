@@ -8,6 +8,7 @@ import { TransactionLifecycle } from "@/components/transaction/transaction-lifec
 import { OverviewTab } from "@/components/transaction/overview-tab";
 import { ConversationTab } from "@/components/transaction/conversation-tab";
 import { DocumentVault } from "@/components/transaction/document-vault";
+import { ActivityTab } from "@/components/transaction/activity-tab";
 import { EscrowForm } from "@/components/transaction/escrow-form";
 import { SmartAssistant } from "@/components/transaction/smart-assistant";
 import { TransactionSettings } from "@/components/transaction/transaction-settings";
@@ -135,6 +136,8 @@ export default function TransactionPage() {
         return <DocumentVault transactionId={transactionId} />;
       case "escrow":
         return <EscrowForm transactionId={transactionId} />;
+      case "activity":
+        return <ActivityTab transactionId={transactionId} />;
       case "assistant":
         return (
           <SmartAssistant
