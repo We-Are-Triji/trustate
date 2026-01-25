@@ -114,7 +114,7 @@ export function LoginForm() {
       `}</style>
 
       {/* Main Card Container */}
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-2xl shadow-blue-900/10 border border-white/60 p-8 sm:p-10 anim-card overflow-hidden relative">
+      <div className="w-full max-w-md rounded-[2rem] p-8 sm:p-10 anim-card overflow-hidden relative">
         
         {/* Decorative background blob inside card */}
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#0247ae]/5 rounded-full blur-3xl pointer-events-none"></div>
