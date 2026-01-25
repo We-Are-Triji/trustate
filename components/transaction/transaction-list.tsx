@@ -9,9 +9,10 @@ import { Badge } from "../ui/badge";
 import { useAuth } from "@/lib/hooks/use-auth";
 import type { Transaction, TransactionStatus } from "@/lib/types/transaction";
 import { CreateTransactionModal } from "./create-transaction-modal";
+import { JoinTransactionModal } from "./join-transaction-modal";
 
 export default function TransactionList() {
-    const { userId } = useAuth();
+    const { userId, accountType } = useAuth();
     const router = useRouter();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -107,15 +108,19 @@ export default function TransactionList() {
                     <p className="text-gray-500 dark:text-gray-400 mb-8">
                         Get started by creating your first real estate transaction.
                     </p>
-                    <CreateTransactionModal
-                        onTransactionCreated={fetchTransactions}
-                        trigger={
-                            <Button className="bg-[#0247ae] hover:bg-[#0560d4] text-white">
-                                <Plus size={18} className="mr-2" />
-                                Create Transaction
-                            </Button>
-                        }
-                    />
+                    {accountType === "client" ? (
+                        <JoinTransactionModal onTransactionJoined={fetchTransactions} />
+                    ) : (
+                        <CreateTransactionModal
+                            onTransactionCreated={fetchTransactions}
+                            trigger={
+                                <Button className="bg-[#0247ae] hover:bg-[#0560d4] text-white">
+                                    <Plus size={18} className="mr-2" />
+                                    Create Transaction
+                                </Button>
+                            }
+                        />
+                    )}
                 </div>
             ) : (
                 <>
@@ -163,15 +168,19 @@ export default function TransactionList() {
                                 </Button>
                             </div>
 
-                            <CreateTransactionModal
-                                onTransactionCreated={fetchTransactions}
-                                trigger={
-                                    <Button className="bg-[#0247ae] hover:bg-[#0560d4] text-white shrink-0">
-                                        <Plus size={18} className="mr-2" />
-                                        New Transaction
-                                    </Button>
-                                }
-                            />
+                            {accountType === "client" ? (
+                                <JoinTransactionModal onTransactionJoined={fetchTransactions} />
+                            ) : (
+                                <CreateTransactionModal
+                                    onTransactionCreated={fetchTransactions}
+                                    trigger={
+                                        <Button className="bg-[#0247ae] hover:bg-[#0560d4] text-white shrink-0">
+                                            <Plus size={18} className="mr-2" />
+                                            New Transaction
+                                        </Button>
+                                    }
+                                />
+                            )}
                         </div>
                     </div>
 
