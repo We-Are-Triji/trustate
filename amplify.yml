@@ -13,7 +13,7 @@
           },
           "build": {
             "commands": [
-              "env | grep -e NEXT_PUBLIC_SUPABASE_URL -e SUPABASE_SERVICE_ROLE_KEY -e NEXT_PUBLIC_COGNITO_ -e APP_AWS_ >> .env.production",
+              "env | grep -e NEXT_PUBLIC_SUPABASE_URL -e SUPABASE_SERVICE_ROLE_KEY -e NEXT_PUBLIC_COGNITO_ -e APP_AWS_ -e NEXT_PUBLIC_ASSISTANT_API_URL >> .env.production",
               "npm run build"
             ]
           }

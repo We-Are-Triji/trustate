@@ -111,6 +111,37 @@ export default function AgentsPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const [processingId, setProcessingId] = useState<string | null>(null);
+
+  const handleRespondRequest = async (requestId: string, action: "accept" | "reject") => {
+    if (!userId) return;
+    setProcessingId(requestId);
+
+    try {
+      const res = await fetch("/api/broker/requests/respond", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId,
+          action,
+          brokerId: userId,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to respond to request");
+      }
+
+      // Refresh requests list
+      await fetchRequests();
+    } catch (error) {
+      console.error(`Failed to ${action} request:`, error);
+      alert(`Failed to ${action} request. Please try again.`);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
   if (isLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] p-8">
@@ -216,9 +247,14 @@ export default function AgentsPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {/* Actions can be added here later */}
-                  <Button size="sm" variant="outline" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50">
-                    Accept
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                    onClick={() => handleRespondRequest(req.id, "accept")}
+                    disabled={processingId === req.id}
+                  >
+                    {processingId === req.id ? "..." : "Accept"}
                   </Button>
                 </div>
               </div>

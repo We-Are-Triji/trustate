@@ -148,7 +148,8 @@ export function AiAssistantFab() {
       const finalMessages = [...updatedMessages, assistantMessage].slice(-MAX_MESSAGES);
       setMessages(finalMessages);
       storeMessages(finalMessages);
-    } catch {
+    } catch (error) {
+      console.error("AI Assistant Error:", error);
       const errorMessage: Message = { id: crypto.randomUUID(), role: "assistant", content: "Sorry, I encountered an error. Please try again.", timestamp: new Date() };
       setMessages([...updatedMessages, errorMessage].slice(-MAX_MESSAGES));
     } finally {
@@ -236,9 +237,8 @@ export function AiAssistantFab() {
             ) : (
               messages.map((msg) => (
                 <div key={msg.id} className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                  <div className={`group relative max-w-[85%] px-3 py-2 rounded-xl text-[13px] ${
-                    msg.role === "user" ? "bg-[#0247ae] text-white rounded-br-sm" : "bg-gray-100 text-gray-800 rounded-bl-sm"
-                  }`}>
+                  <div className={`group relative max-w-[85%] px-3 py-2 rounded-xl text-[13px] ${msg.role === "user" ? "bg-[#0247ae] text-white rounded-br-sm" : "bg-gray-100 text-gray-800 rounded-bl-sm"
+                    }`}>
                     <span className="whitespace-pre-wrap leading-relaxed">{msg.content}</span>
                     {msg.actions && msg.actions.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -302,9 +302,8 @@ export function AiAssistantFab() {
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 z-50 ${
-          isOpen ? "bg-gray-600 hover:bg-gray-700" : "bg-[#0247ae] hover:bg-[#023a8a] hover:scale-105"
-        }`}
+        className={`fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 z-50 ${isOpen ? "bg-gray-600 hover:bg-gray-700" : "bg-[#0247ae] hover:bg-[#023a8a] hover:scale-105"
+          }`}
       >
         {isOpen ? <X size={20} className="text-white" /> : <Bot size={20} className="text-white" />}
       </button>
