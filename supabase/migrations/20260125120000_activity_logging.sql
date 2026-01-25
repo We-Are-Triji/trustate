@@ -1,7 +1,7 @@
 -- Create activity_logs table
 CREATE TABLE IF NOT EXISTS activity_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    transaction_id TEXT NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+    transaction_id UUID NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
     actor_id TEXT NOT NULL, -- User ID or 'system'
     actor_type TEXT NOT NULL, -- 'agent', 'client', 'system'
     action_type TEXT NOT NULL, -- 'view', 'upload', 'message', 'update', 'join', 'approve', 'create'
