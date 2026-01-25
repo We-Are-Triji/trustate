@@ -1,10 +1,15 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { Upload, FileText, Image, File, X, Eye, Download, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PdfPreview } from "./pdf-preview";
+
+const PdfPreview = dynamic(() => import("./pdf-preview").then(mod => mod.PdfPreview), {
+    ssr: false,
+    loading: () => <div className="h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-[#0247ae]" /></div>
+});
 
 interface Document {
     id: string;
