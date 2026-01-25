@@ -12,33 +12,113 @@ import { EscrowForm } from "@/components/transaction/escrow-form";
 import { SmartAssistant } from "@/components/transaction/smart-assistant";
 import type { Transaction } from "@/lib/types/transaction";
 
+interface ExtendedTransaction extends Transaction {
+  project_name?: string;
+  client_name?: string;
+  lifecycle_step?: number;
+}
+
 export default function TransactionPage() {
   const params = useParams();
   const router = useRouter();
   const transactionId = params.id as string;
 
   // State
+  const [transaction, setTransaction] = useState<ExtendedTransaction | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
+  // Fetch transaction data
+  useEffect(() => {
+    const fetchTransaction = async () => {
+      try {
+        // Try to fetch from API first
+        const response = await fetch(`/api/transactions/${transactionId}`, {
+          headers: {
+            "x-user-id": "demo-user", // TODO: Get from auth context
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setTransaction(data.transaction);
+          setCurrentStep(data.transaction.lifecycle_step || 1);
+          // Calculate completed steps based on lifecycle_step
+          const completed = [];
+          for (let i = 1; i < (data.transaction.lifecycle_step || 1); i++) {
+            completed.push(i);
+          }
+          setCompletedSteps(completed);
+        } else {
+          // Fallback to localStorage for demo
+          const stored = localStorage.getItem("mock_transactions");
+          if (stored) {
+            const transactions = JSON.parse(stored);
+            const found = transactions.find((t: Transaction) => t.id === transactionId);
+            if (found) {
+              setTransaction(found);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch transaction:", error);
+        // Fallback to localStorage
+        const stored = localStorage.getItem("mock_transactions");
+        if (stored) {
+          const transactions = JSON.parse(stored);
+          const found = transactions.find((t: Transaction) => t.id === transactionId);
+          if (found) {
+            setTransaction(found);
+          }
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTransaction();
+  }, [transactionId]);
+
   // Derived State
-  // Step 1 (Reservation) -> Step 2 (KYC) -> Step 3 (Docs) -> Step 4 (Escrow)
-  // Escrow tab is locked until Step 4 (Escrow Funding) is active or completed.
   const isEscrowLocked = currentStep < 4;
   const lockedTabs = isEscrowLocked ? ["escrow"] : [];
 
-  const handleStepComplete = () => {
+  const handleStepComplete = async () => {
     if (currentStep < 6) {
+      const newStep = currentStep + 1;
       setCompletedSteps([...completedSteps, currentStep]);
-      setCurrentStep(currentStep + 1);
+      setCurrentStep(newStep);
+
+      // Update in backend
+      try {
+        await fetch(`/api/transactions/${transactionId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": "demo-user",
+          },
+          body: JSON.stringify({ lifecycle_step: newStep }),
+        });
+      } catch (error) {
+        console.error("Failed to update lifecycle step:", error);
+      }
     }
   };
 
   const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-[#0247ae]" />
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case "overview":
-        return <OverviewTab transaction={null} />; // Passing null for demo, real data would go here
+        return <OverviewTab transaction={transaction} />;
       case "messages":
         return <ConversationTab transactionId={transactionId} />;
       case "documents":
@@ -46,9 +126,19 @@ export default function TransactionPage() {
       case "escrow":
         return <EscrowForm transactionId={transactionId} />;
       case "assistant":
-        return <SmartAssistant transactionId={transactionId} />;
+        return (
+          <SmartAssistant
+            transactionId={transactionId}
+            transactionContext={{
+              projectName: transaction?.project_name || transaction?.property_address,
+              clientName: transaction?.client_name,
+              lifecycleStep: currentStep,
+              status: transaction?.status,
+            }}
+          />
+        );
       default:
-        return <OverviewTab transaction={null} />;
+        return <OverviewTab transaction={transaction} />;
     }
   };
 
@@ -67,8 +157,10 @@ export default function TransactionPage() {
           currentStep={currentStep}
           completedSteps={completedSteps}
           onStepClick={(step) => {
-            // Dev/Demo: Allow clicking previous steps to view? Or strict? 
-            // For now, strict: can't jump ahead.
+            // Allow viewing completed steps
+            if (completedSteps.includes(step) || step === currentStep) {
+              // Could implement step history view here
+            }
           }}
         />
       }
@@ -76,14 +168,20 @@ export default function TransactionPage() {
       <div className="h-full flex flex-col">
         {/* Context Header for Workspace */}
         <header className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white">
-          <h1 className="text-xl font-bold capitalize text-gray-900">
-            {activeTab === "overview" ? "Transaction Overview" : activeTab.replace("-", " ")}
-          </h1>
+          <div>
+            <h1 className="text-xl font-bold capitalize text-gray-900">
+              {activeTab === "overview" ? "Transaction Overview" : activeTab.replace("-", " ")}
+            </h1>
+            {transaction?.project_name && (
+              <p className="text-sm text-gray-500">{transaction.project_name}</p>
+            )}
+          </div>
 
           {/* Demo Control */}
           <button
             onClick={handleStepComplete}
-            className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-gray-600 transition-colors"
+            disabled={currentStep >= 6}
+            className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-gray-600 transition-colors disabled:opacity-50"
           >
             [Dev] Complete Step {currentStep}
           </button>

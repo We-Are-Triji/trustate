@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Sparkles, FileSearch, Calculator, HelpCircle, Loader2 } from "lucide-react";
+import { Send, Bot, User, Sparkles, FileSearch, Calculator, HelpCircle, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -14,25 +14,86 @@ interface Message {
 
 interface SmartAssistantProps {
     transactionId: string;
+    transactionContext?: {
+        projectName?: string;
+        clientName?: string;
+        lifecycleStep?: number;
+        status?: string;
+    };
 }
 
+const ASSISTANT_API_URL = process.env.NEXT_PUBLIC_ASSISTANT_API_URL;
+
+const TRANSACTION_SYSTEM_CONTEXT = `You are a Smart Assistant for a specific real estate transaction in TruState.
+
+SCOPE - Help with:
+- Document analysis and requirements
+- Fee and tax calculations
+- Transaction status updates
+- Process guidance and next steps
+- Payment milestone information
+
+RULES:
+- Be concise and transaction-focused
+- Reference the specific transaction context provided
+- Never invent details not provided
+- Suggest actionable next steps when appropriate`;
+
 const quickActions = [
-    { icon: FileSearch, label: "Analyze Documents", prompt: "Analyze the uploaded documents for this transaction" },
-    { icon: Calculator, label: "Calculate Fees", prompt: "Calculate all applicable fees and taxes for this transaction" },
-    { icon: HelpCircle, label: "Transaction Status", prompt: "Give me a summary of this transaction's current status" },
+    { icon: FileSearch, label: "Analyze Documents", prompt: "Analyze the uploaded documents for this transaction and tell me if anything is missing" },
+    { icon: Calculator, label: "Calculate Fees", prompt: "Calculate all applicable fees and taxes for this real estate transaction" },
+    { icon: HelpCircle, label: "Transaction Status", prompt: "Give me a summary of this transaction's current status and what needs to happen next" },
 ];
 
-export function SmartAssistant({ transactionId }: SmartAssistantProps) {
+async function sendToAssistant(
+    messages: Message[],
+    transactionContext: SmartAssistantProps["transactionContext"]
+): Promise<string> {
+    if (!ASSISTANT_API_URL) {
+        throw new Error("Assistant API not configured");
+    }
+
+    const contextString = transactionContext
+        ? `\n\nTransaction Context:
+- Project: ${transactionContext.projectName || "Unknown"}
+- Client: ${transactionContext.clientName || "Unknown"}
+- Lifecycle Step: ${transactionContext.lifecycleStep || 1} of 6
+- Status: ${transactionContext.status || "Unknown"}`
+        : "";
+
+    const response = await fetch(ASSISTANT_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            messages: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+            userContext: {
+                currentPage: "Transaction Workbench",
+                transactionContext: contextString,
+            },
+            systemPromptOverride: TRANSACTION_SYSTEM_CONTEXT + contextString,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to get response from assistant");
+    }
+
+    const data = await response.json();
+    return data.response;
+}
+
+export function SmartAssistant({ transactionId, transactionContext }: SmartAssistantProps) {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: "welcome",
             role: "assistant",
-            content: "Hello! I'm your Smart Assistant for this transaction. I can help you analyze documents, calculate fees, answer questions about the process, and more. How can I help you today?",
+            content: `Hello! I'm your Smart Assistant for this transaction${transactionContext?.projectName ? ` (${transactionContext.projectName})` : ""}. I can help you analyze documents, calculate fees, answer questions about the process, and guide you through the next steps. How can I help you today?`,
             timestamp: new Date(),
         },
     ]);
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -45,7 +106,9 @@ export function SmartAssistant({ transactionId }: SmartAssistantProps) {
 
     const handleSend = async (messageText?: string) => {
         const text = messageText || input;
-        if (!text.trim()) return;
+        if (!text.trim() || isTyping) return;
+
+        setError(null);
 
         const userMessage: Message = {
             id: `user-${Date.now()}`,
@@ -54,29 +117,37 @@ export function SmartAssistant({ transactionId }: SmartAssistantProps) {
             timestamp: new Date(),
         };
 
-        setMessages((prev) => [...prev, userMessage]);
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
         setInput("");
         setIsTyping(true);
 
-        // Simulate AI response
-        setTimeout(() => {
-            const responses = [
-                "I've analyzed your request. Based on the transaction details, here's what I found...",
-                "Great question! Let me help you with that. For this type of transaction, you'll need to consider...",
-                "I've reviewed the available information. Here's a summary of the current status and next steps...",
-                "Based on the documents uploaded, I can see that the transaction is progressing well. The next milestone is...",
-            ];
+        try {
+            const responseContent = await sendToAssistant(updatedMessages, transactionContext);
 
             const assistantMessage: Message = {
                 id: `assistant-${Date.now()}`,
                 role: "assistant",
-                content: responses[Math.floor(Math.random() * responses.length)],
+                content: responseContent,
                 timestamp: new Date(),
             };
 
-            setMessages((prev) => [...prev, assistantMessage]);
+            setMessages([...updatedMessages, assistantMessage]);
+        } catch (err) {
+            console.error("Smart Assistant error:", err);
+            setError("Failed to get a response. Please try again.");
+
+            // Fallback to mock response if API fails
+            const fallbackMessage: Message = {
+                id: `assistant-${Date.now()}`,
+                role: "assistant",
+                content: "I apologize, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or contact support if the issue persists.",
+                timestamp: new Date(),
+            };
+            setMessages([...updatedMessages, fallbackMessage]);
+        } finally {
             setIsTyping(false);
-        }, 1500);
+        }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -111,7 +182,8 @@ export function SmartAssistant({ transactionId }: SmartAssistantProps) {
                             <button
                                 key={index}
                                 onClick={() => handleSend(action.prompt)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all"
+                                disabled={isTyping}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50"
                             >
                                 <Icon size={14} className="text-[#0247ae]" />
                                 {action.label}
@@ -120,6 +192,14 @@ export function SmartAssistant({ transactionId }: SmartAssistantProps) {
                     })}
                 </div>
             </div>
+
+            {/* Error Banner */}
+            {error && (
+                <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-sm text-red-700">
+                    <AlertCircle size={16} />
+                    {error}
+                </div>
+            )}
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -139,7 +219,7 @@ export function SmartAssistant({ transactionId }: SmartAssistantProps) {
                                     : "bg-gray-100 text-gray-900 rounded-bl-md"
                                 }`}
                         >
-                            <p className="text-sm leading-relaxed">{message.content}</p>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                             <p className={`text-[10px] mt-2 ${message.role === "user" ? "text-blue-200" : "text-gray-400"}`}>
                                 {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                             </p>
@@ -178,6 +258,7 @@ export function SmartAssistant({ transactionId }: SmartAssistantProps) {
                         onKeyPress={handleKeyPress}
                         placeholder="Ask me anything about this transaction..."
                         className="flex-1"
+                        disabled={isTyping}
                     />
                     <Button
                         onClick={() => handleSend()}
