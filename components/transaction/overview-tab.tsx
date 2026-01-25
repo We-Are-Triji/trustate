@@ -4,10 +4,25 @@ import { MapPin, DollarSign, Calendar, Users } from "lucide-react";
 import type { Transaction } from "@/lib/types/transaction";
 
 interface OverviewTabProps {
-  transaction: Transaction;
+  transaction: Transaction | null;
 }
 
 export function OverviewTab({ transaction }: OverviewTabProps) {
+  if (!transaction) {
+    return (
+      <div className="h-full bg-white p-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-100 rounded w-1/3"></div>
+          <div className="h-4 bg-gray-100 rounded w-1/4"></div>
+          <div className="space-y-3">
+            <div className="h-20 bg-gray-100 rounded"></div>
+            <div className="h-20 bg-gray-100 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const statusColors: Record<string, string> = {
     initiated: "bg-blue-100 text-blue-700",
     client_joined: "bg-green-100 text-green-700",
@@ -31,9 +46,8 @@ export function OverviewTab({ transaction }: OverviewTabProps) {
         {/* Status Badge */}
         <div>
           <span
-            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              statusColors[transaction.status] || "bg-gray-100 text-gray-700"
-            }`}
+            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusColors[transaction.status] || "bg-gray-100 text-gray-700"
+              }`}
           >
             {transaction.status.replace(/_/g, " ").toUpperCase()}
           </span>
@@ -42,7 +56,7 @@ export function OverviewTab({ transaction }: OverviewTabProps) {
         {/* Property Details */}
         <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
           <h3 className="font-semibold text-gray-900">Property Details</h3>
-          
+
           <div className="flex items-start gap-3">
             <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
             <div>
@@ -87,9 +101,8 @@ export function OverviewTab({ transaction }: OverviewTabProps) {
             ].map((step, index) => (
               <div key={index} className="flex items-center gap-3">
                 <div
-                  className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                    step.completed ? "bg-[#0247ae] text-white" : "bg-gray-200 text-gray-400"
-                  }`}
+                  className={`h-8 w-8 rounded-full flex items-center justify-center ${step.completed ? "bg-[#0247ae] text-white" : "bg-gray-200 text-gray-400"
+                    }`}
                 >
                   {step.completed ? "✓" : index + 1}
                 </div>
