@@ -24,11 +24,12 @@ export const metadata: Metadata = {
   description: "TruState - The Transaction Integrity Layer",
   icons: {
     icon: [
-      { url: "/trustate-logo.png" },
-      { url: "/trustate-logo.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/favicon.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
     ],
-    shortcut: "/trustate-logo.png",
-    apple: "/trustate-logo.png",
+    shortcut: [{ url: "/favicon.png", type: "image/png" }],
+    apple: [{ url: "/favicon.png", type: "image/png" }],
   },
 };
 
@@ -39,6 +40,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${arsenalSC.variable} antialiased`}
       >
