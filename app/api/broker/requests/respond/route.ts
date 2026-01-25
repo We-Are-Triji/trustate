@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
                             UserAttributes: [
                                 {
                                     Name: "custom:status",
-                                    Value: "active"
+                                    Value: "verified"
                                 }
                             ]
                         }).promise();
