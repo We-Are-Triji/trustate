@@ -33,8 +33,6 @@ const getNavItems = (accountType: AccountType | null, brokerType: "individual" |
       baseItems[0],
       { href: "/dashboard/transactions", label: "Transactions", icon: FileText },
       { href: "/dashboard/clients", label: "Clients", icon: Users },
-      { href: "/dashboard/listings", label: "Listings", icon: Building2 },
-      { href: "/dashboard/messages", label: "Messages", icon: MessageSquare },
       baseItems[1],
     ];
   }
@@ -82,16 +80,16 @@ export function DashboardSidebar() {
   return (
     <aside
       className={`
-        bg-white dark:bg-gray-800 
-        border-r border-gray-200 dark:border-gray-700 
-        h-screen flex flex-col fixed left-0 top-0 z-50 
+        bg-white dark:bg-gray-800
+        border-r border-gray-200 dark:border-gray-700
+        h-screen flex flex-col fixed left-0 top-0 z-50
         transition-all duration-300
         ${collapsed ? "w-24" : "w-64"}
       `}
     >
       {/* Logo & Toggle */}
-      <div className="p-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
-        <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
+      <div className={`p-5 flex ${collapsed ? "flex-col gap-4 justify-center" : "items-center justify-between"} border-b border-gray-100 dark:border-gray-700`}>
+        <div className={`flex items-center gap-2 min-w-0 ${!collapsed && "flex-1 mr-2"}`}>
           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#0247ae] to-[#0560d4] flex items-center justify-center shrink-0">
             <Image
               src={trustateLogo}
