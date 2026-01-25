@@ -2,10 +2,11 @@
 
 import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Upload, FileText, Image, File, X, Eye, Download, Loader2, Plus, Sparkles, Trash2, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, FileText, Image, File, X, Eye, Download, Loader2, Plus, Sparkles, Trash2, CheckCircle, AlertCircle, PenTool, ThumbsUp, ThumbsDown, FileCheck, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { SignaturePad } from "./signature-pad";
 
 const PdfPreview = dynamic(() => import("./pdf-preview").then(mod => mod.PdfPreview), {
     ssr: false,
@@ -17,11 +18,12 @@ interface Document {
     file_name: string;
     file_url: string;
     document_type: string;
-    status: "pending" | "reviewed" | "flagged" | "acknowledged";
+    status: "pending" | "reviewed" | "flagged" | "acknowledged" | "signed" | "rejected";
     created_at: string;
     uploaded_by?: string;
     size?: number;
     type?: string;
+    requires_wet_ink?: boolean;
 }
 
 interface DocumentVaultProps {
@@ -36,6 +38,7 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
     const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isUploading, setIsUploading] = useState(false);
+    const [signatureDoc, setSignatureDoc] = useState<Document | null>(null);
 
     const isAgent = accountType === "agent" || accountType === "broker";
 
@@ -195,12 +198,39 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
             case "reviewed":
                 return <Badge className="bg-green-50 text-green-700 border-green-200"><CheckCircle size={10} className="mr-1" />Verified</Badge>;
             case "flagged":
-                return <Badge className="bg-red-50 text-red-700 border-red-200"><AlertCircle size={10} className="mr-1" />Flagged</Badge>;
+            case "rejected":
+                return <Badge className="bg-red-50 text-red-700 border-red-200"><AlertCircle size={10} className="mr-1" />{status === "rejected" ? "Rejected" : "Flagged"}</Badge>;
             case "acknowledged":
-                return <Badge className="bg-blue-50 text-blue-700 border-blue-200">Acknowledged</Badge>;
+                return <Badge className="bg-blue-50 text-blue-700 border-blue-200"><FileCheck size={10} className="mr-1" />Acknowledged</Badge>;
+            case "signed":
+                return <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200"><PenTool size={10} className="mr-1" />Signed</Badge>;
             default:
                 return <Badge className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending</Badge>;
         }
+    };
+
+    const updateDocumentStatus = async (docId: string, newStatus: Document["status"]) => {
+        try {
+            await fetch(`/api/transactions/${transactionId}/documents/${docId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-user-id": userId || "demo-user"
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+            setDocuments(prev => prev.map(d => d.id === docId ? { ...d, status: newStatus } : d));
+        } catch (error) {
+            console.error("Failed to update status:", error);
+        }
+    };
+
+    const handleSignDocument = async (signatureDataUrl: string) => {
+        if (!signatureDoc) return;
+        // In real implementation, merge signature into PDF
+        // For demo, just update status
+        await updateDocumentStatus(signatureDoc.id, "signed");
+        setSignatureDoc(null);
     };
 
     const RenderDocumentList = ({ docs, title, allowUpload = false, allowDelete = false }: { docs: Document[], title: string, allowUpload?: boolean, allowDelete?: boolean }) => (
@@ -293,6 +323,74 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
                                     >
                                         <Sparkles size={16} />
                                     </button>
+
+                                    {/* Sign/Acknowledge (Client on shared docs) OR Approve/Reject (Agent on client uploads) */}
+                                    {!isAgent && !isOwner && doc.status === "pending" && (
+                                        <>
+                                            {doc.requires_wet_ink ? (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        window.open(doc.file_url, "_blank");
+                                                    }}
+                                                    className="h-8 px-2 rounded-lg flex items-center gap-1 text-xs text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all"
+                                                    title="Print and sign physically"
+                                                >
+                                                    <Printer size={14} />
+                                                    Wet Ink
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSignatureDoc(doc);
+                                                    }}
+                                                    className="h-8 px-2 rounded-lg flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 hover:bg-emerald-100 transition-all"
+                                                    title="Sign this document"
+                                                >
+                                                    <PenTool size={14} />
+                                                    Sign
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    updateDocumentStatus(doc.id, "acknowledged");
+                                                }}
+                                                className="h-8 px-2 rounded-lg flex items-center gap-1 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 transition-all"
+                                                title="Acknowledge you have read this"
+                                            >
+                                                <FileCheck size={14} />
+                                                Ack
+                                            </button>
+                                        </>
+                                    )}
+
+                                    {/* Agent Approve/Reject on Client Uploads */}
+                                    {isAgent && !isOwner && doc.status === "pending" && (
+                                        <>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    updateDocumentStatus(doc.id, "reviewed");
+                                                }}
+                                                className="h-8 w-8 rounded-lg flex items-center justify-center text-green-600 hover:bg-green-50 transition-all"
+                                                title="Approve document"
+                                            >
+                                                <ThumbsUp size={16} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    updateDocumentStatus(doc.id, "rejected");
+                                                }}
+                                                className="h-8 w-8 rounded-lg flex items-center justify-center text-red-600 hover:bg-red-50 transition-all"
+                                                title="Reject document"
+                                            >
+                                                <ThumbsDown size={16} />
+                                            </button>
+                                        </>
+                                    )}
 
                                     {canDelete && (
                                         <button
@@ -411,6 +509,13 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
                     </div>
                 </div>
             )}
+            {/* Signature Pad Modal */}
+            <SignaturePad
+                isOpen={!!signatureDoc}
+                onClose={() => setSignatureDoc(null)}
+                onSign={handleSignDocument}
+                documentName={signatureDoc?.file_name}
+            />
         </div>
     );
 }

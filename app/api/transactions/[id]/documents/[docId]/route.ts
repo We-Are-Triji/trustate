@@ -94,7 +94,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         const body = await request.json();
         const { status, ai_analysis } = body;
 
-        const allowedStatuses = ["pending", "reviewed", "flagged", "acknowledged"];
+        const allowedStatuses = ["pending", "reviewed", "flagged", "acknowledged", "signed", "rejected"];
         if (status && !allowedStatuses.includes(status)) {
             return NextResponse.json({ error: "Invalid status" }, { status: 400 });
         }
