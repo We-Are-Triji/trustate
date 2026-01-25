@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, MapPin, DollarSign, Loader2, Tag, Home, User, FileText, Plus } from "lucide-react";
+import { Building2, MapPin, DollarSign, Loader2, Tag, Home, User, FileText, Plus, HardHat } from "lucide-react";
 import { nanoid } from "nanoid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/lib/hooks/use-auth";
 import type { Transaction } from "@/lib/types/transaction";
+import { DeveloperAutocomplete } from "./developer-autocomplete";
 
 interface CreateTransactionModalProps {
     onTransactionCreated: () => void;
@@ -21,12 +22,12 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
     const [loading, setLoading] = useState(false);
 
     // Form State
+    const [developer, setDeveloper] = useState<{ id: string; name: string; logo: string } | null>(null);
     const [projectName, setProjectName] = useState("");
     const [transType, setTransType] = useState("");
     const [address, setAddress] = useState("");
     const [propType, setPropType] = useState("");
     const [price, setPrice] = useState("");
-    const [clientName, setClientName] = useState("");
     const [reservationNo, setReservationNo] = useState("");
 
     const formatPrice = (value: string) => {
@@ -41,15 +42,22 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        if (!developer) {
+            // Should be handled by required check or UI but good to be safe
+            return;
+        }
+
         setLoading(true);
 
         const payload = {
             project_name: projectName,
+            developer_id: developer.id,
             transaction_type: transType || "preselling",
             unit_address: address,
             property_type: propType || "condo",
             transaction_value: parseInt(price.replace(/,/g, "")) || null,
-            client_name: clientName,
+            client_name: null, // Client joins via invite code
             reservation_number: reservationNo || null,
         };
 
@@ -70,54 +78,21 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                 const stored = localStorage.getItem("mock_transactions");
                 const transactions = stored ? JSON.parse(stored) : [];
                 localStorage.setItem("mock_transactions", JSON.stringify([data.transaction, ...transactions]));
-            } else {
-                // Fallback to localStorage only
-                const fallbackTransaction: Transaction = {
-                    id: nanoid(8),
-                    status: "documents_pending",
-                    agent_id: userId || "agent-1",
-                    property_address: `${projectName} - ${address}`,
-                    property_type: (propType as any) || "condo",
-                    transaction_value: parseInt(price.replace(/,/g, "")) || 0,
-                    access_code: nanoid(6).toUpperCase(),
-                    access_code_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                };
-                const stored = localStorage.getItem("mock_transactions");
-                const transactions = stored ? JSON.parse(stored) : [];
-                localStorage.setItem("mock_transactions", JSON.stringify([fallbackTransaction, ...transactions]));
             }
         } catch (error) {
             console.error("Failed to create transaction via API:", error);
-            // Fallback to localStorage
-            const fallbackTransaction: Transaction = {
-                id: nanoid(8),
-                status: "documents_pending",
-                agent_id: userId || "agent-1",
-                property_address: `${projectName} - ${address}`,
-                property_type: (propType as any) || "condo",
-                transaction_value: parseInt(price.replace(/,/g, "")) || 0,
-                access_code: nanoid(6).toUpperCase(),
-                access_code_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-            };
-            const stored = localStorage.getItem("mock_transactions");
-            const transactions = stored ? JSON.parse(stored) : [];
-            localStorage.setItem("mock_transactions", JSON.stringify([fallbackTransaction, ...transactions]));
         }
 
         setLoading(false);
         setOpen(false);
 
         // Reset form
+        setDeveloper(null);
         setProjectName("");
         setTransType("");
         setAddress("");
         setPropType("");
         setPrice("");
-        setClientName("");
         setReservationNo("");
 
         // Notify parent
@@ -148,6 +123,18 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                 </DialogHeader>
 
                 <form onSubmit={onSubmit} className="space-y-6 py-4">
+                    {/* Row 0: Developer */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <HardHat size={16} className="text-[#0247ae]" />
+                            Developer <span className="text-red-500">*</span>
+                        </label>
+                        <DeveloperAutocomplete
+                            onSelect={setDeveloper}
+                            selectedDeveloper={developer}
+                        />
+                    </div>
+
                     {/* Row 1: The Context */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
@@ -215,7 +202,7 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                         </div>
                     </div>
 
-                    {/* Row 3: The Money & People */}
+                    {/* Row 3: The Money */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
@@ -236,29 +223,15 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                <User size={16} className="text-[#0247ae]" />
-                                Client Name
+                                <FileText size={16} className="text-[#0247ae]" />
+                                Reservation Number <span className="text-gray-400 font-normal">(Optional)</span>
                             </label>
                             <Input
-                                required
-                                placeholder="e.g. Juan Cruz"
-                                value={clientName}
-                                onChange={(e) => setClientName(e.target.value)}
+                                placeholder="e.g. OR-12345"
+                                value={reservationNo}
+                                onChange={(e) => setReservationNo(e.target.value)}
                             />
                         </div>
-                    </div>
-
-                    {/* Row 4: The Status */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                            <FileText size={16} className="text-[#0247ae]" />
-                            Reservation Number <span className="text-gray-400 font-normal">(Optional)</span>
-                        </label>
-                        <Input
-                            placeholder="e.g. OR-12345"
-                            value={reservationNo}
-                            onChange={(e) => setReservationNo(e.target.value)}
-                        />
                     </div>
 
                     <DialogFooter>
@@ -272,7 +245,7 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                         <Button
                             type="submit"
                             className="bg-[#0247ae] hover:bg-[#0560d4] text-white min-w-[120px]"
-                            disabled={loading}
+                            disabled={loading || !developer}
                         >
                             {loading ? <Loader2 className="animate-spin mr-2" size={18} /> : null}
                             Create Transaction
