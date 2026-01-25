@@ -26,6 +26,17 @@ const roleRoutes = {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  console.log(`[Middleware] Processing: ${pathname}`);
+
+  // Skip middleware for API routes and static files
+  if (
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/_next") ||
+    pathname.includes(".") // Optimization for static files (images, etc)
+  ) {
+    return NextResponse.next();
+  }
+
 
   // Only check dashboard routes (excluding base /dashboard)
   if (pathname.startsWith("/dashboard/") && pathname !== "/dashboard") {
