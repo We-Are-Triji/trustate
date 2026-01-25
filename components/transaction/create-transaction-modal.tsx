@@ -20,6 +20,7 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
     const { userId } = useAuth();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     // Form State
     const [developer, setDeveloper] = useState<{ id: string; name: string; logo: string } | null>(null);
@@ -42,9 +43,10 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
 
     async function onSubmit(e: React.FormEvent) {
         e.preventDefault();
+        setError(null);
 
-        if (!developer) {
-            // Should be handled by required check or UI but good to be safe
+        if (!developer || !projectName || !address) {
+            setError("Please fill in all required fields.");
             return;
         }
 
@@ -78,25 +80,30 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                 const stored = localStorage.getItem("mock_transactions");
                 const transactions = stored ? JSON.parse(stored) : [];
                 localStorage.setItem("mock_transactions", JSON.stringify([data.transaction, ...transactions]));
+
+                setOpen(false);
+
+                // Reset form
+                setDeveloper(null);
+                setProjectName("");
+                setTransType("");
+                setAddress("");
+                setPropType("");
+                setPrice("");
+                setReservationNo("");
+
+                // Notify parent
+                onTransactionCreated();
+            } else {
+                const data = await response.json();
+                setError(data.error || "Failed to create transaction");
             }
         } catch (error) {
             console.error("Failed to create transaction via API:", error);
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
-        setOpen(false);
-
-        // Reset form
-        setDeveloper(null);
-        setProjectName("");
-        setTransType("");
-        setAddress("");
-        setPropType("");
-        setPrice("");
-        setReservationNo("");
-
-        // Notify parent
-        onTransactionCreated();
     }
 
     return (
@@ -125,6 +132,11 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
                 </DialogHeader>
 
                 <form onSubmit={onSubmit} className="space-y-8">
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                            {error}
+                        </div>
+                    )}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24">
                         {/* Left Column: Project Context */}
                         <div className="space-y-6">
