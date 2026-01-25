@@ -34,15 +34,30 @@ export function JoinTransactionModal({ onTransactionJoined, trigger }: JoinTrans
     const [accessCode, setAccessCode] = useState("");
 
     const extractId = (input: string) => {
-        // Handle full URL or raw ID
+        const text = input.trim();
         try {
-            if (input.includes("/")) {
-                const parts = input.split("/");
-                return parts[parts.length - 1]; // Last part is usually ID
+            // Check for query param ref=...
+            if (text.includes("ref=")) {
+                const match = text.match(/[?&]ref=([^&]+)/);
+                if (match && match[1]) return match[1];
             }
-            return input.trim();
+
+            // Check if it's a URL path
+            if (text.includes("/")) {
+                // If it's a full URL without query param but ID in path?
+                // Our format is ?ref=ID.
+                // But legacy might be /transaction/ID (not implemented for join).
+                // Join link is .../join?ref=ID.
+                // If the user pastes a generic URL, fallback to last segment?
+                // But .../join is the last segment. That's NOT THE ID.
+                // So if it ends in "join", we should probably warn or look harder.
+                // Assuming the link provided IS the one we generate:
+                return text.split("/").pop() || text;
+            }
+
+            return text;
         } catch {
-            return input.trim();
+            return text;
         }
     };
 
@@ -88,7 +103,7 @@ export function JoinTransactionModal({ onTransactionJoined, trigger }: JoinTrans
                     access_code: accessCode,
                     client_email: email,
                     client_name: `${firstName} ${lastName}`,
-                    // Optionally pass transactionId if API supported verification
+                    client_id: userId,
                 }),
             });
 

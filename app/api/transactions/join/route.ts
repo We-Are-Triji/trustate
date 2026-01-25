@@ -7,12 +7,12 @@ export async function POST(request: NextRequest) {
         const supabase = getSupabaseAdmin();
 
         const body = await request.json();
-        const { access_code, client_email, client_name } = body;
+        const { access_code, client_email, client_name, client_id } = body;
 
         // Validate input
-        if (!access_code || !client_email || !client_name) {
+        if (!access_code || !client_email || !client_name || !client_id) {
             return NextResponse.json(
-                { error: "Missing required fields: access_code, client_email, client_name" },
+                { error: "Missing required fields: access_code, client_email, client_name, client_id" },
                 { status: 400 }
             );
         }
@@ -48,22 +48,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Generate a client ID (in production, this would be from Cognito)
-        const clientId = `client-${Date.now()}`;
-
         // Update transaction with pending client info
         const { error: updateError } = await supabase
             .from("transactions")
             .update({
-                client_id: clientId,
+                client_id: client_id,
                 client_name: client_name,
                 client_status: "pending",
-                // status: "client_joined", // Don't update overall status yet until approved
             })
             .eq("id", transaction.id);
 
         if (updateError) {
             console.error("Error updating transaction:", updateError);
+            // Return more specific error for debugging if possible, or generic
             return NextResponse.json({ error: "Failed to join transaction" }, { status: 500 });
         }
 
@@ -71,14 +68,14 @@ export async function POST(request: NextRequest) {
         // Let's stick to client role but the transaction field client_status determines access
         await supabase.from("transaction_participants").insert({
             transaction_id: transaction.id,
-            user_id: clientId,
+            user_id: client_id,
             role: "client",
         });
 
         // Log the join action
         await supabase.from("transaction_logs").insert({
             transaction_id: transaction.id,
-            actor_id: clientId,
+            actor_id: client_id,
             actor_role: "client",
             action: "client_joined_pending",
             details: { client_name, client_email },
