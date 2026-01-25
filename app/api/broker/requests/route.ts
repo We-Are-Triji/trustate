@@ -89,8 +89,8 @@ export async function GET(req: NextRequest) {
                         return {
                             ...req,
                             agent: {
-                                firstName: attributes["custom:firstName"] || "",
-                                lastName: attributes["custom:lastName"] || "",
+                                firstName: attributes["given_name"] || attributes["custom:firstName"] || "",
+                                lastName: attributes["family_name"] || attributes["custom:lastName"] || "",
                                 email: attributes.email || "",
                                 phoneNumber: attributes.phone_number || "",
                                 licenseNumber: attributes["custom:licenseNumber"] || "",
