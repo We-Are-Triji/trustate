@@ -18,7 +18,56 @@ export default function TransactionList() {
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<TransactionStatus | "all" | "archived">("all");
 
-    // ...
+    const fetchTransactions = async () => {
+        setIsLoading(true);
+        try {
+            // Try API first
+            const response = await fetch("/api/transactions", {
+                headers: {
+                    "x-user-id": userId || "demo-user",
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setTransactions(data.transactions || []);
+            } else {
+                // Fallback to localStorage
+                const stored = localStorage.getItem("mock_transactions");
+                if (stored) {
+                    setTransactions(JSON.parse(stored));
+                } else {
+                    setTransactions([]);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch transactions from API:", error);
+            // Fallback to localStorage
+            const stored = localStorage.getItem("mock_transactions");
+            if (stored) {
+                setTransactions(JSON.parse(stored));
+            } else {
+                setTransactions([]);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (userId) {
+            fetchTransactions();
+        }
+    }, [userId]);
+
+    const getStatusColor = (status: TransactionStatus) => {
+        switch (status) {
+            case "completed": return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
+            case "cancelled": return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+            case "initiated": return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
+            default: return "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400";
+        }
+    };
 
     const filteredTransactions = transactions.filter(t => {
         const matchesSearch = t.property_address.toLowerCase().includes(searchQuery.toLowerCase()) ||

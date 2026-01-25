@@ -33,6 +33,13 @@ export interface Transaction {
   access_code_expires_at: string;
   created_at: string;
   updated_at: string;
+  // New fields
+  project_name?: string;
+  transaction_type?: string;
+  unit_address?: string;
+  client_name?: string;
+  reservation_number?: string;
+  lifecycle_step?: number;
 }
 
 export interface TransactionDocument {
