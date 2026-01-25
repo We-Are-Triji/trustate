@@ -5,102 +5,90 @@ import { Send, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/hooks/use-auth";
 
 interface Message {
-  message_id: string;
+  id: string;
   sender_id: string;
-  sender_name: string;
   sender_role: string;
   content: string;
-  created_at: string;
+  timestamp: string;
 }
 
 interface ConversationTabProps {
   transactionId: string;
 }
 
-const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL;
-
 export function ConversationTab({ transactionId }: ConversationTabProps) {
   const { email, accountType } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [isConnecting, setIsConnecting] = useState(true);
-  const [isConnected, setIsConnected] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    connectWebSocket();
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    };
+    fetchMessages();
   }, [transactionId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const connectWebSocket = () => {
-    if (!WEBSOCKET_URL || !email) return;
+  const fetchMessages = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/transactions/${transactionId}/messages`, {
+        headers: { "x-user-id": email || "demo-user" },
+      });
 
-    const userId = email; // Using email as userId for now
-    const userName = email.split("@")[0];
-    const userRole = accountType || "client";
-
-    const ws = new WebSocket(
-      `${WEBSOCKET_URL}?transactionId=${transactionId}&userId=${userId}&userName=${userName}&userRole=${userRole}`
-    );
-
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-      setIsConnected(true);
-      setIsConnecting(false);
-      // Request message history
-      ws.send(JSON.stringify({ action: "getMessages", transactionId, limit: 50 }));
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      
-      if (data.action === "messageHistory") {
-        setMessages(data.data || []);
-      } else if (data.action === "newMessage") {
-        setMessages((prev) => [...prev, data.data]);
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(data.messages || []);
       }
-    };
-
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      setIsConnecting(false);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket disconnected");
-      setIsConnected(false);
-      // Attempt reconnect after 3 seconds
-      setTimeout(() => {
-        if (wsRef.current?.readyState === WebSocket.CLOSED) {
-          connectWebSocket();
-        }
-      }, 3000);
-    };
-
-    wsRef.current = ws;
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSend = () => {
-    if (!input.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+  const handleSend = async () => {
+    if (!input.trim() || isSending) return;
 
-    wsRef.current.send(
-      JSON.stringify({
-        action: "sendMessage",
-        transactionId,
-        content: input.trim(),
-      })
-    );
-
+    setIsSending(true);
+    const content = input.trim();
     setInput("");
+
+    // Optimistic update
+    const tempMessage: Message = {
+      id: `temp-${Date.now()}`,
+      sender_id: email || "demo-user",
+      sender_role: accountType || "agent",
+      content,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, tempMessage]);
+
+    try {
+      const response = await fetch(`/api/transactions/${transactionId}/messages`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": email || "demo-user",
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Replace temp message with real one
+        setMessages((prev) =>
+          prev.map((m) => (m.id === tempMessage.id ? data.message : m))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -110,12 +98,25 @@ export function ConversationTab({ transactionId }: ConversationTabProps) {
     }
   };
 
-  if (isConnecting) {
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "agent":
+        return "text-blue-600";
+      case "broker":
+        return "text-purple-600";
+      case "client":
+        return "text-green-600";
+      default:
+        return "text-gray-600";
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin text-[#0247ae] mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Connecting to chat...</p>
+          <p className="text-sm text-gray-500">Loading messages...</p>
         </div>
       </div>
     );
@@ -125,10 +126,8 @@ export function ConversationTab({ transactionId }: ConversationTabProps) {
     <div className="h-full flex flex-col">
       <div className="p-4 border-b border-gray-100 flex items-center justify-between">
         <div>
-          <h2 className="font-semibold text-gray-900">Conversation</h2>
-          <p className="text-xs text-gray-500">
-            {isConnected ? "Connected" : "Disconnected"}
-          </p>
+          <h2 className="font-semibold text-gray-900">Messages</h2>
+          <p className="text-xs text-gray-500">{messages.length} messages</p>
         </div>
       </div>
 
@@ -139,32 +138,28 @@ export function ConversationTab({ transactionId }: ConversationTabProps) {
           </div>
         ) : (
           messages.map((msg) => {
-            const isOwnMessage = msg.sender_id === email;
+            const isOwnMessage = msg.sender_id === email || msg.sender_id === "demo-user";
             return (
               <div
-                key={msg.message_id}
+                key={msg.id}
                 className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
               >
                 <div className={`max-w-[70%] ${isOwnMessage ? "items-end" : "items-start"} flex flex-col`}>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-medium text-gray-600">
-                      {msg.sender_name}
-                    </span>
-                    <span className="text-xs text-gray-400 capitalize">
+                    <span className={`text-xs font-medium capitalize ${getRoleColor(msg.sender_role)}`}>
                       {msg.sender_role}
                     </span>
                   </div>
                   <div
-                    className={`px-4 py-2 rounded-2xl ${
-                      isOwnMessage
+                    className={`px-4 py-2 rounded-2xl ${isOwnMessage
                         ? "bg-[#0247ae] text-white rounded-br-sm"
                         : "bg-gray-100 text-gray-800 rounded-bl-sm"
-                    }`}
+                      }`}
                   >
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   </div>
                   <span className="text-xs text-gray-400 mt-1">
-                    {new Date(msg.created_at).toLocaleTimeString([], {
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
@@ -185,15 +180,15 @@ export function ConversationTab({ transactionId }: ConversationTabProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            disabled={!isConnected}
+            disabled={isSending}
             className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#0247ae] disabled:opacity-50"
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim() || !isConnected}
+            disabled={!input.trim() || isSending}
             className="px-4 py-2 bg-[#0247ae] text-white rounded-lg hover:bg-[#023a8a] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Send size={18} />
+            {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
           </button>
         </div>
       </div>
