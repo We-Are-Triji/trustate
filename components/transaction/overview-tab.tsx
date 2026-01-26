@@ -189,6 +189,47 @@ export function OverviewTab({
             </div>
           </div>
 
+          {/* Client Submission Review (Step 1 - Payment Confirmation) */}
+          {effectiveStep === 1 && progress.client_joined && !progress.payment_confirmed && (
+            <Card className="border-orange-200 bg-orange-50">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Clock size={18} className="text-orange-600" />
+                  Client Payment Pending Review
+                </CardTitle>
+                <CardDescription>Review and confirm the client's payment submission</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-gray-600">
+                  The client has uploaded their payment proof. Please review the document and confirm.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      await fetch(`/api/transactions/${transaction.id}/progress`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ payment_confirmed: true }),
+                      });
+                      fetchProgress();
+                    }}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <CheckCircle2 size={16} className="mr-2" />
+                    Confirm Payment
+                  </Button>
+                  <Button
+                    onClick={() => onNavigate?.("documents")}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    View Document
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Client Invitation Section (Step 1 only, if client not joined) */}
           {effectiveStep === 1 && !progress.client_joined && transaction.client_status !== "approved" && (
             <ClientInviteSection
@@ -204,6 +245,107 @@ export function OverviewTab({
               onReject={onTransactionUpdate}
               isAgent={true}
             />
+          )}
+
+          {/* Transmittal Card (Phase 4 - Developer Handoff) */}
+          {effectiveStep === 4 && !progress.developer_accepted && (
+            <TransmittalCard
+              transactionId={transaction.id}
+              developerName={transaction.developer_name || "Developer"}
+              packageItems={[
+                { name: "Reservation Agreement", type: "document", icon: "document" },
+                { name: "Buyer's Info Sheet", type: "document", icon: "document" },
+                { name: "Verified ID", type: "id", icon: "id" },
+                { name: "Proof of Payment", type: "payment", icon: "payment" },
+              ]}
+              onTransmit={() => {
+                fetchProgress();
+                onTransactionUpdate?.();
+              }}
+              isTransmitted={progress.developer_accepted}
+            />
+          )}
+
+          {/* Client KYC Review (Step 2) */}
+          {effectiveStep === 2 && !progress.kyc_completed && (
+            <Card className="border-purple-200 bg-purple-50">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Clock size={18} className="text-purple-600" />
+                  Client KYC Pending Review
+                </CardTitle>
+                <CardDescription>Review and approve the client's identity verification</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-gray-600">
+                  The client has submitted their identity documents. Please review and approve.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      await fetch(`/api/transactions/${transaction.id}/progress`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ kyc_completed: true }),
+                      });
+                      fetchProgress();
+                    }}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <CheckCircle2 size={16} className="mr-2" />
+                    Approve KYC
+                  </Button>
+                  <Button
+                    onClick={() => onNavigate?.("kyc")}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    View KYC
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Client Document Signing Review (Step 3) */}
+          {effectiveStep === 3 && !progress.documents_signed && (
+            <Card className="border-indigo-200 bg-indigo-50">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Clock size={18} className="text-indigo-600" />
+                  Client Signatures Pending Review
+                </CardTitle>
+                <CardDescription>Review and confirm the client's document signatures</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-gray-600">
+                  The client has signed the required documents. Please review and confirm.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={async () => {
+                      await fetch(`/api/transactions/${transaction.id}/progress`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ documents_signed: true }),
+                      });
+                      fetchProgress();
+                    }}
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    <CheckCircle2 size={16} className="mr-2" />
+                    Confirm Signatures
+                  </Button>
+                  <Button
+                    onClick={() => onNavigate?.("signing")}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    View Documents
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Transmittal Card (Phase 4 - Developer Handoff) */}

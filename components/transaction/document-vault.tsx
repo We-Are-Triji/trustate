@@ -42,9 +42,11 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
 
     const isAgent = accountType === "agent" || accountType === "broker";
 
-    // Fetch documents on mount
+    // Fetch documents on mount and poll for updates
     useEffect(() => {
         fetchDocuments();
+        const interval = setInterval(fetchDocuments, 3000);
+        return () => clearInterval(interval);
     }, [transactionId]);
 
     const fetchDocuments = async () => {
@@ -106,29 +108,31 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
     const handleFiles = async (files: File[]) => {
         setIsUploading(true);
 
-        // Track if RA or BIS was uploaded for progress update
-        let raUploaded = false;
-        let bisUploaded = false;
-        let paymentProofUploaded = false;
+        // Count existing RA and BIS documents
+        const existingRA = documents.filter(d => d.document_type === "reservation_agreement").length;
+        const existingBIS = documents.filter(d => d.document_type === "buyers_info_sheet").length;
+
+        let raCount = existingRA;
+        let bisCount = existingBIS;
 
         for (const file of files) {
-            const fileNameLower = file.name.toLowerCase();
+            let documentType = "other";
 
-            // Detect document types by filename
-            if (fileNameLower.includes("reservation") && fileNameLower.includes("agreement") ||
-                fileNameLower.includes("ra") ||
-                fileNameLower.includes("reservation_agreement")) {
-                raUploaded = true;
-            }
-            if (fileNameLower.includes("buyer") && (fileNameLower.includes("info") || fileNameLower.includes("sheet")) ||
-                fileNameLower.includes("bis") ||
-                fileNameLower.includes("buyers_info")) {
-                bisUploaded = true;
-            }
-            if (fileNameLower.includes("reservation_payment") ||
-                fileNameLower.includes("payment_proof") ||
-                fileNameLower.includes("reservation_fee")) {
-                paymentProofUploaded = true;
+            // Auto-detect document type based on upload order
+            if (raCount === 0) {
+                documentType = "reservation_agreement";
+                raCount++;
+            } else if (bisCount === 0) {
+                documentType = "buyers_info_sheet";
+                bisCount++;
+            } else {
+                // Check filename for hints
+                const fileNameLower = file.name.toLowerCase();
+                if (fileNameLower.includes("payment") || fileNameLower.includes("receipt")) {
+                    documentType = "payment_proof";
+                } else if (fileNameLower.includes("id") || fileNameLower.includes("identity")) {
+                    documentType = "identity";
+                }
             }
 
             try {
@@ -143,7 +147,7 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
                         file_name: file.name,
                         file_type: file.type,
                         file_size: file.size,
-                        document_type: raUploaded ? "reservation_agreement" : bisUploaded ? "buyers_info_sheet" : paymentProofUploaded ? "payment_proof" : "other",
+                        document_type: documentType,
                     }),
                 });
 
@@ -165,7 +169,7 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
                         id: `local-${Date.now()}`,
                         file_name: file.name,
                         file_url: URL.createObjectURL(file),
-                        document_type: raUploaded ? "reservation_agreement" : bisUploaded ? "buyers_info_sheet" : "other",
+                        document_type: documentType,
                         status: "pending",
                         created_at: new Date().toISOString(),
                         uploaded_by: userId || "demo-user",
@@ -181,7 +185,7 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
                     id: `local-${Date.now()}`,
                     file_name: file.name,
                     file_url: URL.createObjectURL(file),
-                    document_type: "other",
+                    document_type: documentType,
                     status: "pending",
                     created_at: new Date().toISOString(),
                     uploaded_by: userId || "demo-user",
@@ -192,24 +196,25 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
             }
         }
 
-        // Update step progress if RA or BIS was uploaded
-        if (raUploaded || bisUploaded || paymentProofUploaded) {
-            try {
-                const progressUpdate: Record<string, boolean> = {};
-                if (raUploaded) progressUpdate.ra_uploaded = true;
-                if (bisUploaded) progressUpdate.bis_uploaded = true;
+        // Update step progress based on document counts
+        try {
+            const progressUpdate: Record<string, boolean> = {};
+            if (raCount > 0) progressUpdate.ra_uploaded = true;
+            if (bisCount > 0) progressUpdate.bis_uploaded = true;
 
+            if (Object.keys(progressUpdate).length > 0) {
                 await fetch(`/api/transactions/${transactionId}/progress`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(progressUpdate),
                 });
-            } catch (error) {
-                console.error("Failed to update progress:", error);
             }
+        } catch (error) {
+            console.error("Failed to update progress:", error);
         }
 
         setIsUploading(false);
+        fetchDocuments(); // Refresh to get latest state
     };
 
     const removeDocument = async (id: string) => {
