@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Home, Shield, Loader2 } from "lucide-react";
+import { Home, Shield, Loader2, FileText } from "lucide-react";
 import { ClientProgressTracker } from "./progress-tracker";
 import { PaymentCard } from "./payment-card";
 import { AgentWidget } from "./agent-widget";
+import { KYCCard } from "./kyc-card";
 
 interface StepProgress {
     ra_uploaded: boolean;
@@ -194,18 +195,10 @@ export function ClientTransactionView({
                 )}
 
                 {currentStep === 2 && (
-                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 text-center">
-                        <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Shield size={32} className="text-[#0247ae]" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Identity Verification</h3>
-                        <p className="text-gray-500 mb-6">
-                            Complete your identity verification to proceed.
-                        </p>
-                        <p className="text-sm text-gray-400">
-                            Your agent will provide instructions.
-                        </p>
-                    </div>
+                    <KYCCard
+                        transactionId={transactionId}
+                        onComplete={fetchProgress}
+                    />
                 )}
 
                 {currentStep === 3 && (

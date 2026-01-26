@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Camera, Shield, CheckCircle2, AlertCircle, Clock, UserCheck, CreditCard, Loader2, ThumbsUp, RefreshCw, User } from "lucide-react";
+import { Camera, Shield, CheckCircle2, Clock, UserCheck, CreditCard, Loader2, ThumbsUp, RefreshCw, User } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,10 +13,11 @@ interface KYCTabProps {
 }
 
 interface KYCStatus {
+    status: string;
     id_uploaded: boolean;
     selfie_uploaded: boolean;
     analysis_complete: boolean;
-    analysis_score: number;
+    analysis_score: number | null;
     agent_approved: boolean;
 }
 
@@ -24,55 +25,56 @@ export function KYCTab({ transactionId, onKYCComplete }: KYCTabProps) {
     const { accountType } = useAuth();
     const isAgent = accountType === "agent" || accountType === "broker";
 
-    // Mock KYC state - in real app, fetched from API
     const [kycStatus, setKycStatus] = useState<KYCStatus>({
+        status: "pending",
         id_uploaded: false,
         selfie_uploaded: false,
         analysis_complete: false,
-        analysis_score: 0,
+        analysis_score: null,
         agent_approved: false,
     });
+    const [isLoading, setIsLoading] = useState(true);
     const [isApproving, setIsApproving] = useState(false);
-    const [showMockProgress, setShowMockProgress] = useState(false);
 
-    // Simulate client completing KYC scan
-    const simulateKYCCompletion = async () => {
-        setShowMockProgress(true);
+    // Fetch KYC status from backend
+    const fetchKYCStatus = useCallback(async () => {
+        try {
+            const res = await fetch(`/api/transactions/${transactionId}/kyc`);
+            if (res.ok) {
+                const data = await res.json();
+                setKycStatus(data);
+                if (data.agent_approved) {
+                    onKYCComplete?.();
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch KYC status:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [transactionId, onKYCComplete]);
 
-        // Step 1: ID Upload
-        await new Promise(r => setTimeout(r, 1000));
-        setKycStatus(prev => ({ ...prev, id_uploaded: true }));
-
-        // Step 2: Selfie Capture
-        await new Promise(r => setTimeout(r, 1500));
-        setKycStatus(prev => ({ ...prev, selfie_uploaded: true }));
-
-        // Step 3: Analysis
-        await new Promise(r => setTimeout(r, 2000));
-        setKycStatus(prev => ({
-            ...prev,
-            analysis_complete: true,
-            analysis_score: 98
-        }));
-
-        setShowMockProgress(false);
-    };
+    // Initial fetch and polling
+    useEffect(() => {
+        fetchKYCStatus();
+        // Poll every 5 seconds
+        const interval = setInterval(fetchKYCStatus, 5000);
+        return () => clearInterval(interval);
+    }, [fetchKYCStatus]);
 
     // Agent approves KYC
     const handleApproveKYC = async () => {
         setIsApproving(true);
 
         try {
-            // Update step progress
-            const response = await fetch(`/api/transactions/${transactionId}/progress`, {
-                method: "PATCH",
+            const response = await fetch(`/api/transactions/${transactionId}/kyc`, {
+                method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ kyc_completed: true }),
+                body: JSON.stringify({ action: "agent_approve" }),
             });
 
             if (response.ok) {
-                setKycStatus(prev => ({ ...prev, agent_approved: true }));
-                onKYCComplete?.();
+                fetchKYCStatus();
             }
         } catch (error) {
             console.error("Failed to approve KYC:", error);
@@ -80,6 +82,14 @@ export function KYCTab({ transactionId, onKYCComplete }: KYCTabProps) {
             setIsApproving(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="h-full flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-[#0247ae]" />
+            </div>
+        );
+    }
 
     // AGENT VIEW
     if (isAgent) {
@@ -91,12 +101,17 @@ export function KYCTab({ transactionId, onKYCComplete }: KYCTabProps) {
                             <h2 className="text-2xl font-bold text-gray-900">KYC & Identity Verification</h2>
                             <p className="text-gray-500 mt-1">Review and approve client identity</p>
                         </div>
-                        {kycStatus.agent_approved && (
-                            <Badge className="bg-green-100 text-green-700 border-0 text-sm px-4 py-2">
-                                <CheckCircle2 size={16} className="mr-2" />
-                                Identity Verified
-                            </Badge>
-                        )}
+                        <div className="flex items-center gap-2">
+                            <button onClick={fetchKYCStatus} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                                <RefreshCw size={16} />
+                            </button>
+                            {kycStatus.agent_approved && (
+                                <Badge className="bg-green-100 text-green-700 border-0 text-sm px-4 py-2">
+                                    <CheckCircle2 size={16} className="mr-2" />
+                                    Identity Verified
+                                </Badge>
+                            )}
+                        </div>
                     </div>
 
                     {/* Status Overview */}
@@ -131,38 +146,28 @@ export function KYCTab({ transactionId, onKYCComplete }: KYCTabProps) {
                     </div>
 
                     {/* Waiting for Client */}
-                    {!kycStatus.analysis_complete && !showMockProgress && (
+                    {!kycStatus.analysis_complete && kycStatus.status !== "analyzing" && (
                         <Card className="border-gray-200">
                             <CardContent className="py-12 text-center">
                                 <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <Clock size={32} className="text-[#0247ae]" />
                                 </div>
                                 <h4 className="font-semibold text-gray-900 mb-2">Waiting for Client</h4>
-                                <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+                                <p className="text-sm text-gray-500 max-w-md mx-auto">
                                     The client needs to complete their identity verification scan. You will be notified when it&apos;s ready for review.
                                 </p>
-
-                                {/* Demo Button */}
-                                <Button
-                                    variant="outline"
-                                    onClick={simulateKYCCompletion}
-                                    className="text-[#0247ae] border-[#0247ae]"
-                                >
-                                    <RefreshCw size={16} className="mr-2" />
-                                    Simulate Client KYC (Demo)
-                                </Button>
                             </CardContent>
                         </Card>
                     )}
 
-                    {/* Mock Progress */}
-                    {showMockProgress && (
-                        <Card className="border-blue-200 bg-blue-50">
+                    {/* Analysis in Progress */}
+                    {kycStatus.status === "analyzing" && (
+                        <Card className="border-purple-200 bg-purple-50">
                             <CardContent className="py-8 text-center">
-                                <Loader2 size={40} className="mx-auto mb-4 text-[#0247ae] animate-spin" />
-                                <h4 className="font-semibold text-gray-900 mb-2">Client Completing KYC...</h4>
+                                <Loader2 size={40} className="mx-auto mb-4 text-purple-600 animate-spin" />
+                                <h4 className="font-semibold text-gray-900 mb-2">Analyzing Biometrics...</h4>
                                 <p className="text-sm text-gray-600">
-                                    Simulating ID upload, selfie capture, and AI analysis
+                                    AI is verifying the client&apos;s identity documents
                                 </p>
                             </CardContent>
                         </Card>
@@ -258,7 +263,7 @@ export function KYCTab({ transactionId, onKYCComplete }: KYCTabProps) {
         );
     }
 
-    // CLIENT VIEW
+    // CLIENT VIEW - Redirect to main client view
     return (
         <div className="h-full overflow-y-auto">
             <div className="p-6 space-y-6 max-w-4xl mx-auto">
@@ -272,9 +277,9 @@ export function KYCTab({ transactionId, onKYCComplete }: KYCTabProps) {
                         <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Shield size={32} className="text-[#0247ae]" />
                         </div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Identity Verification Coming Soon</h4>
+                        <h4 className="font-semibold text-gray-900 mb-2">Complete KYC on Mobile</h4>
                         <p className="text-sm text-gray-500 max-w-md mx-auto">
-                            You will receive instructions from your agent when it&apos;s time to complete identity verification.
+                            Please use your mobile device to complete identity verification.
                         </p>
                     </CardContent>
                 </Card>
