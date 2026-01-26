@@ -282,7 +282,7 @@ export function DocumentSigningCard({ transactionId, onComplete }: DocumentSigni
                 })}
 
                 {/* Submit button */}
-                {allDocumentsSigned && signingStatus.status !== "submitted" && (
+                {allDocumentsSigned && (
                     <Button
                         onClick={handleSubmitAll}
                         disabled={isSubmitting}
