@@ -19,8 +19,10 @@ interface SigningRecord {
     signed_at?: string;
 }
 
+type SigningStatusType = "pending" | "ready" | "signing" | "submitted" | "validated";
+
 interface SigningStatus {
-    status: "pending" | "ready" | "signing" | "submitted" | "validated";
+    status: SigningStatusType;
     documents: Document[];
     signing_records: SigningRecord[];
     signed_count: number;
