@@ -213,11 +213,11 @@ export default function TransactionPage() {
       }
       rightTools={
         <TransactionLifecycle
-          currentStep={currentStep}
-          completedSteps={completedSteps}
+          transactionId={transactionId}
+          clientStatus={transaction?.client_status}
           onStepClick={(step) => {
             // Navigate to relevant tab based on step
-            if (step === 1) setActiveTab("escrow");
+            if (step === 1) setActiveTab("overview");
             else if (step === 2) setActiveTab("documents");
             else if (step === 3) setActiveTab("documents");
             else setActiveTab("overview");

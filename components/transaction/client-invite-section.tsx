@@ -75,8 +75,22 @@ export function ClientInviteSection({
 
             if (response.ok) {
                 toast.success(`Client ${action}d successfully`);
-                if (action === "approve") onApprove?.();
-                else onReject?.();
+
+                // Update step progress if approved
+                if (action === "approve") {
+                    try {
+                        await fetch(`/api/transactions/${transactionId}/progress`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ client_joined: true }),
+                        });
+                    } catch (error) {
+                        console.error("Failed to update progress:", error);
+                    }
+                    onApprove?.();
+                } else {
+                    onReject?.();
+                }
             } else {
                 toast.error("Failed to process request");
             }

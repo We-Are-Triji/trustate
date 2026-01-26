@@ -106,7 +106,31 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
     const handleFiles = async (files: File[]) => {
         setIsUploading(true);
 
+        // Track if RA or BIS was uploaded for progress update
+        let raUploaded = false;
+        let bisUploaded = false;
+        let paymentProofUploaded = false;
+
         for (const file of files) {
+            const fileNameLower = file.name.toLowerCase();
+
+            // Detect document types by filename
+            if (fileNameLower.includes("reservation") && fileNameLower.includes("agreement") ||
+                fileNameLower.includes("ra") ||
+                fileNameLower.includes("reservation_agreement")) {
+                raUploaded = true;
+            }
+            if (fileNameLower.includes("buyer") && (fileNameLower.includes("info") || fileNameLower.includes("sheet")) ||
+                fileNameLower.includes("bis") ||
+                fileNameLower.includes("buyers_info")) {
+                bisUploaded = true;
+            }
+            if (fileNameLower.includes("reservation_payment") ||
+                fileNameLower.includes("payment_proof") ||
+                fileNameLower.includes("reservation_fee")) {
+                paymentProofUploaded = true;
+            }
+
             try {
                 // 1. Request presigned URL from API
                 const response = await fetch(`/api/transactions/${transactionId}/documents`, {
@@ -119,7 +143,7 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
                         file_name: file.name,
                         file_type: file.type,
                         file_size: file.size,
-                        document_type: "other",
+                        document_type: raUploaded ? "reservation_agreement" : bisUploaded ? "buyers_info_sheet" : paymentProofUploaded ? "payment_proof" : "other",
                     }),
                 });
 
@@ -141,7 +165,7 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
                         id: `local-${Date.now()}`,
                         file_name: file.name,
                         file_url: URL.createObjectURL(file),
-                        document_type: "other",
+                        document_type: raUploaded ? "reservation_agreement" : bisUploaded ? "buyers_info_sheet" : "other",
                         status: "pending",
                         created_at: new Date().toISOString(),
                         uploaded_by: userId || "demo-user",
@@ -165,6 +189,23 @@ export function DocumentVault({ transactionId, onAnalyzeDocument }: DocumentVaul
                     type: file.type,
                 };
                 setDocuments((prev) => [localDoc, ...prev]);
+            }
+        }
+
+        // Update step progress if RA or BIS was uploaded
+        if (raUploaded || bisUploaded || paymentProofUploaded) {
+            try {
+                const progressUpdate: Record<string, boolean> = {};
+                if (raUploaded) progressUpdate.ra_uploaded = true;
+                if (bisUploaded) progressUpdate.bis_uploaded = true;
+
+                await fetch(`/api/transactions/${transactionId}/progress`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(progressUpdate),
+                });
+            } catch (error) {
+                console.error("Failed to update progress:", error);
             }
         }
 
