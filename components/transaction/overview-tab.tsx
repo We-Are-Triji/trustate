@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Transaction } from "@/lib/types/transaction";
 import { ClientInviteSection } from "./client-invite-section";
+import { TransmittalCard } from "./transmittal-card";
 
 interface ExtendedTransaction extends Omit<Transaction, "property_type" | "transaction_type"> {
   client_status?: "none" | "pending" | "approved" | "rejected";
@@ -205,6 +206,36 @@ export function OverviewTab({
             />
           )}
 
+          {/* Transmittal Card (Phase 4 - Developer Handoff) */}
+          {effectiveStep === 4 && !progress.developer_accepted && (
+            <TransmittalCard
+              transactionId={transaction.id}
+              developerName={transaction.developer_name || "Developer"}
+              packageItems={[
+                { name: "Reservation Agreement", type: "document", icon: "document" },
+                { name: "Buyer's Info Sheet", type: "document", icon: "document" },
+                { name: "Verified ID", type: "id", icon: "id" },
+                { name: "Proof of Payment", type: "payment", icon: "payment" },
+              ]}
+              onTransmit={() => {
+                fetchProgress();
+                onTransactionUpdate?.();
+              }}
+              isTransmitted={progress.developer_accepted}
+            />
+          )}
+
+          {/* Transmitted State */}
+          {progress.developer_accepted && effectiveStep >= 4 && (
+            <TransmittalCard
+              transactionId={transaction.id}
+              developerName={transaction.developer_name || "Developer"}
+              packageItems={[]}
+              isTransmitted={true}
+              transmittedAt={new Date().toISOString()}
+            />
+          )}
+
           {/* Task Checklist */}
           <Card className="border-gray-200">
             <CardHeader>
@@ -219,8 +250,8 @@ export function OverviewTab({
                     key={index}
                     onClick={() => onNavigate?.(task.tab)}
                     className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all group text-left ${isDone
-                        ? "border-green-200 bg-green-50"
-                        : "border-gray-200 bg-white hover:border-[#0247ae] hover:bg-blue-50/30"
+                      ? "border-green-200 bg-green-50"
+                      : "border-gray-200 bg-white hover:border-[#0247ae] hover:bg-blue-50/30"
                       }`}
                   >
                     <div className="flex items-center gap-3">
