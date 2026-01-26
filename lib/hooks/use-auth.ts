@@ -12,7 +12,6 @@ interface AuthState {
   email: string | null;
   firstName: string | null;
   lastName: string | null;
-  email: string | null;
   phoneNumber: string | null;
   userId: string | null;
   brokerType: "individual" | "firm" | null;
