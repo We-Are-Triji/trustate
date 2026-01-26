@@ -7,6 +7,7 @@ import { PaymentCard } from "./payment-card";
 import { AgentWidget } from "./agent-widget";
 import { KYCCard } from "./kyc-card";
 import { DocumentSigningCard } from "./document-signing-card";
+import { HandoffCard } from "./handoff-card";
 
 interface StepProgress {
     ra_uploaded: boolean;
@@ -210,15 +211,11 @@ export function ClientTransactionView({
                 )}
 
                 {currentStep === 4 && (
-                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 text-center">
-                        <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Home size={32} className="text-green-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Developer Handoff</h3>
-                        <p className="text-gray-500">
-                            Your reservation is being processed by the developer.
-                        </p>
-                    </div>
+                    <HandoffCard
+                        transactionId={transactionId}
+                        developerName={transaction.developer_name}
+                        onComplete={fetchProgress}
+                    />
                 )}
 
                 {/* Agent Widget - Fixed at Bottom */}
