@@ -16,6 +16,7 @@ import { SmartAssistant } from "@/components/transaction/smart-assistant";
 import { TransactionSettings } from "@/components/transaction/transaction-settings";
 import { KYCTab } from "@/components/transaction/kyc-tab";
 import { DocumentSigningTab } from "@/components/transaction/document-signing-tab";
+import { ClientTransactionView } from "@/components/transaction/client/transaction-view";
 import type { Transaction } from "@/lib/types/transaction";
 
 interface ExtendedTransaction extends Transaction {
@@ -25,6 +26,16 @@ interface ExtendedTransaction extends Transaction {
   client_status?: "none" | "pending" | "approved" | "rejected";
   client_invite_code?: string;
   client_invite_expires_at?: string;
+  developer_name?: string;
+  agent_name?: string;
+  agent_phone?: string;
+  agent_email?: string;
+  brokerage_name?: string;
+  payment_bank_name?: string;
+  payment_account_name?: string;
+  payment_account_number?: string;
+  payment_gcash?: string;
+  reservation_amount?: number;
 }
 
 export default function TransactionPage() {
@@ -205,6 +216,32 @@ export default function TransactionPage() {
     }
   };
 
+  // Client gets a simplified mobile-first view
+  if (!isAgent) {
+    return (
+      <ClientTransactionView
+        transactionId={transactionId}
+        transaction={transaction ? {
+          id: transaction.id,
+          property_address: transaction.property_address,
+          project_name: transaction.project_name,
+          transaction_value: transaction.transaction_value,
+          developer_name: transaction.developer_name,
+          agent_name: transaction.agent_name,
+          agent_phone: transaction.agent_phone,
+          agent_email: transaction.agent_email,
+          brokerage_name: transaction.brokerage_name,
+          payment_bank_name: transaction.payment_bank_name,
+          payment_account_name: transaction.payment_account_name,
+          payment_account_number: transaction.payment_account_number,
+          payment_gcash: transaction.payment_gcash,
+          reservation_amount: transaction.reservation_amount || 25000,
+        } : null}
+        onRefresh={fetchTransaction}
+      />
+    );
+  }
+
   return (
     <TransactionLayout
       leftMenu={
@@ -224,8 +261,8 @@ export default function TransactionPage() {
           onStepClick={(step) => {
             // Navigate to relevant tab based on step
             if (step === 1) setActiveTab("overview");
-            else if (step === 2) setActiveTab("documents");
-            else if (step === 3) setActiveTab("documents");
+            else if (step === 2) setActiveTab("kyc");
+            else if (step === 3) setActiveTab("signing");
             else setActiveTab("overview");
           }}
         />
