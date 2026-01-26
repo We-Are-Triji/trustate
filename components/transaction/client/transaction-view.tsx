@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Home, Shield, Loader2, FileText } from "lucide-react";
+import { Home, Shield, Loader2, FileText, Building2 } from "lucide-react";
 import { ClientProgressTracker } from "./progress-tracker";
 import { PaymentCard } from "./payment-card";
 import { AgentWidget } from "./agent-widget";
 import { KYCCard } from "./kyc-card";
+import { DocumentSigningCard } from "./document-signing-card";
 
 interface StepProgress {
     ra_uploaded: boolean;
@@ -202,18 +203,10 @@ export function ClientTransactionView({
                 )}
 
                 {currentStep === 3 && (
-                    <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 text-center">
-                        <div className="h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Home size={32} className="text-purple-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Document Signing</h3>
-                        <p className="text-gray-500 mb-6">
-                            Sign your transaction documents.
-                        </p>
-                        <p className="text-sm text-gray-400">
-                            Your agent will send documents for signature.
-                        </p>
-                    </div>
+                    <DocumentSigningCard
+                        transactionId={transactionId}
+                        onComplete={fetchProgress}
+                    />
                 )}
 
                 {currentStep === 4 && (
