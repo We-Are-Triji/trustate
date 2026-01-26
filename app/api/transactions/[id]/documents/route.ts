@@ -121,13 +121,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: "Failed to create document record" }, { status: 500 });
         }
 
-        // Auto-accept payment proof for clients (mock purposes)
-        if (document_type === "payment_proof") {
-            await supabase
-                .from("transaction_step_progress")
-                .update({ payment_confirmed: true })
-                .eq("transaction_id", id);
-        }
+        // Don't auto-accept - let agent review and confirm
+        // Payment will be confirmed when agent clicks "Confirm Payment" button
 
         return NextResponse.json({
             document,
