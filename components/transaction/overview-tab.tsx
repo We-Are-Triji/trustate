@@ -52,14 +52,6 @@ const STEP_ACTIONS = [
   },
   {
     step: 2,
-    title: "KYC & Identity",
-    tasks: [
-      { label: "Await Client Identity Scan", tab: "kyc", progressKey: null },
-      { label: "Approve Identity Verification", tab: "kyc", progressKey: "kyc_completed" },
-    ]
-  },
-  {
-    step: 3,
     title: "Document Assembly",
     tasks: [
       { label: "Prepare Contract Documents", tab: "documents", progressKey: null },
@@ -67,7 +59,7 @@ const STEP_ACTIONS = [
     ]
   },
   {
-    step: 4,
+    step: 3,
     title: "Developer Handoff",
     tasks: [
       { label: "Submit to Developer", tab: "overview", progressKey: null },
@@ -75,7 +67,7 @@ const STEP_ACTIONS = [
     ]
   },
   {
-    step: 5,
+    step: 4,
     title: "Commission Release",
     tasks: [
       { label: "Verify Commission Amount", tab: "overview", progressKey: null },
@@ -139,10 +131,9 @@ export function OverviewTab({
 
   // Calculate effective current step based on progress
   const getEffectiveStep = () => {
-    if (progress.commission_released) return 5;
-    if (progress.developer_accepted) return 5;
-    if (progress.documents_signed) return 4;
-    if (progress.kyc_completed) return 3;
+    if (progress.commission_released) return 4;
+    if (progress.developer_accepted) return 4;
+    if (progress.documents_signed) return 3;
     if (progress.payment_confirmed) return 2;
     return 1;
   };
@@ -266,49 +257,8 @@ export function OverviewTab({
             />
           )}
 
-          {/* Client KYC Review (Step 2) */}
-          {effectiveStep === 2 && !progress.kyc_completed && (
-            <Card className="border-purple-200 bg-purple-50">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Clock size={18} className="text-purple-600" />
-                  Client KYC Pending Review
-                </CardTitle>
-                <CardDescription>Review and approve the client's identity verification</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-gray-600">
-                  The client has submitted their identity documents. Please review and approve.
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={async () => {
-                      await fetch(`/api/transactions/${transaction.id}/progress`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ kyc_completed: true }),
-                      });
-                      fetchProgress();
-                    }}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
-                  >
-                    <CheckCircle2 size={16} className="mr-2" />
-                    Approve KYC
-                  </Button>
-                  <Button
-                    onClick={() => onNavigate?.("kyc")}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    View KYC
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Client Document Signing Review (Step 3) */}
-          {effectiveStep === 3 && !progress.documents_signed && (
+          {/* Client Document Signing Review (Step 2) */}
+          {effectiveStep === 2 && !progress.documents_signed && (
             <Card className="border-indigo-200 bg-indigo-50">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
@@ -348,8 +298,8 @@ export function OverviewTab({
             </Card>
           )}
 
-          {/* Transmittal Card (Phase 4 - Developer Handoff) */}
-          {effectiveStep === 4 && !progress.developer_accepted && (
+          {/* Transmittal Card (Phase 3 - Developer Handoff) */}
+          {effectiveStep === 3 && !progress.developer_accepted && (
             <TransmittalCard
               transactionId={transaction.id}
               developerName={transaction.developer_name || "Developer"}
