@@ -122,11 +122,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             .eq("transaction_id", id)
             .eq("user_id", userId);
 
+        // Fetch sender name from agents table
+        const { data: agentData } = await supabase
+            .from("agents")
+            .select("name")
+            .eq("id", userId)
+            .single();
+
         return NextResponse.json({
             message: {
                 id: message.id,
                 sender_id: message.actor_id,
-                sender_name: userName,
+                sender_name: agentData?.name || "Unknown",
                 sender_role: message.actor_role,
                 content: content.trim(),
                 timestamp: message.created_at,
