@@ -17,13 +17,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        // Fetch transaction with participants
+        // Fetch transaction with participants and agent details
         const { data: transaction, error } = await supabase
             .from("transactions")
             .select(`
         *,
         transaction_participants(user_id, role, joined_at),
-        transaction_documents(id, document_type, file_name, status, created_at)
+        transaction_documents(id, document_type, file_name, status, created_at),
+        agents!transactions_agent_id_fkey(name, phone, email, brokerage_name)
       `)
             .eq("id", id)
             .single();
@@ -60,9 +61,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         );
 
         // Add computed fields
+        const agentData = transaction.agents;
         const enhancedTransaction = {
             ...transaction,
-            client_status: clientParticipant ? "approved" : "none"
+            client_status: clientParticipant ? "approved" : "none",
+            agent_name: agentData?.name,
+            agent_phone: agentData?.phone,
+            agent_email: agentData?.email,
+            brokerage_name: agentData?.brokerage_name,
         };
 
         return NextResponse.json({ transaction: enhancedTransaction });

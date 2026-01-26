@@ -177,6 +177,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             details: { document_id: document.id, file_name, document_type },
         });
 
+        // Auto-accept payment proof for clients (mock purposes)
+        if (document_type === "payment_proof" && participant.role === "client") {
+            await supabase
+                .from("transaction_step_progress")
+                .update({ payment_confirmed: true })
+                .eq("transaction_id", id);
+        }
+
         return NextResponse.json({
             document,
             upload_url: uploadUrl,

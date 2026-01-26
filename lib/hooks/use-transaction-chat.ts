@@ -23,10 +23,33 @@ export function useTransactionChat({ transactionId, userId, userName, userRole }
     const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
     const socketRef = useRef<WebSocket | null>(null);
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const usePolling = !process.env.NEXT_PUBLIC_WEBSOCKET_URL;
+
+    // REST API fallback - fetch messages
+    const fetchMessages = useCallback(async () => {
+        try {
+            const response = await fetch(`/api/transactions/${transactionId}/messages`, {
+                headers: { 'x-user-id': userId }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setMessages(data.messages);
+            }
+        } catch (error) {
+            console.error('Failed to fetch messages:', error);
+        }
+    }, [transactionId, userId]);
 
     const connect = useCallback(() => {
         const wsUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL;
-        if (!wsUrl || !transactionId || !userId) return;
+        if (!wsUrl || !transactionId || !userId) {
+            // Use polling fallback
+            setStatus('connected');
+            fetchMessages();
+            pollingIntervalRef.current = setInterval(fetchMessages, 2000);
+            return;
+        }
 
         // Prevent multiple connections
         if (socketRef.current?.readyState === WebSocket.OPEN) return;
@@ -111,12 +134,37 @@ export function useTransactionChat({ transactionId, userId, userName, userRole }
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
             }
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
         };
     }, [connect]);
 
-    const sendMessage = useCallback((content: string) => {
+    const sendMessage = useCallback(async (content: string) => {
+        if (usePolling) {
+            // Use REST API
+            try {
+                const response = await fetch(`/api/transactions/${transactionId}/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-id': userId
+                    },
+                    body: JSON.stringify({ content })
+                });
+                if (response.ok) {
+                    fetchMessages();
+                } else {
+                    toast.error('Failed to send message');
+                }
+            } catch (error) {
+                toast.error('Failed to send message');
+            }
+            return;
+        }
+
         if (socketRef.current?.readyState !== WebSocket.OPEN) {
-            toast.error('Connection lost. Exploring reconnection...');
+            toast.error('Connection lost. Reconnecting...');
             return;
         }
 
@@ -149,7 +197,7 @@ export function useTransactionChat({ transactionId, userId, userName, userRole }
             transactionId,
             content
         }));
-    }, [transactionId, userId, userName, userRole]);
+    }, [transactionId, userId, userName, userRole, usePolling, fetchMessages]);
 
     return {
         messages,

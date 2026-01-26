@@ -32,7 +32,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         // Fetch messages (logs with action = 'message')
         const { data: messages, error } = await supabase
             .from("transaction_logs")
-            .select("id, actor_id, actor_role, details, created_at")
+            .select(`
+                id, 
+                actor_id, 
+                actor_role, 
+                details, 
+                created_at,
+                agents!transaction_logs_actor_id_fkey(name)
+            `)
             .eq("transaction_id", id)
             .eq("action", "message")
             .order("created_at", { ascending: true });
@@ -43,9 +50,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }
 
         // Transform to message format
-        const formattedMessages = messages?.map((msg) => ({
+        const formattedMessages = messages?.map((msg: any) => ({
             id: msg.id,
             sender_id: msg.actor_id,
+            sender_name: msg.agents?.name || "Unknown",
             sender_role: msg.actor_role,
             content: (msg.details as { content?: string })?.content || "",
             timestamp: msg.created_at,
@@ -118,6 +126,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             message: {
                 id: message.id,
                 sender_id: message.actor_id,
+                sender_name: userName,
                 sender_role: message.actor_role,
                 content: content.trim(),
                 timestamp: message.created_at,
