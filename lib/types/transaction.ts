@@ -40,6 +40,7 @@ export interface Transaction {
   client_name?: string;
   reservation_number?: string;
   lifecycle_step?: number;
+  client_status?: "none" | "pending" | "approved" | "rejected";
 }
 
 export interface TransactionDocument {
