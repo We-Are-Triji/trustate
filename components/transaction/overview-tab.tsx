@@ -1,6 +1,7 @@
 "use client";
 
-import { MapPin, DollarSign, Users, Home, Building2, Hash, ArrowRight, CheckCircle2, Clock, Upload } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { MapPin, DollarSign, Users, Home, Building2, ArrowRight, CheckCircle2, Clock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Transaction } from "@/lib/types/transaction";
@@ -17,6 +18,17 @@ interface ExtendedTransaction extends Omit<Transaction, "property_type" | "trans
   reservation_number?: string;
 }
 
+interface StepProgress {
+  ra_uploaded: boolean;
+  bis_uploaded: boolean;
+  client_joined: boolean;
+  payment_confirmed: boolean;
+  kyc_completed: boolean;
+  documents_signed: boolean;
+  developer_accepted: boolean;
+  commission_released: boolean;
+}
+
 interface OverviewTabProps {
   transaction: ExtendedTransaction | null;
   onTransactionUpdate?: () => void;
@@ -25,48 +37,48 @@ interface OverviewTabProps {
   onNavigate?: (tab: string) => void;
 }
 
-// Step actions for the agent
+// Step actions with progress keys
 const STEP_ACTIONS = [
   {
     step: 1,
     title: "Reservation & Escrow",
     tasks: [
-      { label: "Upload Reservation Agreement (RA)", tab: "documents", done: false },
-      { label: "Upload Buyer's Info Sheet (BIS)", tab: "documents", done: false },
-      { label: "Invite Client to Transaction", tab: "overview", done: false },
-      { label: "Confirm Reservation Payment", tab: "escrow", done: false },
+      { label: "Upload Reservation Agreement (RA)", tab: "documents", progressKey: "ra_uploaded" },
+      { label: "Upload Buyer's Info Sheet (BIS)", tab: "documents", progressKey: "bis_uploaded" },
+      { label: "Invite Client to Transaction", tab: "overview", progressKey: "client_joined" },
+      { label: "Confirm Reservation Payment", tab: "escrow", progressKey: "payment_confirmed" },
     ]
   },
   {
     step: 2,
     title: "KYC & Identity",
     tasks: [
-      { label: "Verify Client Identity Documents", tab: "documents", done: false },
-      { label: "Complete Liveness Check", tab: "documents", done: false },
+      { label: "Await Client Identity Scan", tab: "kyc", progressKey: null },
+      { label: "Approve Identity Verification", tab: "kyc", progressKey: "kyc_completed" },
     ]
   },
   {
     step: 3,
     title: "Document Assembly",
     tasks: [
-      { label: "Prepare Contract Documents", tab: "documents", done: false },
-      { label: "Obtain Client Signatures", tab: "documents", done: false },
+      { label: "Prepare Contract Documents", tab: "documents", progressKey: null },
+      { label: "Obtain Client Signatures", tab: "documents", progressKey: "documents_signed" },
     ]
   },
   {
     step: 4,
     title: "Developer Handoff",
     tasks: [
-      { label: "Submit to Developer", tab: "overview", done: false },
-      { label: "Await Developer Confirmation", tab: "overview", done: false },
+      { label: "Submit to Developer", tab: "overview", progressKey: null },
+      { label: "Await Developer Confirmation", tab: "overview", progressKey: "developer_accepted" },
     ]
   },
   {
     step: 5,
     title: "Commission Release",
     tasks: [
-      { label: "Verify Commission Amount", tab: "overview", done: false },
-      { label: "Confirm Commission Received", tab: "overview", done: false },
+      { label: "Verify Commission Amount", tab: "overview", progressKey: null },
+      { label: "Confirm Commission Received", tab: "overview", progressKey: "commission_released" },
     ]
   },
 ];
@@ -78,6 +90,64 @@ export function OverviewTab({
   currentStep = 1,
   onNavigate
 }: OverviewTabProps) {
+  const [progress, setProgress] = useState<StepProgress>({
+    ra_uploaded: false,
+    bis_uploaded: false,
+    client_joined: false,
+    payment_confirmed: false,
+    kyc_completed: false,
+    documents_signed: false,
+    developer_accepted: false,
+    commission_released: false,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchProgress = useCallback(async () => {
+    if (!transaction?.id) return;
+    try {
+      const res = await fetch(`/api/transactions/${transaction.id}/progress`);
+      if (res.ok) {
+        const data = await res.json();
+        setProgress(data.progress);
+      }
+    } catch (error) {
+      console.error("Failed to fetch progress:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [transaction?.id]);
+
+  useEffect(() => {
+    fetchProgress();
+    // Poll for updates
+    const interval = setInterval(fetchProgress, 5000);
+    return () => clearInterval(interval);
+  }, [fetchProgress]);
+
+  // Also update if client status changes
+  useEffect(() => {
+    if (transaction?.client_status === "approved") {
+      setProgress(prev => ({ ...prev, client_joined: true }));
+    }
+  }, [transaction?.client_status]);
+
+  const isTaskDone = (progressKey: string | null): boolean => {
+    if (!progressKey) return false;
+    return progress[progressKey as keyof StepProgress] || false;
+  };
+
+  // Calculate effective current step based on progress
+  const getEffectiveStep = () => {
+    if (progress.commission_released) return 5;
+    if (progress.developer_accepted) return 5;
+    if (progress.documents_signed) return 4;
+    if (progress.kyc_completed) return 3;
+    if (progress.payment_confirmed) return 2;
+    return 1;
+  };
+
+  const effectiveStep = getEffectiveStep();
+
   if (!transaction) {
     return (
       <div className="h-full bg-white p-6">
@@ -95,7 +165,8 @@ export function OverviewTab({
 
   // Agent View
   if (isAgent) {
-    const currentPhaseConfig = STEP_ACTIONS.find(s => s.step === currentStep) || STEP_ACTIONS[0];
+    const currentPhaseConfig = STEP_ACTIONS.find(s => s.step === effectiveStep) || STEP_ACTIONS[0];
+    const completedTasks = currentPhaseConfig.tasks.filter(t => isTaskDone(t.progressKey)).length;
 
     return (
       <div className="h-full overflow-y-auto bg-gray-50/30">
@@ -103,24 +174,32 @@ export function OverviewTab({
           {/* Current Phase Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Step {currentStep}: {currentPhaseConfig.title}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Step {effectiveStep}: {currentPhaseConfig.title}</h1>
               <p className="text-gray-500 mt-1">Complete the tasks below to proceed</p>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-[#0247ae] rounded-full text-sm font-medium">
-              <Clock size={14} />
-              In Progress
+            <div className="flex items-center gap-3">
+              <button onClick={fetchProgress} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                <RefreshCw size={16} />
+              </button>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-[#0247ae] rounded-full text-sm font-medium">
+                <Clock size={14} />
+                {completedTasks}/{currentPhaseConfig.tasks.length} Complete
+              </div>
             </div>
           </div>
 
-          {/* Client Invitation Section (Step 1) */}
-          {currentStep === 1 && transaction.client_status !== "approved" && (
+          {/* Client Invitation Section (Step 1 only, if client not joined) */}
+          {effectiveStep === 1 && !progress.client_joined && transaction.client_status !== "approved" && (
             <ClientInviteSection
               transactionId={transaction.id}
               accessCode={transaction.client_invite_code || transaction.access_code || "N/A"}
               expiresAt={transaction.client_invite_expires_at || transaction.access_code_expires_at || new Date().toISOString()}
               clientStatus={transaction.client_status || "none"}
               pendingClientName={transaction.client_name}
-              onApprove={onTransactionUpdate}
+              onApprove={() => {
+                fetchProgress();
+                onTransactionUpdate?.();
+              }}
               onReject={onTransactionUpdate}
               isAgent={true}
             />
@@ -133,28 +212,36 @@ export function OverviewTab({
               <CardDescription>Complete all tasks to unlock the next step</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {currentPhaseConfig.tasks.map((task, index) => (
-                <button
-                  key={index}
-                  onClick={() => onNavigate?.(task.tab)}
-                  className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:border-[#0247ae] hover:bg-blue-50/30 transition-all group text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center ${task.done ? "bg-green-100" : "bg-gray-100 group-hover:bg-blue-100"
-                      }`}>
-                      {task.done ? (
-                        <CheckCircle2 size={16} className="text-green-600" />
-                      ) : (
-                        <span className="text-sm font-medium text-gray-500 group-hover:text-[#0247ae]">{index + 1}</span>
-                      )}
+              {currentPhaseConfig.tasks.map((task, index) => {
+                const isDone = isTaskDone(task.progressKey);
+                return (
+                  <button
+                    key={index}
+                    onClick={() => onNavigate?.(task.tab)}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all group text-left ${isDone
+                        ? "border-green-200 bg-green-50"
+                        : "border-gray-200 bg-white hover:border-[#0247ae] hover:bg-blue-50/30"
+                      }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center ${isDone ? "bg-green-100" : "bg-gray-100 group-hover:bg-blue-100"
+                        }`}>
+                        {isDone ? (
+                          <CheckCircle2 size={16} className="text-green-600" />
+                        ) : (
+                          <span className="text-sm font-medium text-gray-500 group-hover:text-[#0247ae]">{index + 1}</span>
+                        )}
+                      </div>
+                      <span className={`font-medium ${isDone ? "text-green-700 line-through" : "text-gray-900"}`}>
+                        {task.label}
+                      </span>
                     </div>
-                    <span className={`font-medium ${task.done ? "text-gray-400 line-through" : "text-gray-900"}`}>
-                      {task.label}
-                    </span>
-                  </div>
-                  <ArrowRight size={16} className="text-gray-400 group-hover:text-[#0247ae] transition-colors" />
-                </button>
-              ))}
+                    {!isDone && (
+                      <ArrowRight size={16} className="text-gray-400 group-hover:text-[#0247ae] transition-colors" />
+                    )}
+                  </button>
+                );
+              })}
             </CardContent>
           </Card>
 
@@ -193,7 +280,7 @@ export function OverviewTab({
                   <div>
                     <p className="text-xs text-gray-500">Client</p>
                     <p className="font-medium text-gray-900">
-                      {transaction.client_status === "approved" ? transaction.client_name || "Linked" : "Not Joined"}
+                      {progress.client_joined ? transaction.client_name || "Linked" : "Not Joined"}
                     </p>
                   </div>
                 </div>
@@ -205,7 +292,7 @@ export function OverviewTab({
     );
   }
 
-  // Client View (Simplified - to be implemented later)
+  // Client View
   return (
     <div className="h-full overflow-y-auto bg-gray-50/30">
       <div className="p-6 max-w-5xl mx-auto space-y-8">
