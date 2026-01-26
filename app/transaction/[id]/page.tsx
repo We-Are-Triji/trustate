@@ -15,6 +15,7 @@ import { EscrowForm } from "@/components/transaction/escrow-form";
 import { SmartAssistant } from "@/components/transaction/smart-assistant";
 import { TransactionSettings } from "@/components/transaction/transaction-settings";
 import { KYCTab } from "@/components/transaction/kyc-tab";
+import { DocumentSigningTab } from "@/components/transaction/document-signing-tab";
 import type { Transaction } from "@/lib/types/transaction";
 
 interface ExtendedTransaction extends Transaction {
@@ -173,6 +174,8 @@ export default function TransactionPage() {
         return <DocumentVault transactionId={transactionId} onAnalyzeDocument={handleAnalyzeDocument} />;
       case "kyc":
         return <KYCTab transactionId={transactionId} />;
+      case "signing":
+        return <DocumentSigningTab transactionId={transactionId} />;
       case "escrow":
         return <EscrowForm transactionId={transactionId} />;
       case "activity":
