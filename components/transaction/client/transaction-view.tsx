@@ -8,6 +8,7 @@ import { AgentWidget } from "./agent-widget";
 import { KYCCard } from "./kyc-card";
 import { DocumentSigningCard } from "./document-signing-card";
 import { HandoffCard } from "./handoff-card";
+import { DocumentReviewCard } from "./document-review-card";
 
 interface StepProgress {
     ra_uploaded: boolean;
@@ -45,8 +46,8 @@ interface ClientTransactionViewProps {
 
 const STEPS = [
     { id: 1, name: "Reservation" },
-    { id: 2, name: "Identity" },
-    { id: 3, name: "Documents" },
+    { id: 2, name: "Documents" },
+    { id: 3, name: "Signatures" },
     { id: 4, name: "Handoff" },
 ];
 
@@ -114,8 +115,7 @@ export function ClientTransactionView({
     // Calculate current step from progress
     const getCurrentStep = () => {
         if (progress.developer_accepted) return 4;
-        if (progress.documents_signed) return 4;
-        if (progress.kyc_completed) return 3;
+        if (progress.documents_signed) return 3;
         if (progress.payment_confirmed) return 2;
         return 1;
     };
@@ -197,7 +197,7 @@ export function ClientTransactionView({
                 )}
 
                 {currentStep === 2 && (
-                    <KYCCard
+                    <DocumentReviewCard
                         transactionId={transactionId}
                         onComplete={fetchProgress}
                     />
