@@ -213,16 +213,14 @@ export default function TransactionPage() {
       }
       rightTools={
         <TransactionLifecycle
-          transactionId={transactionId}
           currentStep={currentStep}
           completedSteps={completedSteps}
-          clientStatus={transaction?.client_status}
-          readOnly={!isAgent}
           onStepClick={(step) => {
-            // Allow viewing completed steps
-            if (completedSteps.includes(step) || step === currentStep) {
-              // Could implement step history view here
-            }
+            // Navigate to relevant tab based on step
+            if (step === 1) setActiveTab("escrow");
+            else if (step === 2) setActiveTab("documents");
+            else if (step === 3) setActiveTab("documents");
+            else setActiveTab("overview");
           }}
         />
       }
