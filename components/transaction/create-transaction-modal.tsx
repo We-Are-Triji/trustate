@@ -17,7 +17,7 @@ interface CreateTransactionModalProps {
 }
 
 export function CreateTransactionModal({ onTransactionCreated, trigger }: CreateTransactionModalProps) {
-    const { userId } = useAuth();
+    const { userId, firstName, lastName, email, phoneNumber } = useAuth();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -61,6 +61,9 @@ export function CreateTransactionModal({ onTransactionCreated, trigger }: Create
             transaction_value: parseInt(price.replace(/,/g, "")) || null,
             client_name: null, // Client joins via invite code
             reservation_number: reservationNo || null,
+            agent_name: firstName && lastName ? `${firstName} ${lastName}` : null,
+            agent_email: email,
+            agent_phone: phoneNumber,
         };
 
         try {

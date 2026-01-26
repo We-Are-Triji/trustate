@@ -56,6 +56,7 @@ export function AgentWidget({
                         <Button
                             size="icon"
                             className="h-10 w-10 rounded-full bg-[#0247ae] hover:bg-[#023a8a]"
+                            onClick={() => window.open(`sms:${agentPhone}`)}
                         >
                             <MessageCircle size={16} />
                         </Button>

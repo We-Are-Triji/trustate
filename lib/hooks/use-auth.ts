@@ -12,6 +12,8 @@ interface AuthState {
   email: string | null;
   firstName: string | null;
   lastName: string | null;
+  email: string | null;
+  phoneNumber: string | null;
   userId: string | null;
   brokerType: "individual" | "firm" | null;
 }
@@ -25,6 +27,7 @@ export function useAuth() {
     email: null,
     firstName: null,
     lastName: null,
+    phoneNumber: null,
     userId: null,
     brokerType: null,
   });
@@ -62,6 +65,7 @@ export function useAuth() {
         email: attributes.email || null,
         firstName: attributes.given_name || null,
         lastName: attributes.family_name || null,
+        phoneNumber: attributes.phone_number || null,
         userId: user.userId || null,
         brokerType: brokerType,
       });
@@ -74,6 +78,7 @@ export function useAuth() {
         email: null,
         firstName: null,
         lastName: null,
+        phoneNumber: null,
         userId: null,
         brokerType: null,
       });

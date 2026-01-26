@@ -8,11 +8,14 @@ export async function GET(request: NextRequest) {
         const supabase = getSupabaseAdmin();
 
         // Get user ID from headers (set by middleware after Cognito auth)
-        const userId = request.headers.get("x-user-id");
+        // Check auth
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-        if (!userId) {
+        if (authError || !user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
+
+        const userId = user.id;
 
         // Fetch transactions where user is a participant
         const { data: transactions, error } = await supabase
@@ -41,11 +44,14 @@ export async function POST(request: NextRequest) {
     try {
         const supabase = getSupabaseAdmin();
 
-        const userId = request.headers.get("x-user-id");
+        // Check auth
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-        if (!userId) {
+        if (authError || !user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
+
+        const userId = user.id;
 
         const body = await request.json();
         const {
@@ -56,6 +62,10 @@ export async function POST(request: NextRequest) {
             transaction_value,
             client_name,
             reservation_number,
+            agent_name,
+            agent_email,
+            agent_phone,
+            brokerage_name
         } = body;
 
         // Validate required fields
@@ -75,6 +85,10 @@ export async function POST(request: NextRequest) {
             .from("transactions")
             .insert({
                 agent_id: userId,
+                agent_name,
+                agent_email,
+                agent_phone,
+                brokerage_name,
                 project_name,
                 transaction_type: transaction_type || "preselling",
                 unit_address,

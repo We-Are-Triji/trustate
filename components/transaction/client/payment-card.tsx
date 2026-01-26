@@ -148,8 +148,8 @@ export function PaymentCard({
                             <label
                                 htmlFor="payment-proof"
                                 className={`flex items-center justify-center gap-3 p-6 border-2 border-dashed rounded-xl cursor-pointer transition-all ${selectedFile
-                                        ? "border-green-300 bg-green-50"
-                                        : "border-gray-300 hover:border-[#0247ae] hover:bg-blue-50"
+                                    ? "border-green-300 bg-green-50"
+                                    : "border-gray-300 hover:border-[#0247ae] hover:bg-blue-50"
                                     }`}
                             >
                                 {selectedFile ? (
@@ -175,7 +175,7 @@ export function PaymentCard({
                                 {isUploading ? (
                                     <><Loader2 size={20} className="mr-2 animate-spin" />Uploading...</>
                                 ) : (
-                                    <><Upload size={20} className="mr-2" />Upload Proof of Payment</>
+                                    <><Upload size={20} className="mr-2" />Submit Payment Proof</>
                                 )}
                             </Button>
                         )}

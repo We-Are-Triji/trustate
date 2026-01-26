@@ -33,11 +33,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const { id } = await params;
         const supabase = getSupabaseAdmin();
 
-        const userId = request.headers.get("x-user-id");
+        // Check auth
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-        if (!userId) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (authError || !user) {
+            // For client view without login (magic link logic), check if transaction allows public access or token
+            // For now, we'll assume logged in participants or loosen check for demo
+            // But to fix 401 immediately for logged in users:
+            if (!user) {
+                return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            }
         }
+
+        const userId = user?.id; // Use authenticated user ID
 
         // Verify user is a participant
         const { data: participant } = await supabase
@@ -76,11 +84,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const { id } = await params;
         const supabase = getSupabaseAdmin();
 
-        const userId = request.headers.get("x-user-id");
+        // Check auth
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-        if (!userId) {
+        if (authError || !user) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
+
+        const userId = user.id;
 
         const body = await request.json();
         const { file_name, file_type, file_size, document_type = "other" } = body;
