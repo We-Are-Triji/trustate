@@ -7,9 +7,12 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // Use service role 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // GET /api/transactions/[id]/activity
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const transactionId = params.id;
+        const { id: transactionId } = await params;
         const { searchParams } = new URL(request.url);
         const page = parseInt(searchParams.get("page") || "1");
         const limit = parseInt(searchParams.get("limit") || "20");
@@ -43,9 +46,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // POST /api/transactions/[id]/activity
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const transactionId = params.id;
+        const { id: transactionId } = await params;
         const body = await request.json();
         const { action_type, description, metadata, actor_id, actor_type } = body;
 
