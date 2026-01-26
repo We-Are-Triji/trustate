@@ -132,12 +132,13 @@ export async function POST(
         }
 
         // Log activity
-        await supabase.from("transaction_activity").insert({
+        await supabase.from("activity_logs").insert({
             transaction_id: transactionId,
-            activity_type: "document_signed",
-            title: "Document Signed by Client",
+            action_type: "document_signed",
             description: `Client signed: ${document_name}`,
             actor_type: "client",
+            actor_id: "client", // placeholder until we have client auth
+            metadata: { document_id, document_name }
         });
 
         return NextResponse.json({ success: true, message: "Document signed" });

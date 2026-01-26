@@ -89,16 +89,19 @@ export async function PATCH(
 
     // Log activity
     try {
-        await supabase.from("transaction_activity").insert({
-            transaction_id: transactionId,
-            activity_type: "step_progress",
-            title: "Step Progress Updated",
-            description: `Updated: ${Object.keys(updates).join(", ")}`,
-            actor_type: "agent",
-        });
-    } catch (logError) {
-        console.error("Failed to log activity:", logError);
-    }
+        // Log activity
+        try {
+            await supabase.from("activity_logs").insert({
+                transaction_id: transactionId,
+                action_type: "step_progress",
+                description: `Updated: ${Object.keys(updates).join(", ")}`,
+                actor_type: "agent",
+                actor_id: "agent", // placeholder
+                metadata: { updates }
+            });
+        } catch (logError) {
+            console.error("Failed to log activity:", logError);
+        }
 
-    return NextResponse.json({ progress });
-}
+        return NextResponse.json({ progress });
+    }

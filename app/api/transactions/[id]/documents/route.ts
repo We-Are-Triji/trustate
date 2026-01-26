@@ -16,7 +16,7 @@ const s3Client = new S3Client({
     },
 });
 
-const S3_BUCKET = process.env.AWS_S3_DOCUMENTS_BUCKET || "trustate-documents";
+const S3_BUCKET = process.env.APP_AWS_S3_DOCUMENTS_BUCKET || "trustate-documents";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = [
     "application/pdf",

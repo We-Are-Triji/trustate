@@ -54,7 +54,18 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             }
         }
 
-        return NextResponse.json({ transaction });
+        // Compute client status
+        const clientParticipant = transaction.transaction_participants?.find(
+            (p: { role: string }) => p.role === "client"
+        );
+
+        // Add computed fields
+        const enhancedTransaction = {
+            ...transaction,
+            client_status: clientParticipant ? "approved" : "none"
+        };
+
+        return NextResponse.json({ transaction: enhancedTransaction });
     } catch (error) {
         console.error("Transaction GET error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
